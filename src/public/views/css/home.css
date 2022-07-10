@@ -1,0 +1,26 @@
+:root {
+    --num-grid-columns: 2;
+    --page-gutter: 40px;
+    --section-spacing: 80px;
+    --padding-y: clamp(56px, 10%, 120px);
+}
+
+.container {
+    max-width: 100%!important;
+    align-content: center;
+}
+
+.home-row-content {
+    width: 100%;
+    max-width: 1260px;
+    gap: 0 40px;
+    padding: 0 24px;
+    padding: var(--padding-y) var(--page-gutter);
+    margin: auto;
+}
+
+.bg-gray {
+    width: 100%;
+
+    background-color: rgba(201, 201, 201, 0.277);
+}
