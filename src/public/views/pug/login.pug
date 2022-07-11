@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+    head 
+        include header.pug
+        link(rel="stylesheet", href="public/views/css/login.css")
+    body.text-center 
+        main.form-signin.w-100.m-auto
+            form(action="/login/password", method="post") 
+                h1.h3.mb-3.fw-normal Log in
+                .form-floating
+                    input#username.form-control(name="username" type="text" placeholder="ID" autocomplete="username" required)
+                    label(for='username') ID
+                .form-floating
+                    input#current-password.form-control(name="password" type='password' placeholder='Password' autocomplete="current-password" required)
+                    label(for='current-password') Password
+                .checkbox.mb-3
+                    label
+                        input(type='checkbox' value='remember-me')
+                        |  Remember me
+                button.w-100.btn.btn-lg.btn-primary(type='submit') Sign in
