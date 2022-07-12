@@ -5,3 +5,19 @@
 .offcanvas-title {
     color:#FFFFFF8C;
 }
+
+.mr-md-auto, .mx-md-auto {
+    margin-right: auto;
+}
+
+.mr-md-3, .mx-md-3 {
+    margin-right: 1rem!important;
+}
+
+.no-deco {
+    text-decoration: none;
+}
+
+.hidden {
+    display: none;
+}
