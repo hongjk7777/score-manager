@@ -184,7 +184,5 @@ const isAuthenticated = function (req, res, next) {
   }
 };
 
-module.exports = {
-  router:  router,
-  isAuthenticated: isAuthenticated
-}
+export { isAuthenticated }
+export { router }
