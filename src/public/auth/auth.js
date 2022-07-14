@@ -73,7 +73,7 @@ var router = express.Router();
  * sent to the `POST /login/password` route.
  */
 router.get('/login', function(req, res, next) {
-  res.render('login');
+  res.render('signform/login');
 });
 
 /* POST /login/password
@@ -140,7 +140,7 @@ router.post('/logout', function(req, res, next) {
  * will be sent to the `POST /signup` route.
  */
 router.get('/signup', function(req, res, next) {
-  res.render('signup');
+  res.render('signform/signup');
 });
 
 /* POST /signup
