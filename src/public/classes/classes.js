@@ -8,7 +8,7 @@ router.get("/", isAuthenticated, function(req, res) {
 });
 
 router.get("/add", isAuthenticated, function(req, res) {
-    res.render("addClass");
+    res.render("classes/add-class");
 })
 
 

@@ -1,0 +1,34 @@
+extends ../layout/layout.pug
+block nav-header   
+    link(rel="stylesheet", href="../public/views/css/nav.css")
+
+block content 
+    .py-5.text-center 
+        h2 클래스 추가하기
+    .container
+        .row.g-5
+            form.needs-validation(action="/add-class" method="post" novalidate) 
+                .row.g-3
+                    .col-12
+                        label.form-label(for="classname") 반 이름
+                        input#classname.form-control(type="text" placeholder="Name" required)
+                        .invalid-feedback 이름을 입력해주세요
+                    //- .col-12
+                    //-     label.form-label(for="classname") 학생
+                    //-     input#classname.form-control(type="text" placeholder="Name" required)
+                    //-     .invalid-feedback 이름을 입력해주세요
+                    .col-12
+                        p 수강 요일
+                        .d-flex.flex-row
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 월
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 화
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 수
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 목
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 금
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 토
+                            button.p-2.btn.btn-outline-secondary.shadow-none(type="button" data-bs-toggle="button" autocomplete="off") 일
+                        //- input#classname.form-control(type="text" placeholder="Name" required)
+                        //- .invalid-feedback 이름을 입력해주세요
+                    hr.my-4
+                    button.w-100.btn.btn-primary(type="submit") 완료
+
