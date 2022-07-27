@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import crypto from "crypto";
-import db from "../db/mysql.js";
+import db from "../db/dbConfig";
 
 console.log("auth");
 /* Configure password authentication strategy.
@@ -17,17 +17,18 @@ console.log("auth");
  * user is authenticated; otherwise, not.
  */
 passport.use(new LocalStrategy(function verify(username, password, cb) {
-  db.query('SELECT * FROM users WHERE username = ?', [ username ], function(err, row) {
+  db.query("USE classdb");
+  db.query('SELECT * FROM accounts WHERE username = ?', [ username ], function(err, row) {
     if (err) { return cb(err); }
-    if (!row) { return cb(null, false, { message: 'Incorrect username or password.' }); }
-    // console.log(row[0].hashed_password);
+    if (row.length === 0) { return cb(null, false, { message: 'Incorrect username or password.' }); }
+    // console.log(row);
     // console.log(password);
     crypto.pbkdf2(password, row[0].salt, 310000, 32, 'sha256', function(err, hashedPassword) {
       if (err) { return cb(err); }
       if (!crypto.timingSafeEqual(row[0].hashed_password, hashedPassword)) {
         return cb(null, false, { message: 'Incorrect username or password.' });
       }
-      return cb(null, row);
+      return cb(null, row[0]);
     });
   });
 }));
@@ -49,7 +50,7 @@ passport.use(new LocalStrategy(function verify(username, password, cb) {
  */
 passport.serializeUser(function(user, cb) {
   process.nextTick(function() {
-    cb(null, { id: user[0].id, username: user[0].username });
+    cb(null, { id: user.id, username: user.username });
   });
   // console.log(user);
 });
@@ -98,7 +99,11 @@ router.post('/login/password', passport.authenticate('local', {
 }), function(req, res, next) {
   res.format({
     'text/html': function() {
-      res.redirect('/classes');
+      if(isAdmin(req.user)) {
+        res.redirect('/classList');
+      } else{
+        res.redirect('/class');
+      }
     },
     'application/json': function() {
       res.json({ ok: true, location: '/' });
@@ -122,12 +127,10 @@ router.post('/login/password', passport.authenticate('local', {
  * This route logs the user out.
  */
 router.post('/logout', function(req, res, next) {
-  console.log(req.user);
   req.logout(function(err) {
     if (err) { return next(err); }
     res.redirect('/');
   });
-  console.log(req.user);
 
 });
 
@@ -155,10 +158,10 @@ router.get('/signup', function(req, res, next) {
 router.post('/signup', function(req, res, next) {
   var salt = crypto.randomBytes(16);
   // console.log(req.body.password);
+  db.query("USE classdb");
   crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
     if (err) { return next(err); }
-    console.log(hashedPassword);
-    db.query('INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)', [
+    db.query('INSERT INTO accounts (username, hashed_password, salt) VALUES (?, ?, ?)', [
       req.body.username,
       hashedPassword,
       salt
@@ -176,6 +179,39 @@ router.post('/signup', function(req, res, next) {
   });
 });
 
+router.post("/change-password", function(req, res, next) {
+  db.query("USE classdb");
+  var salt = crypto.randomBytes(16);
+  console.log(req.user);
+  db.query('SELECT id FROM accounts WHERE username = ?', [ req.user.username ], function(err, row) {
+    if (err) { console.log(err); return next(); }
+    if (row.length === 0) { return next(); }
+    const id = row[0].id;
+    crypto.pbkdf2(req.body.newPassword, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
+      if (err) { return next(err); }
+  
+     
+      db.query(`UPDATE accounts SET hashed_password = ?, salt = ? WHERE id = ?`, [hashedPassword, salt, id], function(err) {
+        if (err) { return next(err); }
+        var user = {
+          id: this.lastID,
+          username: req.body.username
+        };
+        req.logout(function(err) {
+          if (err) { return next(err); }
+          res.redirect('/');
+        });
+      });
+    });
+  });
+  
+});
+
+function isAdmin(user) {
+  const ADMIN_ID = 'admin';
+  return user.username === ADMIN_ID;
+}
+
 const isAuthenticated = function (req, res, next) {
   if(req.isAuthenticated()) {
     return next();
@@ -184,5 +220,32 @@ const isAuthenticated = function (req, res, next) {
   }
 };
 
-export { isAuthenticated }
+function isAdminAuthenticated(req, res, next) {
+  const ADMIN_ID = 'admin';
+  if(req.isAuthenticated() && req.user.username === ADMIN_ID) {
+    return next();
+  } else {
+    res.redirect("/login");
+  }
+}
+
+function signUpByStudentPhoneNum(studentPhoneNum) {
+    var salt = crypto.randomBytes(16);
+    const initId = studentPhoneNum.replaceAll('-', '');
+    const initPassword = '1111';
+    // console.log(initId);
+    crypto.pbkdf2(initPassword, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
+      if (err) { return next(err); }
+      // console.log(hashedPassword);
+      db.query("USE classdb");
+      db.query('INSERT INTO accounts (username, hashed_password, salt) VALUES (?, ?, ?)', [
+        initId,
+        hashedPassword,
+        salt
+      ]);
+      //위 함수가 에러가 나면 어카지?
+    });
+}
+
+export { isAuthenticated, isAdminAuthenticated, signUpByStudentPhoneNum, isAdmin }
 export { router }

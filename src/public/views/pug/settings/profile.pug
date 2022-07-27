@@ -1,22 +1,23 @@
 extends ../layout/layout.pug
 
-block content
-    .row.mt-5 
-        .col-3
-            .col.mx-5.p-5
-                #v-pills-tab.nav.flex-column.nav-pills(role='tablist' aria-orientation='vertical')
-                    a#v-pills-home-tab.nav-link.active(data-toggle='pill' href='#v-pills-home' role='tab' aria-controls='v-pills-home' aria-selected='true') 계정
-                    a#v-pills-profile-tab.nav-link(data-toggle='pill' href='#v-pills-profile' role='tab' aria-controls='v-pills-profile' aria-selected='false') 알림
-                    a#v-pills-messages-tab.nav-link(data-toggle='pill' href='#v-pills-messages' role='tab' aria-controls='v-pills-messages' aria-selected='false') 디스플레이
-                    a#v-pills-settings-tab.nav-link(data-toggle='pill' href='#v-pills-settings' role='tab' aria-controls='v-pills-settings' aria-selected='false') 보안
-                    a#v-pills-delete-account-tab.nav-link(data-toggle='pill' href='#v-pills-settings' role='tab' aria-controls='v-pills-delete-acount' aria-selected='false') 계정 삭제
-        .col-9
-            #v-pills-tabContent.tab-content
-                #v-pills-home.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='v-pills-home-tab')
-                    include account.pug
-                #v-pills-profile.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-profile-tab') 2
-                    //- include account.pug
-                #v-pills-messages.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-messages-tab') 3
-                #v-pills-settings.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-settings-tab')
-                    include security.pug
-                #v-pills-delete-account.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-delete-account-tab')
+block append header 
+    link(rel="stylesheet", href="public/views/css/login.css")
+
+block nav
+
+block content 
+    body.text-center 
+        main.form-signin.w-100.m-auto
+            form#change-password-form(action="/change-password" method="post" onsubmit="return checkValidity()") 
+                h1.h3.mb-3.fw-normal 비밀번호 변경
+                .form-floating
+                    input#newPassword.form-control(name="newPassword" type='password' placeholder='새 비밀번호' autocomplete="newPassword" required)
+                    label(for='newPassword') 새 비밀번호
+                .form-floating
+                    input#newPasswordCheck.form-control(type='password' placeholder='비밀번호 확인' autocomplete="new-password-check" required)
+                    label(for='newPasswordCheck') 비밀번호 확인
+                button#submit-btn.w-100.btn.btn-lg.btn-primary(type='submit') 비밀번호 변경
+
+block footer
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js") 
+    script(src="/public/views/js/settings.js") 
