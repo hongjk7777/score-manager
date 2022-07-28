@@ -1,0 +1,8 @@
+#v-pills-delete-class-tab  {
+    color : #DC3545;
+}
+
+#v-pills-delete-class-tab.nav-link.active {
+    background-color: #DC3545!important;
+    color: white;
+}

@@ -1,0 +1,14 @@
+extends ../layout/class-list-layout.pug
+
+block class-list
+    .container
+        .d-flex.flex-row-reverse
+            button#class-add-btn.btn.btn-primary.me-5(type="button") 클래스 추가
+        ul.mt-4
+            each aClass in classes 
+                li.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom.class-list
+                    #class.col-9.col-lg-9.d-inline-block
+                        #class-name.mb-1 #{aClass.name}
+                        .mb-0 #{aClass.classDay}
+
+

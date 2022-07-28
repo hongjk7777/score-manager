@@ -1,0 +1,18 @@
+extends ../layout/layout.pug
+
+block append header 
+    link(rel="stylesheet", href="../../public/views/css/home.css")
+    link(rel="stylesheet", href="../../public/views/css/nav.css")
+
+block content
+    .row
+        .container.mx-5
+            h4.text-center 채점 기준
+            each scoreRule in scoreRuleArr
+                if(scoreRule === "$")
+                    div <br>
+                else
+                    div #{scoreRule} <br>
+
+block append footer 
+    script(src="/public/views/js/examList.js") 
