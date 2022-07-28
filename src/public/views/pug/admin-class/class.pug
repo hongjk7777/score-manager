@@ -1,0 +1,46 @@
+extends ../layout/class-layout.pug
+
+block append header 
+    link(rel="stylesheet", href="../public/views/css/home.css")
+    link(rel="stylesheet", href="../public/views/css/nav.css")
+
+block append student-list
+    .container
+        .d-flex.flex-row-reverse
+            button#class-add-btn.btn.btn-primary.me-5(type="button") 학생 추가
+        ul.mt-4
+            each student in studentList
+                li#student.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom
+                    .col-9.col-lg-9.d-inline-block
+                        #student-name.mb-1 #{student.name}
+
+block append exam-list 
+    .container
+        ul.mt-4
+            each exam in examList
+                li#exam.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom.exam-list
+                    .col-9.col-lg-9.d-inline-block
+                        if(exam.commonRound > 0)
+                            #exam-round.mb-1.exam #{exam.round}회차 시험(공통 #{exam.commonRound}회차)
+                        else 
+                            #exam-round.mb-1.exam #{exam.round}회차 시험
+
+block append enter-score 
+    .container
+        .row 
+            .col-12
+                form(action=`/classList/${id}/add-score` method="post" enctype="multipart/form-data" accept=".xlsx") 
+                    label(for="excel-file") 성적 파일 
+                    input#excel-file(type="file" name="excel" required)
+                    button.btn.btn-secondary(type="submit") 제출
+            .col-12.mt-3
+                form(action=`/classList/${id}/add-dept` method="post" enctype="multipart/form-data" accept=".xlsx") 
+                    label(for="excel-file") 지원 학부 파일 
+                    input#excel-file(type="file" name="excel" required)
+                    button.btn.btn-secondary(type="submit") 제출
+
+block delete-class-list
+    .container
+        .d-flex.flex-row-reverse
+            button#delete-btn.btn.btn-danger.ms-3(type="button") 삭제하기
+
