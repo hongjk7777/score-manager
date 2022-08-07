@@ -1,5 +1,7 @@
 import db from "./dbConfig.js";
 import {signUpByStudentPhoneNum, isAdmin} from "../auth/auth.js"
+import { resolve } from "path";
+import { log } from "console";
 
 async function putTotalExamToDB(examInfo, scoreRule, classId) {
     //TODO:
@@ -113,14 +115,14 @@ function getStudentNameByPNum(studentPhoneNum) {
                 console.log(err);
                 resolve(userInfo);
             }
-    
+            console.log(row);
             if(row.length > 0) {
                 userInfo.username = row[0].name;
                 userInfo.classId = row[0].class_id;
                 userInfo.id = row[0].id;
                 resolve(userInfo);
             } else {
-                console.log("Failed to get student name with phone number");
+                console.log("Failed to get student name with phone number.");
                 resolve(userInfo);
             }
         });
@@ -147,35 +149,45 @@ function getStudentNameByPNum(studentPhoneNum) {
 // }
 
 //TODO: 핸드폰 번호 중복 시 처리도 넣자
-function isNewStudent(studentName, studentPhoneNum, classId, schoolName) {
+function removeSamePNumStudent(studentName, studentPhoneNum, classId, schoolName, studentId) {
     return new Promise(resolve => {
-        db.query("USE classdb");
-        db.query(`SELECT id FROM students WHERE name = '${studentName}' AND class_id = ${classId}`, function (err, row) {
-            if(err){
-                console.log(err);
-                resolve(false);
-            } 
+        getStudentIdByPNum(studentPhoneNum).then(studentId => {
+            console.log(studentId);
+            db.query("USE classdb");
+                db.query(`DELETE FROM exams WHERE student_id = ${studentId}`, function(err) {
+                    if(err) {
+                        console.log(err);
+                        resolve();
+                    }
 
-            if (row.length === 0) {
-                resolve(true);
-            } else {
-                resolve(false);
-            }
+                    console.log(studentName);
+                    // console.log("success");
+                    // resolve();
+                    db.query(`DELETE FROM students WHERE id = ${studentId}`, function (err) {
+                        if(err){
+                            console.log(err);
+                            resolve();
+                        } 
+                        resolve();
+                    });
+                });
         });
+        
     });
 }
 
 function addStudentToDB(studentName, studentPhoneNum, classId, schoolName) {
     return new Promise(resolve => {
         db.query("USE classdb");
+        
         db.query(`INSERT INTO students(name, phone_num, class_id, school) 
-                values ('${studentName}', '${studentPhoneNum}', '${classId}', '${schoolName}')`, function(err, row) {
-                    if(err) {
-                        console.log(err);                        
-                    }
-                });
-        signUpByStudentPhoneNum(studentPhoneNum);
-        resolve();
+            values ('${studentName}', '${studentPhoneNum}', '${classId}', '${schoolName}')`, function(err, row) {
+                if(err) {
+                    console.log(err);                        
+                }
+                signUpByStudentPhoneNum(studentPhoneNum);
+                resolve();
+        });
     });
     
 }
@@ -246,7 +258,7 @@ function getExamList(classId) {
 function getClassId(className) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
-        db.query(`SELECT id FROM class WHERE name = '${className}'`, function(err, aClass) {
+        db.query(`SELECT id FROM classes WHERE name = '${className}'`, function(err, aClass) {
             if(err) {
                 console.log("Failed to load class id with class name");
                 console.log(err);
@@ -276,16 +288,26 @@ async function getExamInfosById(round, classId, user) {
                     console.log(err);
                     resolve(studentList);
                 } else{
+                    let ranking = 1;
+                    let sameCount = 0;
+                    let lastScore = -1;
+
                     studentScores.forEach(studentScore => {
                         let studentInfo = [];
                         studentInfo.firstScore = studentScore.first_score;
                         studentInfo.secondScore = studentScore.second_score;
                         studentInfo.thirdScore = studentScore.third_score;
                         studentInfo.scoreSum = studentScore.score_sum;
-                        studentInfo.ranking = studentScore.ranking;
+                        // studentInfo.ranking = studentScore.ranking;
                         if(studentScore.school){
                             studentInfo.school = studentScore.school;
                         }
+
+                        if(lastScore === studentScore.score_sum) sameCount++;
+                        else sameCount = 0;
+                        lastScore = studentScore.score_sum;
+
+                        studentInfo.ranking = ranking++ - sameCount;
 
                         if(isAdmin(user) || user.id === studentScore.id) {
                             studentInfo.name = studentScore.name;
@@ -363,6 +385,68 @@ async function getExamInfosById(round, classId, user) {
     
 }
 
+async function getExamChartDataById(round, classId, user) {
+    const commonRound = await getCommonExamRound(round, classId);
+    if(commonRound === 0) {
+        return new Promise(resolve => {
+            db.query(`USE classdb`);
+            db.query(`SELECT exams.score_sum FROM exams WHERE round = ${round} 
+                    AND exams.class_id = ${classId}`, function (err, studentScores) {
+                let chartData = new Array(10).fill(0);
+    
+                if(err) {
+                    console.log("Failed to load exam datas");
+                    console.log(err);
+                    resolve(chartData);
+                } else{
+                    studentScores.forEach(studentScore => {
+                        const scoreSum = studentScore.score_sum;
+                        if(scoreSum != 0) {
+                            chartData[Math.ceil(scoreSum / 5) - 1]++;
+                        } else {
+                            chartData[0]++;
+                        }
+                    });
+                    
+                    resolve(chartData);
+                }
+    
+                
+            });
+        });
+    } else {
+        return new Promise(resolve => {
+            db.query(`USE classdb`);
+            db.query(`SELECT 
+                    exams.score_sum FROM exams INNER JOIN students ON exams.student_id = students.id
+                    WHERE common_round = ${commonRound}`, function (err, studentScores) {
+                let chartData = new Array(10).fill(0);
+    
+                if(err) {
+                    console.log("Failed to load exam datas");
+                    console.log(err);
+                    resolve(chartData);
+                } else{
+                    studentScores.forEach(studentScore => {
+                        const scoreSum = studentScore.score_sum;
+                        if(scoreSum != 0) {
+                            chartData[Math.ceil(scoreSum / 5) - 1]++;
+                        } else {
+                            chartData[0]++;
+                        }
+                    });
+                    
+                    resolve(chartData);
+                }
+    
+                
+            });
+        });
+    }
+    
+    
+}
+
 function getTotalExamInfoById(id) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
@@ -417,6 +501,7 @@ async function getStudentInfosById(id) {
                         newExam.school = exam.school;
                     }
                     newExam.totalTester = exam.total_tester;
+                    newExam.percent = ((exam.ranking / exam.total_tester) * 100).toFixed(0);
                     newExam.average = exam.average;
                     newExam.standardDeviation = exam.standard_deviation;
                     examList.push(newExam);
@@ -475,6 +560,15 @@ function getTotalInfo(studentId, commonRound) {
             // resolve(0);
             totalInfo.commonRanking = getCommonRanking(rows, studentId);
             totalInfo.commonTester = rows.length;
+            totalInfo.commonPercent = ((totalInfo.commonRanking/totalInfo.commonTester)*100).toFixed(1);
+            rows = rows.map(x => {
+                if(x.score_sum > 0){
+                    return x.score_sum;
+                }
+            });
+            totalInfo.commonAverage = (rows.reduce((a, b) => a + b) / rows.length).toFixed(2);
+            totalInfo.commonStandardDev = (Math.sqrt(rows.map(x => Math.pow(x - totalInfo.commonAverage, 2)).reduce((a, b) => a + b) / rows.length)).toFixed(2);
+            // console.log(totalInfo);
             resolve(totalInfo);
         });
     });
@@ -574,7 +668,12 @@ async function getStudentInfosByName(name, classId) {
     for (let i = 0; i < examList.length; i++) {
         const exam = examList[i];
         if(exam.commonRound > 0){
-            exam.commonRanking = await getTotalInfo(id, exam.commonRound).commonRanking;        
+            const totalInfo = await getTotalInfo(id, exam.commonRound);
+            exam.commonRanking = totalInfo.commonRanking;        
+            exam.commonAverage = totalInfo.commonAverage;
+            exam.commonTester = totalInfo.commonTester;
+            exam.commonPercent = totalInfo.commonPercent;
+            exam.commonStandardDev = totalInfo.commonStandardDev;
             if(exam.seoulDept){
                 exam.seoulDeptRanking = await getSeoulDeptInfo(id, exam.commonRound, exam.seoulDept).seoulDeptRanking;
             }
@@ -589,13 +688,28 @@ async function getStudentInfosByName(name, classId) {
 
 async function getStudentInfosByPNum(studentPhoneNum) {
     const id = await getStudentIdByPNum(studentPhoneNum);
+    const classId = await getClassIdByStudent(studentPhoneNum);
     let examList = await getStudentInfosById(id);
+    const maxRound = await getMaxRound(classId);
+    console.log(maxRound);
+    let ret = new Array(maxRound).fill(null);
 
     for (let i = 0; i < examList.length; i++) {
         const exam = examList[i];
+        exam.solve = true;
         if(exam.commonRound > 0){
             const totalInfo = await getTotalInfo(id, exam.commonRound);
-            exam.commonRanking = totalInfo.commonRanking;        
+            exam.commonRanking = totalInfo.commonRanking;
+            exam.commonTester = totalInfo.commonTester;
+            exam.commonPercent = totalInfo.commonPercent;   
+            exam.commonAverage = totalInfo.commonAverage;
+            // if(exam.commonAverage){
+            //     exam.commonAverage = exam.commonAverage.toFixed(2);
+            // }
+            exam.commonStandardDev = totalInfo.commonStandardDev;     
+            // if(exam.commonStandardDev){
+            //     exam.commonStandardDev = exam.commonStandardDev.toFixed(2);
+            // }
             if(exam.seoulDept){
                 const seoulDeptInfo = await getSeoulDeptInfo(id, exam.commonRound, exam.seoulDept);
                 exam.seoulDeptRanking = seoulDeptInfo.seoulDeptRanking;
@@ -607,8 +721,9 @@ async function getStudentInfosByPNum(studentPhoneNum) {
                 exam.yonseiDeptRanking = yonseiDeptInfo.yonseiDeptRanking;
             }
         }
+        ret[exam.round - 1] = exam;
     }
-    return new Promise(resolve => resolve(examList));
+    return new Promise(resolve => resolve(ret));
 }
 
 async function getStudentInfoByPNum(studentPhoneNum, round) {
@@ -623,8 +738,17 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
             if(exam.commonRound > 0){
                 const examInfo = await getTotalInfo(id, exam.commonRound);
                 // console.log(examInfo);
+                exam.commonAverage = examInfo.commonAverage;
+                // if(exam.commonAverage){
+                //     exam.commonAverage = exam.commonAverage.toFixed(2);
+                // }
+                exam.commonStandardDev = examInfo.commonStandardDev;
+                // if(exam.commonStandardDev){
+                //     exam.commonStandardDev = exam.commonStandardDev.toFixed(2);
+                // }
                 exam.commonRanking = examInfo.commonRanking;
                 exam.commonTester = examInfo.commonTester;
+                exam.commonPercent = examInfo.commonPercent;
                 // console.log(exam);
 
                 if(exam.seoulDept){
@@ -645,14 +769,80 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
     return new Promise(resolve => resolve(studentInfo));
 }
 
+function getClassIdByStudent(studentPhoneNum){
+    return new Promise(resolve => {
+        db.query(`SELECT class_id FROM students WHERE phone_num = '${studentPhoneNum}'`, function(err, row) {
+            if(err) {
+                console.log(err);
+                resolve(0);
+            }
+
+            if(row?.length > 0) {
+                resolve(row[0].class_id);
+            } else{
+                resolve(0);
+            }
+        });
+    });
+}
+
+function getMaxRound(classId){
+    return new Promise(resolve => {
+        db.query(`SELECT round FROM total_exams WHERE class_id = ${classId} ORDER BY round DESC`, function(err, row) {
+            if(err) {
+                console.log(err);
+                resolve(0);
+            }
+
+            if(row?.length > 0) {
+                resolve(row[0].round);
+            } else{
+                resolve(0);
+            }
+        });
+    });
+}
+
 function addClassToDB(className, dayStr) {
     db.query("USE classdb");
-    db.query(`INSERT INTO class(name, class_day) VALUES('${className}', '${dayStr}')`);
+    db.query(`INSERT INTO classes(name, class_day) VALUES('${className}', '${dayStr}')`);
 }
 
 function deleteClassFromDB(classId) {
-    db.query("USE classdb");
-    db.query(`DELETE FROM class WHERE id = ${classId}`);
+    return new Promise(resolve => {
+        db.query("USE classdb");
+//     delete from exams where class_id = 5;
+// delete from students where class_id = 5;
+// delete from total_exams where class_id = 5;
+// delete from classes where id = 5;
+        db.query(`DELETE FROM exams WHERE class_id = ${classId}`, function(err) {
+            if(err) {
+                console.log(err);
+                resolve();
+            }
+            db.query(`DELETE FROM students WHERE class_id = ${classId}`, function(err) {
+                if(err) {
+                    console.log(err);
+                    resolve();
+                }
+                db.query(`DELETE FROM total_exams WHERE class_id = ${classId}`, function(err) {
+                    if(err) {
+                        console.log(err);
+                        resolve();
+                    }
+                    db.query(`DELETE FROM classes WHERE id = ${classId}`, function(err) {
+                        if(err) {
+                            console.log(err);
+                            resolve();
+                        }
+
+                        resolve();
+                    });
+                });
+            });
+        });
+    });
+    
 }
 
 function getScoreRule(round, classId) {
@@ -664,7 +854,7 @@ function getScoreRule(round, classId) {
                 resolve("");
             }
             
-            if(row.length > 0) {
+            if(row?.length > 0) {
                 resolve(row[0].score_rule);
             } else {
                 resolve("");
@@ -683,7 +873,7 @@ function getCommonExamRound(round, classId) {
                 resolve(0);
             }
             // console.log(row);
-            if(row.length > 0) {
+            if(row?.length > 0) {
                 resolve(row[0].common_round);
             } else {
                 resolve(0);
@@ -730,6 +920,49 @@ function addDeptToDB(seoulDept, yonseiDept, studentId, commonRound) {
     });
 }
 
+function deleteClassDB(classId) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM exams WHERE class_id = ${classId}`, function(err) {
+            if(err) {
+                console.log(err);
+                resolve(false);
+            }
+            db.query(`DELETE FROM total_exams WHERE class_id = ${classId}`, function(err) {
+                if(err) {
+                    console.log(err);
+                    resolve(false);
+                }
+                
+                db.query(`DELETE FROM students WHERE class_id = ${classId}`, function(err) {
+                    if(err) {
+                        console.log(err);
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                });
+            });
+        });
+    })
+}
+
+function getStudentPNumByName(studentName) {
+    return new Promise(resolve => {
+        db.query(`SELECT phone_num FROM students WHERE name = '${studentName}'`, function(err, row) {
+            if(err) {
+                console.log(err);
+                resolve("");
+            }
+            console.log(row);
+            if(row?.length > 0) {
+                resolve(row[0].phone_num);
+            } else {
+                resolve("");
+            }
+        });
+    });
+}
+
 export {putTotalExamToDB}
 export {getStudentIdByName}
 export {putScoreToDB, addDeptToDB}
@@ -738,4 +971,5 @@ export {getClassId}
 export {getStudentInfosByName, getStudentNameByPNum}
 export {getExamInfosById}
 export {getStudentInfosByPNum, getStudentInfoByPNum, addClassToDB, deleteClassFromDB, 
-        isNewStudent, addStudentToDB, getScoreRule, getCommonExamRound}
+        removeSamePNumStudent, addStudentToDB, getScoreRule, getCommonExamRound, deleteClassDB
+        , getStudentPNumByName, getExamChartDataById}
