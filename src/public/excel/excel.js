@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
-import {putScoreToDB, getStudentIdByName, putTotalExamToDB, isNewStudent, 
-        addStudentToDB, getCommonExamRound, addDeptToDB} from "../db/dbQuery.js";
+import { log } from "firebase-functions/logger";
+import {putScoreToDB, getStudentIdByName, putTotalExamToDB, removeSamePNumStudent, 
+        addStudentToDB, getCommonExamRound, addDeptToDB, deleteClassDB} from "../db/dbQuery.js";
 
 /* 
 TODO:
@@ -11,10 +12,29 @@ TODO:
 async function putExcelValToDB(file, classId) {
     const workbook = new ExcelJS.Workbook();
     const excel = await workbook.xlsx.readFile(file.path);
-    handleExamDatas(excel, classId);
-    const worksheet = excel.worksheets[0];
-    handleStudentDatas(worksheet, classId);
+    const success = await deleteClassPrevDB(classId);
+    if(success) {
+        handleExamDatas(excel, classId);
+        const worksheet = excel.worksheets[0];
+        handleStudentDatas(worksheet, classId);
+    }
     
+}
+
+function deleteClassPrevDB(classId) {
+    return new Promise(resolve => {
+        deleteClassDB(classId).then( success => {
+                if(success){
+                    console.log('success to delete class db');
+                    resolve(true);
+                } else{
+                    console.log('fail to delete class db');
+                    resolve(false);
+                }
+            }
+        );
+        
+    });
 }
 
 
@@ -51,8 +71,13 @@ function getExamInfos(excel) {
                 info.round = round;
                 const scoreArr = getScoreArr(worksheet.getColumn(col + 4));
                 info.totalTester = scoreArr.length;
-                info.average = scoreArr.reduce((a, b) => a + b) / info.totalTester;
-                info.standardDeviation = Math.sqrt(scoreArr.map(x => Math.pow(x - info.average, 2)).reduce((a, b) => a + b) / info.totalTester);
+                if(scoreArr.length > 0){
+                    info.average = (scoreArr.reduce((a, b) => a + b) / info.totalTester).toFixed(2);
+                    info.standardDeviation = (Math.sqrt(scoreArr.map(x => Math.pow(x - info.average, 2)).reduce((a, b) => a + b) / info.totalTester)).toFixed(2);
+                } else {
+                    info.average = 0;
+                    info.standardDeviation = 0;
+                }
                 info.commonRound = getCommonRound(commonRow, col + 4);
                 infos.push(info);
             }
@@ -204,6 +229,9 @@ function getPhoneNumCol(worksheet) {
         count++;
     });
 
+    if(ret < 0) {
+        return 3;
+    }
     return ret;
 }
 
@@ -254,10 +282,12 @@ function getScoreStartCol(worksheet) {
     const row = worksheet.getRow(2);
     for (let col = 0; col < row._cells.length; col++) {
         const cell = row._cells[col];
-        const value = cell.value.result? cell.value.result:cell.value;
+        if(cell.value){
+            const value = cell.value.result? cell.value.result:cell.value;
 
-        if(value.substring(0,2) === "1회"){
-            return col + 1;
+            if(value.substring(0,2) === "1회"){
+                return col + 1;
+            }
         }
         
     }
@@ -290,12 +320,9 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
         schoolName = row.getCell(schoolStartCol);
     }
 
-    // console.log(studentStartCol);
-
     //TODO: 이것도 다시 기입햇을 때 조금만 다르면 바꿔줘야 되지 않나?
-    if(await isNewStudent(studentName, studentPhoneNum, classId, schoolName)) {
-        await addStudentToDB(studentName, studentPhoneNum, classId, schoolName);
-    }
+    await removeSamePNumStudent(studentName, studentPhoneNum, classId, schoolName);
+    await addStudentToDB(studentName, studentPhoneNum, classId, schoolName);
 
     const studentId = await getStudentIdByName(studentName, classId, studentPhoneNum);
     // console.log(studentId);
@@ -310,6 +337,7 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
         const ranking = row.getCell(col + 4).value? row.getCell(col + 4).value.result : 0;
         const commonRound = await getCommonExamRound(round, classId);
 
+        // console.log("여기에요" + firstScore, secondScore, thirdScore, scoreSum, ranking, commonRound);
         if(!checkValidity(firstScore, secondScore, thirdScore, scoreSum, ranking, commonRound)) {
             continue;
         }
@@ -319,6 +347,10 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
 }
 
 function getOnlyNumber(phoneNum) {
+    if(typeof phoneNum === 'number') {
+        phoneNum = phoneNum.toString();
+    }
+
     if(phoneNum){
         return phoneNum.replace(/\(|\)|-| /g, '');
     } else {
