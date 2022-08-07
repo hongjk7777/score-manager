@@ -3,11 +3,13 @@ import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
 import {getStudentAndExamInfos, getClassId, getStudentInfosByName, getExamInfosById, addClassToDB, 
-    deleteClassFromDB,
-    getCommonExamRound} from "../db/dbQuery.js";
+    deleteClassFromDB, getStudentNameByPNum, getStudentInfosByPNum, getStudentPNumByName,
+    getCommonExamRound, getStudentInfoByPNum, getExamChartDataById, getScoreRule} from "../db/dbQuery.js";
 import multer from "multer";
+// import fs from "fs";
 
 const router = express.Router();
+
 
 //set path to save input excels
 const upload = multer({dest: 'excels/'});
@@ -82,10 +84,11 @@ function trnasferJsonToDayStr(json) {
 router.get("/", isAdminAuthenticated, function(req, res) {
     let classArray = [];
     db.query("USE classdb");
-    db.query("SELECT * FROM class", function(err, classes){
+    db.query("SELECT * FROM classes", function(err, classes){
         if(err) {
             console.log("failed to find classes from db");
         }
+        console.log(classes);
         classes.forEach(aClass => {
             let newClass = [];
             newClass.id = aClass.id;
@@ -135,9 +138,44 @@ router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), funct
 });
 
 router.get("/:id/student", isAdminAuthenticated, function(req, res) {
-    getStudentInfosByName(req.query.name, req.params.id).then(examList => {
-        console.log(examList);
-        res.render("admin-class/student", {examList : examList, studentName : req.query.name, user: req.user});
+    getStudentPNumByName(req.query.name).then(pNum => {
+        getStudentNameByPNum(pNum).then(userInfo => {
+            getStudentInfosByPNum(pNum).then(examList => {
+                // console.log(examList);
+                res.render("admin-class/student-info", {examList : examList, userInfo : userInfo, user: req.user});
+                // res.render("class/exam-list", {examList : examList, userInfo : userInfo, user: req.user});
+            });    
+        });
+    })
+    
+    // getStudentInfosByName(req.query.name, req.params.id).then(examList => {
+    //     console.log(examList);
+    //     res.render("admin-class/student", {examList : examList, studentName : req.query.name, user: req.user});
+    // });
+});
+
+router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
+    getStudentPNumByName(req.query.name).then(pNum => {
+        getStudentNameByPNum(pNum).then(userInfo => {
+            getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
+                getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
+                    res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
+                        chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
+                });
+                // getExamInfosById(req.query.round, userInfo.classId, userInfo).then(studentList => {
+                //     res.render("class/exam-info", {username : userInfo.username , round : req.query.round, 
+                //         studentList : studentList, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
+                // });
+            });
+        });
+    });
+});
+
+router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, res) {
+    getScoreRule(req.query.round, req.params.id).then(scoreRule => {
+        // console.log(req.params.id);
+        const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
+        res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user});
     });
 });
 
@@ -149,8 +187,11 @@ router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
 });
 
 router.get("/:id/delete", isAdminAuthenticated, function(req, res) {
-    deleteClassFromDB(req.params.id);
-    res.redirect("/classList");
+    deleteClassFromDB(req.params.id).then( ()=> {
+        res.redirect("/classList");
+    });
 });
+
+
 
 export default router;
