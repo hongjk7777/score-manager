@@ -6,7 +6,7 @@
 }
 
 .container {
-    max-width: 100%!important;
+    /* max-width: 100%!important; */
     align-content: center;
 }
 
@@ -23,4 +23,8 @@
     width: 100%;
 
     background-color: rgba(201, 201, 201, 0.277);
+}
+
+#home-img{
+    max-width: 50em!important;
 }
