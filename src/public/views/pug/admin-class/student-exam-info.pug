@@ -1,0 +1,100 @@
+extends ../layout/layout.pug
+
+block append header 
+    link(rel="stylesheet", href="/public/views/css/home.css")
+    link(rel="stylesheet", href="/public/views/css/nav.css")
+    link(rel="stylesheet", href="/public/views/css/exam-info.css")
+    link(rel="icon", type="image/png", href="/public/favicon.ico")
+    script(src="https://cdn.jsdelivr.net/npm/chart.js@2.9.0")
+
+
+block content
+    .container
+        .row.justify-content-center
+        .card.mt-5.mx-3
+            if(studentInfo.commonRound > 0)
+                h5.card-header #{username}님의 <br>
+                    |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
+                    |공통 #{studentInfo.commonRound}회차 시험  
+            else 
+                h5.card-header #{username}님의 <br>
+                    |<span id='exam-round'>#{studentInfo.round}회차 시험</span>  
+            .table-responsive.text-nowrap
+                table.table
+                    thead
+                        tr
+                            //- th 시험 회차
+                            th 문제 1/2/3
+                            th 총점
+                            th 평균/표준편차
+                            th 등수
+                            th 백분위
+                            th 채점 기준
+                    tbody.table-border-bottom-0
+                        tr
+                            //- 공통시험일 경우     
+                            if(studentInfo.commonRound > 0)
+                                //- 공통시험이 아닐경우
+                                //- if(exam.commonRound === 0)
+                                //- td
+                                //-     i.fab.fa-angular.fa-lg.text-danger.me-3
+                                //-     strong#exam-round #{studentInfo.round}회차(공통 #{studentInfo.commonRound}회차)
+                                td #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
+                                td#score-sum #{studentInfo.scoreSum}
+                                td #{studentInfo.commonAverage}/#{studentInfo.commonStandardDev}
+                                td #{studentInfo.commonRanking}/#{studentInfo.commonTester}
+                                td #{studentInfo.commonPercent}%
+                            else 
+                                //- td
+                                //-     i.fab.fa-angular.fa-lg.text-danger.me-3
+                                //-     strong#exam-round #{studentInfo.round}회차
+                                td #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
+                                td#score-sum #{studentInfo.scoreSum}
+                                td #{studentInfo.average}/#{studentInfo.standardDeviation}
+                                td #{studentInfo.ranking}/#{studentInfo.totalTester} 
+                                td #{studentInfo.percent}%
+                            td 
+                                button#score-rule-btn.btn.btn-secondary 채점기준
+            //- if(studentInfo.commonRound > 0)
+            //-     h4#exam-round.text-center #{round}회차(공통 #{studentInfo.commonRound}회차) 시험 결과
+            //-     p #{username}님의 점수
+            //-     div 1번 문항: <span id="my-first-score">#{studentInfo.firstScore}</span>점/ 
+            //-         | 2번 문항: <span id="my-second-score">#{studentInfo.secondScore}</span>점/ 
+            //-         | 3번 문항: <span id="my-third-score">#{studentInfo.thirdScore}</span>점/
+            //-         | 총점: <span id="my-score-sum">#{studentInfo.scoreSum}</span>점 <br>
+            //-         | 평균: #{studentInfo.commonAverage} 표준편차: #{studentInfo.commonStandardDev} <br>
+            //-         | 반 등수: #{studentInfo.ranking}/#{studentInfo.totalTester}등
+            //-         | 전체 #{studentInfo.commonRanking}/#{studentInfo.commonTester}등 (상위#{studentInfo.commonPercent}%)
+            //-         if(studentInfo.seoulDeptRanking)
+            //-             div 서울대 #{studentInfo.seoulDept}: #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}등
+            //-         if(studentInfo.yonseiDeptRanking)
+            //-             div 연세대 #{studentInfo.yonseiDept}: #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}등
+            //- else
+            //-     h4#exam-round.text-center #{round}회차 시험 결과
+            //-     p #{username}님의 점수
+            //-     div 1번 문항: <span id="my-first-score">#{studentInfo.firstScore}</span>점/ 
+            //-         | 2번 문항: <span id="my-second-score">#{studentInfo.secondScore}</span>점/ 
+            //-         | 3번 문항: <span id="my-third-score">#{studentInfo.thirdScore}</span>점/ 
+            //-         | 총점: <span id="my-score-sum">#{studentInfo.scoreSum}</span>점 <br> 
+            //-         | 평균: #{studentInfo.average} 표준편차: #{studentInfo.standardDeviation} <br>
+            //-         | <span id="my-ranking">#{studentInfo.ranking}</span>등
+            //-         | 응시인원 #{studentInfo.totalTester}명 (상위#{studentInfo.percent}%)
+
+            //- button#score-rule-btn.col-2.btn.btn-secondary 채점기준 보기
+
+            h5.text-center 전체 성적
+            canvas#exam-chart(data-chart=chartData) 
+            //- ul.m-auto
+            //-     each student in studentList
+            //-         li.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom.student-list
+            //-             .col-9.col-lg-9.d-inline-block
+            //-                 #student-info.mb-1 <span id="ranking">#{student.ranking}</span>등: <span id="student-name">#{student.name} </span> #{student.school} <br>
+            //-                     | 1번 문항: <span id="first-score">#{student.firstScore}</span>점/
+            //-                     | 2번 문항: <span id="second-score">#{student.secondScore}</span>점/
+            //-                     | 3번 문항: <span id="third-score">#{student.thirdScore}</span>점/
+            //-                     | 총점: <span id="score-sum">#{student.scoreSum}</span>점 
+
+    
+
+block append footer 
+    script(src="/public/views/js/studentExamInfo.js") 

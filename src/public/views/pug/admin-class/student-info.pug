@@ -1,0 +1,100 @@
+extends ../layout/layout.pug
+
+block append header 
+    link(rel="stylesheet", href="../../public/views/css/home.css")
+    link(rel="stylesheet", href="../../public/views/css/nav.css")
+
+block content
+    .card.mt-5.mx-3
+      h5.card-header <span id="username">#{userInfo.username}</span>님의 시험 결과
+      .table-responsive.text-nowrap
+        table.table
+            thead
+                tr
+                    th 시험 회차
+                    //- th 문제 1/2/3
+                    th 총점
+                    //- th 평균/표준편차
+                    th 등수
+                    //- th 백분위
+                    th 자세히
+            tbody.table-border-bottom-0
+            -var round = 0;
+                each exam in examList
+                    -round++;
+                    tr
+                        if(exam)
+                            //- 공통시험이 아닐경우
+                            if(exam.commonRound === 0)
+                                td
+                                    i.fab.fa-angular.fa-lg.text-danger.me-3
+                                    strong#exam-round #{exam.round}회차
+                                //- td #{exam.firstScore}/#{exam.secondScore}/#{exam.thirdScore}
+                                td #{exam.scoreSum}
+                                //- td #{exam.average}/#{exam.standardDeviation}
+                                td #{exam.ranking}/#{exam.totalTester} 
+                                //- td #{exam.percent}%
+                            //- 공통시험일 경우
+                            else 
+                                td
+                                    i.fab.fa-angular.fa-lg.text-danger.me-3
+                                    strong#exam-round #{exam.round}회차(공통 #{exam.commonRound}회차)
+                                //- td #{exam.firstScore}/#{exam.secondScore}/#{exam.thirdScore}
+                                td #{exam.scoreSum}
+                                //- td #{exam.commonAverage}/#{exam.commonStandardDev}
+                                td #{exam.commonRanking}/#{exam.commonTester}
+                                //- td #{exam.commonPercent}%
+                        
+                        else 
+                            td
+                                i.fab.fa-angular.fa-lg.text-danger.me-3
+                                strong #{round}회차
+                            td 미응시
+                            td 
+                            td 
+                            //- td 
+                            //- td
+                            //- td
+                        if(exam != null)
+                            td 
+                                button#info-btn.btn.btn-secondary 자세히        
+
+    //- .row
+    //-     .container.mt-4
+    //-         h4.text-center #{userInfo.username}님 시험 결과
+    //-         if(examList.length === 0)
+    //-             h6.text-center.mt-5 응시한 시험이 없습니다.
+    //-         -var round = 0;
+    //-         ul.mt-4.mx-5
+    //-             each exam in examList
+    //-                 li.d-flex.flex-justify-between.width-full.py-4.border-bottom.exam-list
+    //-                     #student.col-11.col-lg-9.d-inline-block
+    //-                         -round++;
+    //-                         if(exam)
+    //-                             if(exam.commonRound > 0)
+    //-                                 #exam-round.mb-1 #{exam.round}회차 시험 (공통 #{exam.commonRound}회차 시험)
+    //-                                 | #{exam.firstScore}점/#{exam.secondScore}점/#{exam.thirdScore}점  총점: #{exam.scoreSum}<br>
+    //-                                 | 평균:#{exam.commonAverage} 표준편차:#{exam.commonStandardDev} <br> 
+    //-                                 | #{exam.commonRanking}등 응시인원 #{exam.commonTester}명 (상위#{exam.commonPercent}%)
+    //-                                 if(exam.seoulDeptRanking)
+    //-                                     div 서울대 #{exam.seoulDept}: #{exam.seoulDeptRanking}등
+    //-                                 if(exam.yonseiDeptRanking)
+    //-                                     div 연세대 #{exam.yonseiDept}: #{exam.yonseiDeptRanking}등
+    //-                                     //- div #{userInfo.dept}: #{exam.deptRanking}등
+    //-                             else 
+    //-                                 #exam-round.mb-1 #{exam.round}회차 시험 
+    //-                                 | #{exam.firstScore}점/#{exam.secondScore}점/#{exam.thirdScore}점  총점: #{exam.scoreSum}<br>
+    //-                                 | 평균:#{exam.average} 표준편차:#{exam.standardDeviation} <br> 
+    //-                                 | #{exam.ranking}등 응시인원 #{exam.totalTester}명 (상위#{exam.percent}%)
+    //-                         else 
+    //-                             .mb-1 #{round}회차 시험
+    //-                             | 미응시
+
+    //-                     if(exam != null)        
+    //-                         .col-1
+    //-                         button#info-btn.btn.btn-secondary 자세히 보기
+                        
+                        
+
+block append footer 
+    script(src="/public/views/js/studentInfo.js") 
