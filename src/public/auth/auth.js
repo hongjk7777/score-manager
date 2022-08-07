@@ -232,7 +232,7 @@ function isAdminAuthenticated(req, res, next) {
 function signUpByStudentPhoneNum(studentPhoneNum) {
     var salt = crypto.randomBytes(16);
     const initId = studentPhoneNum.replaceAll('-', '');
-    const initPassword = '1111';
+    const initPassword = studentPhoneNum += '5';
     // console.log(initId);
     crypto.pbkdf2(initPassword, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
       if (err) { return next(err); }
