@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
 import { log } from "firebase-functions/logger";
 import {putScoreToDB, getStudentIdByName, putTotalExamToDB, removeSamePNumStudent, 
-        addStudentToDB, getCommonExamRound, addDeptToDB, deleteClassDB} from "../db/dbQuery.js";
+        addStudentToDB, getCommonExamRound, addSeoulDeptToDB, addYonseiDeptToDB, deleteClassDB} from "../db/dbQuery.js";
 
 /* 
 TODO:
@@ -428,17 +428,20 @@ async function putDeptDatasToDB(row, pNumCol, classId, maxCol) {
     for (let col = deptStartCol; col < maxCol; col+=2, commonRound++ ) {
         let scoreInfo = [];
         const seoulDept = row.getCell(col).value;
+        if(checkDeptValidity(seoulDept)) {
+            addSeoulDeptToDB(seoulDept, studentId, commonRound);
+        }
         const yonseiDept = row.getCell(col + 1).value;
-        if(!checkDeptValidity(seoulDept, yonseiDept)) {
-            continue;
+        if(checkDeptValidity(yonseiDept)) {
+            addYonseiDeptToDB(yonseiDept, studentId, commonRound);
         }
         // console.log(studentName + firstScore + secondScore + thirdScore + scoreSum + ranking);
-        addDeptToDB(seoulDept, yonseiDept, studentId, commonRound);
+        // addDeptToDB(seoulDept, yonseiDept, studentId, commonRound);
     }
 }
 
-function checkDeptValidity(seoulDept, yonseiDept) {
-    return typeof seoulDept === 'string' &&  typeof yonseiDept === 'string';
+function checkDeptValidity(dept) {
+    return typeof dept === 'string';
 }
 
 export {putExcelValToDB, putDeptValToDB}

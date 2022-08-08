@@ -29,7 +29,12 @@ block content
                             th 평균/표준편차
                             th 등수
                             th 백분위
+                            if(studentInfo.seoulDept)
+                                th 서울대 #{studentInfo.seoulDept} 순위
+                            if(studentInfo.yonseiDept)
+                                th 연세대 #{studentInfo.yonseiDept} 순위
                             th 채점 기준
+
                     tbody.table-border-bottom-0
                         tr
                             //- 공통시험일 경우     
@@ -44,6 +49,10 @@ block content
                                 td #{studentInfo.commonAverage}/#{studentInfo.commonStandardDev}
                                 td #{studentInfo.commonRanking}/#{studentInfo.commonTester}
                                 td #{studentInfo.commonPercent}%
+                                if(studentInfo.seoulDeptRanking)
+                                    th #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}
+                                if(studentInfo.yonseiDeptRanking)
+                                    th #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}
                             else 
                                 //- td
                                 //-     i.fab.fa-angular.fa-lg.text-danger.me-3
