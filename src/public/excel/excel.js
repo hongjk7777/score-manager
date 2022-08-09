@@ -1,7 +1,9 @@
 import ExcelJS from "exceljs";
+import fs from "fs"
 import { log } from "firebase-functions/logger";
 import {putScoreToDB, getStudentIdByName, putTotalExamToDB, removeSamePNumStudent, 
         addStudentToDB, getCommonExamRound, addSeoulDeptToDB, addYonseiDeptToDB, deleteClassDB} from "../db/dbQuery.js";
+import { resolve } from "path";
 
 /* 
 TODO:
@@ -10,6 +12,11 @@ TODO:
 
 
 async function putExcelValToDB(file, classId) {
+    //이전에 사용했던 excel 파일을 지우고 다시 만든다.
+    const excelsPath = "excels";
+    removeExcelsDirectory(excelsPath, file.filename);
+    makeExcelsDirectory(excelsPath);
+
     const workbook = new ExcelJS.Workbook();
     const excel = await workbook.xlsx.readFile(file.path);
     const success = await deleteClassPrevDB(classId);
@@ -19,6 +26,45 @@ async function putExcelValToDB(file, classId) {
         handleStudentDatas(worksheet, classId);
     }
     
+}
+
+function removeExcelsDirectory(path, inputFileName) {
+    const directory = fs.existsSync(path);
+    
+    fs.readdirSync(path).forEach(file => {
+        if(!(file === inputFileName)){
+            try {
+                fs.unlinkSync(`${path}/${file}`)
+            } catch (err) {
+                if(err.code == 'ENOENT'){
+                    console.log("파일 삭제 Error 발생");
+                }
+            }
+        }
+    });
+    // if(directory){
+    //     try {
+    //         fs.rmdirSync(path);
+        
+    //         console.log(`excelFile is deleted!`);
+    //     } catch (err) {
+    //         console.error(`Error while deleting excels directory.`);
+    //     }
+    // }
+}
+
+function makeExcelsDirectory(path) {
+    const directory = fs.existsSync(path);
+    
+    if(!directory){
+        try {
+            fs.mkdirSync(path);
+        
+            console.log(`excelFile is created!`);
+        } catch (err) {
+            console.error(`Error while creating excels directory.`);
+        }
+    }
 }
 
 function deleteClassPrevDB(classId) {
