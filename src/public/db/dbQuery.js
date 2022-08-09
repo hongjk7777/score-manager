@@ -51,21 +51,41 @@ function insertTotalExam(examInfo, scoreRule, classId) {
 }
 
 function putScoreToDB(studentId, classId, round , commonRound, firstScore, secondScore, thirdScore, scoreSum, ranking) {
-    db.query(`USE classdb`);
-    db.query(`SELECT id FROM exams WHERE student_id = '${studentId}' AND round = '${round}'`, function(err, row) {
-        if(err){
-            console.log(err);
-            return;
-        }
-        if(row.length != 0) {
-            db.query(`DELETE FROM exams WHERE id = '${row[0].id}'`);
-        }
+    return new Promise(resolve => {
+        db.query(`USE classdb`);
+        db.query(`SELECT id FROM exams WHERE student_id = '${studentId}' AND round = '${round}'`, function(err, row) {
+            if(err){
+                console.log(err);
+                resolve();
+            }
+
+            if(row.length != 0) {
+                db.query(`DELETE FROM exams WHERE id = '${row[0].id}'`, function (err, row) {
+                    if(err){
+                        console.log(err);
+                        resolve();
+                    }
+
+                    db.query(`INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
+                            values('${round}', ${commonRound}, '${firstScore}', '${secondScore}', '${thirdScore}', '${scoreSum}', '${ranking}', '${studentId}', '${classId}')`,
+                            function(err) {
+                                if(err){
+                                    console.log(err);
+                                }
+
+                                resolve();
+                            });
+                });
+            }
+        });
+        
     });
-    db.query(`INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
-    values('${round}', ${commonRound}, '${firstScore}', '${secondScore}', '${thirdScore}', '${scoreSum}', '${ranking}', '${studentId}', '${classId}')`);
+    
     // console.log(studentId + classId + round + firstScore + secondScore + thirdScore + scoreSum + ranking);
 }
 
+
+//FIXME: 이거 없애야 함 똑같은 이름을 가진 학생이 잇을수도
 function getStudentIdByName(studentName, classId, studentPhoneNum) {
     return new Promise(resolve =>  {
         db.query("USE classdb");
@@ -661,6 +681,7 @@ function getDeptRanking(rows, studentId) {
 }
 
 async function getStudentInfosByName(name, classId) {
+    //FIXME: 이거 이름으로 하면 안될지도
     const id = await getStudentIdByName(name, classId);
     let examList = await getStudentInfosById(id);
     let ret = [];
@@ -905,10 +926,40 @@ function getCommonExamRound(round, classId) {
 //     });
 // }
 
-function addDeptToDB(seoulDept, yonseiDept, studentId, commonRound) {
+// function addDeptToDB(seoulDept, yonseiDept, studentId, commonRound) {
+//     return new Promise(resolve =>  {
+//         db.query("USE classdb");
+//         db.query(`UPDATE exams SET seoul_dept = '${seoulDept}', yonsei_dept = '${yonseiDept}'
+//                 WHERE student_id = '${studentId}' AND common_round = ${commonRound}`, function(err, row) {
+//             if(err) {
+//                 console.log("Failed to get student name with phone number");
+//                 console.log(err);
+//             }
+
+//             resolve();
+//         });
+//     });
+// }
+
+function addSeoulDeptToDB(seoulDept, studentId, commonRound) {
     return new Promise(resolve =>  {
         db.query("USE classdb");
-        db.query(`UPDATE exams SET seoul_dept = '${seoulDept}', yonsei_dept = '${yonseiDept}'
+        db.query(`UPDATE exams SET seoul_dept = '${seoulDept}'
+                WHERE student_id = '${studentId}' AND common_round = ${commonRound}`, function(err, row) {
+            if(err) {
+                console.log("Failed to get student name with phone number");
+                console.log(err);
+            }
+
+            resolve();
+        });
+    });
+}
+
+function addYonseiDeptToDB(yonseiDept, studentId, commonRound) {
+    return new Promise(resolve =>  {
+        db.query("USE classdb");
+        db.query(`UPDATE exams SET yonsei_dept = '${yonseiDept}'
                 WHERE student_id = '${studentId}' AND common_round = ${commonRound}`, function(err, row) {
             if(err) {
                 console.log("Failed to get student name with phone number");
@@ -965,7 +1016,7 @@ function getStudentPNumByName(studentName) {
 
 export {putTotalExamToDB}
 export {getStudentIdByName}
-export {putScoreToDB, addDeptToDB}
+export {putScoreToDB, addSeoulDeptToDB, addYonseiDeptToDB}
 export {getStudentAndExamInfos}
 export {getClassId}
 export {getStudentInfosByName, getStudentNameByPNum}
