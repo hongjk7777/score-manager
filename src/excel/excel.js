@@ -383,6 +383,7 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
         const ranking = row.getCell(col + 4).value? row.getCell(col + 4).value.result : 0;
         const commonRound = await getCommonExamRound(round, classId);
 
+
         // console.log("여기에요" + firstScore, secondScore, thirdScore, scoreSum, ranking, commonRound);
         if(!checkValidity(firstScore, secondScore, thirdScore, scoreSum, ranking, commonRound)) {
             continue;

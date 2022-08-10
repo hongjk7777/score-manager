@@ -59,29 +59,40 @@ function putScoreToDB(studentId, classId, round , commonRound, firstScore, secon
                 resolve();
             }
 
-            if(row.length != 0) {
-                db.query(`DELETE FROM exams WHERE id = '${row[0].id}'`, function (err, row) {
+            console.log(row.length);
+
+            deleteExistedData(row).then(
+                db.query(`INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
+                        values('${round}', ${commonRound}, '${firstScore}', '${secondScore}', '${thirdScore}', '${scoreSum}', '${ranking}', '${studentId}', '${classId}')`,
+                        function(err) {
                     if(err){
                         console.log(err);
-                        resolve();
                     }
-
-                    db.query(`INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
-                            values('${round}', ${commonRound}, '${firstScore}', '${secondScore}', '${thirdScore}', '${scoreSum}', '${ranking}', '${studentId}', '${classId}')`,
-                            function(err) {
-                                if(err){
-                                    console.log(err);
-                                }
-
-                                resolve();
-                            });
-                });
-            }
+                    resolve();
+                })
+            );
+            
+            
         });
         
     });
     
     // console.log(studentId + classId + round + firstScore + secondScore + thirdScore + scoreSum + ranking);
+}
+
+function deleteExistedData(row) {
+    return new Promise(resolve => {
+        if(row.length != 0) {
+            db.query(`DELETE FROM exams WHERE id = '${row[0].id}'`, function (err, row) {
+                if(err){
+                    console.log(err);
+                }
+                resolve();
+            });
+        } else{
+            resolve();
+        }
+    })
 }
 
 
@@ -172,7 +183,7 @@ function getStudentNameByPNum(studentPhoneNum) {
 function removeSamePNumStudent(studentName, studentPhoneNum, classId, schoolName, studentId) {
     return new Promise(resolve => {
         getStudentIdByPNum(studentPhoneNum).then(studentId => {
-            console.log(studentId);
+            // console.log(studentId);
             db.query("USE classdb");
                 db.query(`DELETE FROM exams WHERE student_id = ${studentId}`, function(err) {
                     if(err) {
