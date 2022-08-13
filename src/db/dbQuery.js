@@ -2,6 +2,7 @@ import db from "./dbConfig.js";
 import {signUpByStudentPhoneNum, isAdmin} from "../auth/auth.js"
 import { resolve } from "path";
 import { log } from "console";
+import { async } from "regenerator-runtime";
 
 async function putTotalExamToDB(examInfo, scoreRule, classId) {
     //TODO:
@@ -39,9 +40,9 @@ function insertTotalExam(examInfo, scoreRule, classId) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
         db.query(`INSERT INTO total_exams(round, common_round, score_rule, class_id
-                , total_tester, average, standard_deviation) VALUES(${examInfo.round}, 
+                , total_tester, average, standard_deviation, max_score) VALUES(${examInfo.round}, 
                     ${examInfo.commonRound}, '${scoreRule}', ${classId}, ${examInfo.totalTester},
-                    ${examInfo.average}, ${examInfo.standardDeviation})`, function(err){
+                    ${examInfo.average}, ${examInfo.standardDeviation}, ${examInfo.maxScore})`, function(err){
             if(err){
                 console.log(err);
             }
@@ -502,7 +503,7 @@ async function getStudentInfosById(id) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
         db.query(`SELECT exams.round, exams.common_round, first_score, second_score, third_score, score_sum, ranking, students.school,
-                seoul_dept, yonsei_dept, total_exams.average, total_exams.standard_deviation, total_exams.total_tester
+                seoul_dept, yonsei_dept, total_exams.average, total_exams.standard_deviation, total_exams.total_tester, max_score
                 FROM exams INNER JOIN total_exams ON exams.round = total_exams.round AND exams.class_id = total_exams.class_id 
                 INNER JOIN students ON students.id = exams.student_id WHERE student_id = ${id}`, function (err, exams) {
             let examList = [];
@@ -522,6 +523,8 @@ async function getStudentInfosById(id) {
                     newExam.scoreSum = exam.score_sum;
                     newExam.ranking = exam.ranking;
                     newExam.commonRound = exam.common_round;
+                    newExam.maxScore = exam.max_score;
+
                     if(exam.seoul_dept) {
                         newExam.seoulDept = exam.seoul_dept;
                     }
@@ -546,6 +549,96 @@ async function getStudentInfosById(id) {
     });
 }
 
+async function getProblemInfoByRound(round, classId) {
+
+    const commonRound = getCommonExamRound(round, classId);
+
+    let problemInfo;
+
+    if(commonRound > 0){
+        problemInfo = await getCommonProblemInfo(commonRound);
+    } else {
+        problemInfo = await getProblemInfo(round, classId);
+    }
+
+    return new Promise(resolve => {
+        resolve(problemInfo);
+    });
+}
+
+function getCommonProblemInfo(commonRound) {
+    return new Promise(resolve => {
+        db.query(`SELECT first_score, second_score, third_score FROM exams WHERE common_round = ${commonRound}`, function(err, rows){
+            let problemInfo = [];
+
+            let firstScoreSum = 0;
+            let secondScoreSum = 0;
+            let thirdScoreSum = 0;
+
+            if(err){
+                console.log(err);
+                resolve(problemInfo);
+            }
+
+            if(rows.length > 0){
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    firstScoreSum += row.first_score;
+                    secondScoreSum += row.second_score;
+                    thirdScoreSum += row.third_score;
+                }
+
+                problemInfo.firstScoreAverage = (firstScoreSum / rows.length).toFixed(2);
+                problemInfo.secondScoreAverage = (secondScoreSum / rows.length).toFixed(2);
+                problemInfo.thirdScoreAverage = (thirdScoreSum / rows.length).toFixed(2);
+            } else {
+                problemInfo.firstScoreAverage = 0;
+                problemInfo.secondScoreAverage = 0;
+                problemInfo.thirdScoreAverage = 0;
+            }
+            
+            resolve(problemInfo);
+        });
+    });
+}
+
+function getProblemInfo(round, classId) {
+    return new Promise(resolve => {
+        db.query(`SELECT first_score, second_score, third_score FROM exams WHERE round = ${round} AND class_id = ${classId}`, function(err, rows){
+            let problemInfo = [];
+
+            let firstScoreSum = 0;
+            let secondScoreSum = 0;
+            let thirdScoreSum = 0;
+
+            if(err){
+                console.log(err);
+                resolve(problemInfo);
+            }
+
+            if(rows?.length > 0){
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    firstScoreSum += row.first_score;
+                    secondScoreSum += row.second_score;
+                    thirdScoreSum += row.third_score;
+                }
+
+                problemInfo.firstScoreAverage = (firstScoreSum / rows.length).toFixed(2);
+                problemInfo.secondScoreAverage = (secondScoreSum / rows.length).toFixed(2);
+                problemInfo.thirdScoreAverage = (thirdScoreSum / rows.length).toFixed(2);
+            } else {
+                problemInfo.firstScoreAverage = 0;
+                problemInfo.secondScoreAverage = 0;
+                problemInfo.thirdScoreAverage = 0;
+            }
+            
+            resolve(problemInfo);
+        });
+    });
+}
 // async function addTotalRankingToList(phoneNum, examList) {
 //     const id = await getStudentIdByPNum(phoneNum);
 
@@ -636,13 +729,21 @@ function getSeoulDeptInfo(studentId, commonRound, seoulDept) {
         db.query("USE classdb");
         db.query(`SELECT score_sum, student_id FROM exams WHERE common_round = ${commonRound} 
                 AND seoul_dept = '${seoulDept}' ORDER BY score_sum DESC`, function(err, rows) {
+
             let seoulDeptInfo = [];
+
             if(err) {
                 console.log(err);
                 resolve(seoulDeptInfo);
             }
+
             seoulDeptInfo.seoulDeptTester = rows.length;
+            
+            //TODO: 아래 두개를 합치는 게 더 빠를 듯
+            seoulDeptInfo.seoulChartData = getChartData(rows);
             seoulDeptInfo.seoulDeptRanking = getDeptRanking(rows, studentId);
+            seoulDeptInfo.seoulDeptAverage = getDeptAverage(rows);
+            seoulDeptInfo.seoulDeptMaxScore = getDeptMaxScore(rows);
             resolve(seoulDeptInfo);
         });
     });
@@ -659,10 +760,29 @@ function getYonseiDeptRanking(studentId, commonRound, yonseiDept) {
                 resolve(yonseiDeptInfo);
             }
             yonseiDeptInfo.yonseiDeptTester = rows.length;
+
+            yonseiDeptInfo.yonseiChartData = getChartData(rows);
             yonseiDeptInfo.yonseiDeptRanking = getDeptRanking(rows, studentId);
+            yonseiDeptInfo.yonseiDeptAverage = getDeptAverage(rows);
+            yonseiDeptInfo.yonseiDeptMaxScore = getDeptMaxScore(rows);
             resolve(yonseiDeptInfo);
         });
     });
+}
+
+function getChartData(rows){
+    let chartData = new Array(10).fill(0);
+
+    rows.forEach(row => {
+        const scoreSum = row.score_sum;
+        if(scoreSum != 0) {
+            chartData[Math.ceil(scoreSum / 5) - 1]++;
+        } else {
+            chartData[0]++;
+        }
+    });
+
+    return chartData;
 }
 
 //TODO: getcommonranking이랑 조인을 활용하면 함수를 하나로 합칠 수 잇음
@@ -689,6 +809,30 @@ function getDeptRanking(rows, studentId) {
         lastScore = row.score_sum;
     }
     return deptRanking;
+}
+
+function getDeptAverage(rows) {
+    let sum = 0;
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        sum += row.score_sum;
+    }
+
+    if(rows.length > 0) {
+        return (sum / rows.length).toFixed(2);
+    } else {
+        return " ";
+    }
+}
+
+function getDeptMaxScore(rows) {
+    let maxScore = 0;
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        maxScore = Math.max(maxScore, row.score_sum);
+    }
+
+    return maxScore;
 }
 
 async function getStudentInfosByName(name, classId) {
@@ -785,14 +929,20 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
 
                 if(exam.seoulDept){
                     const seoulDeptInfo = await getSeoulDeptInfo(id, exam.commonRound, exam.seoulDept);
+                    exam.seoulChartData = seoulDeptInfo.seoulChartData;
                     exam.seoulDeptRanking = seoulDeptInfo.seoulDeptRanking;
                     exam.seoulDeptTester = seoulDeptInfo.seoulDeptTester;
+                    exam.seoulDeptAverage = seoulDeptInfo.seoulDeptAverage;
+                    exam.seoulDeptMaxScore = seoulDeptInfo.seoulDeptMaxScore;
                 }
     
                 if(exam.yonseiDept){
                     const yonseiDeptInfo = await getYonseiDeptRanking(id, exam.commonRound, exam.yonseiDept);
+                    exam.yonseiChartData = yonseiDeptInfo.yonseiChartData;
                     exam.yonseiDeptRanking = yonseiDeptInfo.yonseiDeptRanking;
                     exam.yonseiDeptTester = yonseiDeptInfo.yonseiDeptTester;
+                    exam.yonseiDeptAverage = yonseiDeptInfo.yonseiDeptAverage;
+                    exam.yonseiDeptMaxScore = yonseiDeptInfo.yonseiDeptMaxScore;
                 }
             }
             studentInfo = exam;
@@ -800,6 +950,7 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
     }
     return new Promise(resolve => resolve(studentInfo));
 }
+
 
 function getClassIdByStudent(studentPhoneNum){
     return new Promise(resolve => {
@@ -1031,7 +1182,7 @@ export {putScoreToDB, addSeoulDeptToDB, addYonseiDeptToDB}
 export {getStudentAndExamInfos}
 export {getClassId}
 export {getStudentInfosByName, getStudentNameByPNum}
-export {getExamInfosById}
+export {getExamInfosById, getProblemInfoByRound}
 export {getStudentInfosByPNum, getStudentInfoByPNum, addClassToDB, deleteClassFromDB, 
         removeSamePNumStudent, addStudentToDB, getScoreRule, getCommonExamRound, deleteClassDB
         , getStudentPNumByName, getExamChartDataById}

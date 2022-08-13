@@ -1,6 +1,6 @@
 import express from "express";
 import {isAuthenticated} from "../auth/auth.js";
-import {getExamInfosById, getStudentNameByPNum, getStudentInfosByPNum, 
+import {getExamInfosById, getStudentNameByPNum, getStudentInfosByPNum, getProblemInfoByRound,
         getScoreRule, getStudentInfoByPNum, getExamChartDataById} from "../db/dbQuery.js";
 
 const router = express.Router();
@@ -37,6 +37,17 @@ router.get("/score-rule", isAuthenticated, function(req, res) {
             res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user});
         });
     });
+});
+
+router.get("/exam/problem-info", isAuthenticated, function(req, res) {
+    getStudentNameByPNum(req.user.username).then(userInfo => {
+        getStudentInfoByPNum(req.user?.username, req.query.round).then(studentInfo => {
+            getProblemInfoByRound(req.query.round, userInfo.classId).then(problemInfo => {
+                res.render("class/problem-info", {studentInfo: studentInfo, problemInfo: problemInfo});
+            });
+        });
+    });
+    
 });
 
 

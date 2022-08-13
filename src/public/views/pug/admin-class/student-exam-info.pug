@@ -8,102 +8,138 @@ block append header
     script(src="https://cdn.jsdelivr.net/npm/chart.js@2.9.0")
 
 
-block content
-    .container
-        .row.justify-content-center
-        .card.mt-5.mx-3
-            if(studentInfo.commonRound > 0)
-                h5.card-header #{username}님의 <br>
-                    |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
-                    |공통 #{studentInfo.commonRound}회차 시험  
-            else 
-                h5.card-header #{username}님의 <br>
-                    |<span id='exam-round'>#{studentInfo.round}회차 시험</span>  
-            .table-responsive.text-nowrap
-                table.table
-                    thead
-                        tr
+block content  
+    .d-flex.justify-content-center
+        #score-card.container
+            .row.justify-content-center
+            .card.mt-4.mx-3.overflow-auto
+                if(studentInfo.commonRound > 0)
+                    h5.card-header.text-center <span id="username">#{username}</span>님의
+                        |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
+                        |공통 #{studentInfo.commonRound}회차 시험  
+                else 
+                    h5.card-header.text-center <span id="username">#{username}</span>님의 <br>
+                        |<span id='exam-round'>#{studentInfo.round}회차 시험</span>  
+            
+                table.table.text-center
+                    thead.fs-6
+                        tr.table-active
                             //- th 시험 회차
-                            th 문제 1/2/3
-                            th 총점
-                            th 평균/표준편차
-                            th 등수
-                            th 백분위
-                            if(studentInfo.seoulDept)
-                                th 서울대 #{studentInfo.seoulDept} 순위
-                            if(studentInfo.yonseiDept)
-                                th 연세대 #{studentInfo.yonseiDept} 순위
-                            th 채점 기준
+                            th(colspan="2") 문제 1/2/3
+                            th(colspan="2") 총점
+                            th(colspan="2") 자세히
+                            
 
                     tbody.table-border-bottom-0
                         tr
                             //- 공통시험일 경우     
+                            td(colspan="2") #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
+                            td#score-sum(colspan="2") #{studentInfo.scoreSum}
+                            td.pb-0.pt-1(colspan="2") 
+                                button#problem-info-btn.btn.btn-sm.btn-outline-secondary 자세히
+                            //- td 
+                                //- button#score-rule-btn.btn.btn-outline-secondary 채점기준
+                    
+                    thead.fs-6
+                        tr.table-active
+                            //- th 시험 회차
+                            th(colspan="2") 전체 평균
+                            th(colspan="2") 표준편차
+                            th(colspan="2") 최고점
+                            
+
+                    tbody.table-border-bottom-0
+                        tr
                             if(studentInfo.commonRound > 0)
-                                //- 공통시험이 아닐경우
-                                //- if(exam.commonRound === 0)
-                                //- td
-                                //-     i.fab.fa-angular.fa-lg.text-danger.me-3
-                                //-     strong#exam-round #{studentInfo.round}회차(공통 #{studentInfo.commonRound}회차)
-                                td #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
-                                td#score-sum #{studentInfo.scoreSum}
-                                td #{studentInfo.commonAverage}/#{studentInfo.commonStandardDev}
-                                td #{studentInfo.commonRanking}/#{studentInfo.commonTester}
-                                td #{studentInfo.commonPercent}%
-                                if(studentInfo.seoulDeptRanking)
-                                    th #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}
-                                if(studentInfo.yonseiDeptRanking)
-                                    th #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}
+                                td(colspan="2") #{studentInfo.commonAverage}
+                                td(colspan="2") #{studentInfo.commonStandardDev}
+                                
                             else 
-                                //- td
-                                //-     i.fab.fa-angular.fa-lg.text-danger.me-3
-                                //-     strong#exam-round #{studentInfo.round}회차
-                                td #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
-                                td#score-sum #{studentInfo.scoreSum}
-                                td #{studentInfo.average}/#{studentInfo.standardDeviation}
-                                td #{studentInfo.ranking}/#{studentInfo.totalTester} 
-                                td #{studentInfo.percent}%
-                            td 
-                                button#score-rule-btn.btn.btn-secondary 채점기준
-            //- if(studentInfo.commonRound > 0)
-            //-     h4#exam-round.text-center #{round}회차(공통 #{studentInfo.commonRound}회차) 시험 결과
-            //-     p #{username}님의 점수
-            //-     div 1번 문항: <span id="my-first-score">#{studentInfo.firstScore}</span>점/ 
-            //-         | 2번 문항: <span id="my-second-score">#{studentInfo.secondScore}</span>점/ 
-            //-         | 3번 문항: <span id="my-third-score">#{studentInfo.thirdScore}</span>점/
-            //-         | 총점: <span id="my-score-sum">#{studentInfo.scoreSum}</span>점 <br>
-            //-         | 평균: #{studentInfo.commonAverage} 표준편차: #{studentInfo.commonStandardDev} <br>
-            //-         | 반 등수: #{studentInfo.ranking}/#{studentInfo.totalTester}등
-            //-         | 전체 #{studentInfo.commonRanking}/#{studentInfo.commonTester}등 (상위#{studentInfo.commonPercent}%)
-            //-         if(studentInfo.seoulDeptRanking)
-            //-             div 서울대 #{studentInfo.seoulDept}: #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}등
-            //-         if(studentInfo.yonseiDeptRanking)
-            //-             div 연세대 #{studentInfo.yonseiDept}: #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}등
-            //- else
-            //-     h4#exam-round.text-center #{round}회차 시험 결과
-            //-     p #{username}님의 점수
-            //-     div 1번 문항: <span id="my-first-score">#{studentInfo.firstScore}</span>점/ 
-            //-         | 2번 문항: <span id="my-second-score">#{studentInfo.secondScore}</span>점/ 
-            //-         | 3번 문항: <span id="my-third-score">#{studentInfo.thirdScore}</span>점/ 
-            //-         | 총점: <span id="my-score-sum">#{studentInfo.scoreSum}</span>점 <br> 
-            //-         | 평균: #{studentInfo.average} 표준편차: #{studentInfo.standardDeviation} <br>
-            //-         | <span id="my-ranking">#{studentInfo.ranking}</span>등
-            //-         | 응시인원 #{studentInfo.totalTester}명 (상위#{studentInfo.percent}%)
+                                td(colspan="2") #{studentInfo.average}
+                                td(colspan="2") #{studentInfo.standardDeviation}
+                                
+                            td(colspan="2") #{studentInfo.maxScore}
+                            //- td 
+                                //- button#score-rule-btn.btn.btn-outline-secondary 채점기준
 
-            //- button#score-rule-btn.col-2.btn.btn-secondary 채점기준 보기
+                    thead.fs-6
+                        tr.table-active
+                            //- th 시험 회차
+                            th(colspan="2") 등수
+                            th(colspan="2") 백분위
+                            th(colspan="2") 채점기준
+                    tbody.table-border-bottom-0
+                        tr
+                            if(studentInfo.commonRound > 0)
+                                td(colspan="2") #{studentInfo.commonRanking}/#{studentInfo.commonTester}
+                                td(colspan="2") #{studentInfo.commonPercent}%
+                            else 
+                                td(colspan="2") #{studentInfo.ranking}/#{studentInfo.totalTester} 
+                                td(colspan="2") #{studentInfo.percent}%
+                            td.pb-0.pt-1(colspan="2") 
+                                button#score-rule-btn.btn.btn-sm.btn-outline-secondary 채점기준
+                                
+                                
+                    if(studentInfo.seoulDept)
+                        thead.fs-6
+                            tr.table-active
+                                th(colspan="6") 서울대 #{studentInfo.seoulDept}과 순위
+                        tbody.table-border-bottom-0
+                            tr
+                                if(studentInfo.seoulDeptRanking)
+                                    th(colspan="6") #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}
+                                
+                    if(studentInfo.yonseiDept)
+                        thead.fs-6
+                            tr.table-active
+                                th(colspan="6") 연세대 #{studentInfo.yonseiDept}과 순위
+                                    
+                        tbody.table-border-bottom-0
+                            tr
+                                if(studentInfo.yonseiDeptRanking) 
+                                    th(colspan="6") #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}                 
+                                        
+                    
 
-            h5.text-center 전체 성적
-            canvas#exam-chart(data-chart=chartData) 
-            //- ul.m-auto
-            //-     each student in studentList
-            //-         li.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom.student-list
-            //-             .col-9.col-lg-9.d-inline-block
-            //-                 #student-info.mb-1 <span id="ranking">#{student.ranking}</span>등: <span id="student-name">#{student.name} </span> #{student.school} <br>
-            //-                     | 1번 문항: <span id="first-score">#{student.firstScore}</span>점/
-            //-                     | 2번 문항: <span id="second-score">#{student.secondScore}</span>점/
-            //-                     | 3번 문항: <span id="third-score">#{student.thirdScore}</span>점/
-            //-                     | 총점: <span id="score-sum">#{student.scoreSum}</span>점 
+                //- canvas#exam-chart(data-chart=chartData) 
+                if(studentInfo.yonseiDept || studentInfo.seoulDeptRanking)
+                    #carouselExampleControls.carousel.carousel-dark.slide(data-bs-ride='carousel')
+                        .carousel-inner
+                            .carousel-item.active
+                                .text-center.fs-4 전체 성적 
+                                .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.commonAverage}
+                                canvas#exam-chart.d-block.w-100(data-chart=chartData) 
+                            
+                            if(studentInfo.seoulDeptRanking)
+                                .carousel-item
+                                    .fs-4.text-center 서울대 #{studentInfo.seoulDept}과 성적
+                                    .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.seoulDeptMaxScore} 평균: #{studentInfo.seoulDeptAverage}
+                                    canvas#seoul-exam-chart.d-block.w-100(data-chart=studentInfo.seoulChartData) 
 
-    
+                            if(studentInfo.yonseiDeptRanking) 
+                                .carousel-item
+                                    .fs-4.text-center 연세대 #{studentInfo.yonseiDept}과 성적 
+                                    .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.yonseiDeptMaxScore} 평균: #{studentInfo.yonseiDeptAverage}
+                                    canvas#yonsei-exam-chart.d-block.w-100(data-chart=studentInfo.yonseiChartData) 
+
+                        button.carousel-control-prev(type='button' data-bs-target='#carouselExampleControls' data-bs-slide='prev')
+                            span.carousel-control-prev-icon(aria-hidden='true')
+                            span.visually-hidden Previous
+                        button.carousel-control-next(type='button' data-bs-target='#carouselExampleControls' data-bs-slide='next')
+                            span.carousel-control-next-icon(aria-hidden='true')
+                            span.visually-hidden Next
+                
+                else 
+                    .text-center.fs-4 전체 성적 
+                    if(studentInfo.commonRound > 0)
+                        .text-end.fs-6.text-muted.me-3 평균: #{studentInfo.commonAverage}
+                    else 
+                        .text-end.fs-6.text-muted.me-3 평균: #{studentInfo.average}
+
+                    canvas#exam-chart(data-chart=chartData) 
+
+
+
 
 block append footer 
     script(src="/public/views/js/studentExamInfo.js") 
