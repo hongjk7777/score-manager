@@ -118,9 +118,11 @@ function getExamInfos(excel) {
                 const scoreArr = getScoreArr(worksheet.getColumn(col + 4));
                 info.totalTester = scoreArr.length;
                 if(scoreArr.length > 0){
+                    info.maxScore = Math.max.apply(null, scoreArr);
                     info.average = (scoreArr.reduce((a, b) => a + b) / info.totalTester).toFixed(2);
                     info.standardDeviation = (Math.sqrt(scoreArr.map(x => Math.pow(x - info.average, 2)).reduce((a, b) => a + b) / info.totalTester)).toFixed(2);
                 } else {
+                    info.maxScore = 0;
                     info.average = 0;
                     info.standardDeviation = 0;
                 }

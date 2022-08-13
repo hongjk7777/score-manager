@@ -2,7 +2,7 @@ import express from "express";
 import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
-import {getStudentAndExamInfos, getClassId, getStudentInfosByName, getExamInfosById, addClassToDB, 
+import {getStudentAndExamInfos, getClassId, getProblemInfoByRound, getExamInfosById, addClassToDB, 
     deleteClassFromDB, getStudentNameByPNum, getStudentInfosByPNum, getStudentPNumByName,
     getCommonExamRound, getStudentInfoByPNum, getExamChartDataById, getScoreRule} from "../db/dbQuery.js";
 import multer from "multer";
@@ -159,6 +159,7 @@ router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
         getStudentNameByPNum(pNum).then(userInfo => {
             getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
                 getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
+                    console.log(studentInfo);
                     res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
                         chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
                 });
@@ -176,6 +177,20 @@ router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, r
         // console.log(req.params.id);
         const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
         res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user});
+    });
+});
+
+router.get("/:id/student/exam/problem-info", isAdminAuthenticated, function(req, res) {
+    getStudentPNumByName(req.query.name).then(pNum => {
+        getStudentNameByPNum(pNum).then(userInfo => {
+            getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
+                console.log(studentInfo);
+                getProblemInfoByRound(req.query.round, req.params.id).then(problemInfo => {
+                    res.render("class/problem-info", {username : userInfo.username , round : req.query.round, 
+                        studentInfo: studentInfo, problemInfo: problemInfo, userInfo : userInfo, user: req.user});
+                });
+            });
+        });
     });
 });
 

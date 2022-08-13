@@ -1,0 +1,70 @@
+extends ../layout/layout.pug
+
+block append header 
+    link(rel="stylesheet", href="/public/views/css/home.css")
+    link(rel="stylesheet", href="/public/views/css/nav.css")
+    link(rel="stylesheet", href="/public/views/css/exam-info.css")
+    link(rel="icon", type="image/png", href="/public/favicon.ico")
+    script(src="https://cdn.jsdelivr.net/npm/chart.js@2.9.0")
+
+
+block content  
+    .d-flex.justify-content-center
+        #score-card.container
+            .row.justify-content-center
+            .card.mt-4.mx-3.overflow-auto
+                if(studentInfo.commonRound > 0)
+                    h5.card-header.text-center 
+                        |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
+                        |공통 #{studentInfo.commonRound}회차 시험 정보
+                else 
+                    h5.card-header
+                        |<span id='exam-round'>#{studentInfo.round}회차 시험 정보</span>  
+            
+                table.table.text-center
+                    thead.fs-6
+                        tr.table-active
+                            //- th 시험 회차
+                            th(scope="col") 문제
+                            th(scope="col") 획득 점수
+                            th(scope="col") 배점
+                            th(scope="col") 평균
+                            
+
+                    tbody
+                        tr
+                            //- 공통시험일 경우     
+                            th(scope="row") 1번
+                            td #{studentInfo.firstScore}
+                            td 20
+                            td #{problemInfo.firstScoreAverage}
+
+                        tr
+                            //- 공통시험일 경우     
+                            th(scope="row") 2번
+                            td #{studentInfo.secondScore}
+                            td 20
+                            td #{problemInfo.secondScoreAverage}
+
+                        tr
+                            //- 공통시험일 경우     
+                            th(scope="row") 3번
+                            td #{studentInfo.thirdScore}
+                            td 20
+                            td #{problemInfo.thirdScoreAverage}
+                                
+                            //- td 
+                                //- button#score-rule-btn.btn.btn-outline-secondary 채점기준
+                    
+                                   
+                                        
+                    
+
+                //- canvas#exam-chart(data-chart=chartData) 
+               
+
+
+
+
+block append footer 
+    script(src="/public/views/js/studentExamInfo.js") 

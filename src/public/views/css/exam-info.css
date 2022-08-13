@@ -7,3 +7,12 @@
 canvas{
     display: flex!important;
 }
+
+#score-card{
+    max-width: 800px;
+}
+
+.carousel-caption {
+    top: 0;
+    bottom: auto;
+}
