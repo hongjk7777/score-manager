@@ -34,7 +34,7 @@ router.get("/score-rule", isAuthenticated, function(req, res) {
         getScoreRule(req.query.round, userInfo.classId).then(scoreRule => {
             // console.log(scoreRule);
             const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
-            res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user});
+            res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user, round: req.query.round});
         });
     });
 });

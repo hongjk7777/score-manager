@@ -6,14 +6,27 @@ block append header
     link(rel="icon", type="image/png", href="../../public/views/img/favicon.ico")
 
 block content
-    .row
-        .container.mx-5
-            h4.text-center 채점 기준
-            each scoreRule in scoreRuleArr
-                if(scoreRule === "$")
-                    div <br>
-                else
-                    div #{scoreRule} <br>
+
+    .d-flex.justify-content-center
+        #score-card.container
+            .row.justify-content-center
+            .card.mt-4.mx-3.overflow-auto
+                h5.card-header.text-center #{round}회차 채점 기준
+                each scoreRule in scoreRuleArr
+                    if(scoreRule === "$")
+                        div <br>
+                    else
+                        div #{scoreRule} <br>
+            
+                
+    //- .row
+    //-     .container.mx-5
+    //-         h4.text-center 채점 기준
+    //-         each scoreRule in scoreRuleArr
+    //-             if(scoreRule === "$")
+    //-                 div <br>
+    //-             else
+    //-                 div #{scoreRule} <br>
 
 block append footer 
     script(src="/public/views/js/examList.js") 
