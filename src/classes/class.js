@@ -1,7 +1,9 @@
 import express from "express";
 import {isAuthenticated} from "../auth/auth.js";
-import {getExamInfosById, getStudentNameByPNum, getStudentInfosByPNum, getProblemInfoByRound,
-        getScoreRule, getStudentInfoByPNum, getExamChartDataById} from "../db/dbQuery.js";
+import {getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
+import {getStudentNameByPNum} from '../db/student/dbStudentQuery.js'
+import { getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
+import { getExamChartDataById } from "../db/exam/dbExamQuery";
 
 const router = express.Router();
 
@@ -20,10 +22,6 @@ router.get("/exam", isAuthenticated, function(req, res) {
                 res.render("class/exam-info", {username : userInfo.username , round : req.query.round, 
                     chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
             });
-            // getExamInfosById(req.query.round, userInfo.classId, userInfo).then(studentList => {
-            //     res.render("class/exam-info", {username : userInfo.username , round : req.query.round, 
-            //         studentList : studentList, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
-            // });
         });
         
     });
