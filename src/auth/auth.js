@@ -142,9 +142,9 @@ router.post('/logout', function(req, res, next) {
  * desired username and password.  When the user submits the form, a request
  * will be sent to the `POST /signup` route.
  */
-router.get('/signup', function(req, res, next) {
-  res.render('signform/signup');
-});
+// router.get('/signup', function(req, res, next) {
+//   res.render('signform/signup');
+// });
 
 /* POST /signup
  *
@@ -155,29 +155,29 @@ router.get('/signup', function(req, res, next) {
  * then a new user record is inserted into the database.  If the record is
  * successfully created, the user is logged in.
  */
-router.post('/signup', function(req, res, next) {
-  var salt = crypto.randomBytes(16);
-  // console.log(req.body.password);
-  db.query("USE classdb");
-  crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
-    if (err) { return next(err); }
-    db.query('INSERT INTO accounts (username, hashed_password, salt) VALUES (?, ?, ?)', [
-      req.body.username,
-      hashedPassword,
-      salt
-    ], function(err) {
-      if (err) { return next(err); }
-      var user = {
-        id: this.lastID,
-        username: req.body.username
-      };
-      req.login(user, function(err) {
-        if (err) { return next(err); }
-        res.redirect('/');
-      });
-    });
-  });
-});
+// router.post('/signup', function(req, res, next) {
+//   var salt = crypto.randomBytes(16);
+//   // console.log(req.body.password);
+//   db.query("USE classdb");
+//   crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
+//     if (err) { return next(err); }
+//     db.query('INSERT INTO accounts (username, hashed_password, salt) VALUES (?, ?, ?)', [
+//       req.body.username,
+//       hashedPassword,
+//       salt
+//     ], function(err) {
+//       if (err) { return next(err); }
+//       var user = {
+//         id: this.lastID,
+//         username: req.body.username
+//       };
+//       req.login(user, function(err) {
+//         if (err) { return next(err); }
+//         res.redirect('/');
+//       });
+//     });
+//   });
+// });
 
 router.post("/change-password", function(req, res, next) {
   db.query("USE classdb");
