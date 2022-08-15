@@ -1,15 +1,18 @@
 import ExcelJS from "exceljs";
 import fs from "fs"
 import { log } from "firebase-functions/logger";
-import {putScoreToDB, getStudentIdByName, putTotalExamToDB, removeSamePNumStudent, 
-        addStudentToDB, getCommonExamRound, addSeoulDeptToDB, addYonseiDeptToDB, deleteClassDB} from "../db/dbQuery.js";
+import { getCommonExamRound} from "../db/totalExam/dbTotalExamQuery.js";
+import { deleteClassDB } from "../db/class/dbClassQuery";
+import { addSeoulDeptToDB, addYonseiDeptToDB } from "../db/student/dbStudentDeptQuery.js";
+import { putTotalExamToDB } from '../db/totalExam/dbTotalExamQuery.js'
+import { addStudentToDB, removeSamePNumStudent, getStudentIdByName } from '../db/student/dbStudentQuery'
+import { putScoreToDB } from '../db/exam/dbExamQuery'
 import { resolve } from "path";
 
 /* 
 TODO:
 양식을 지정해서 쓰게 해주는 것도 좋을 듯?
 */
-
 
 async function putExcelValToDB(file, classId) {
     //이전에 사용했던 excel 파일을 지우고 다시 만든다.

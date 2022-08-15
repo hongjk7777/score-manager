@@ -2,9 +2,12 @@ import express from "express";
 import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
-import {getStudentAndExamInfos, getClassId, getProblemInfoByRound, getExamInfosById, addClassToDB, 
-    deleteClassFromDB, getStudentNameByPNum, getStudentInfosByPNum, getStudentPNumByName,
-    getCommonExamRound, getStudentInfoByPNum, getExamChartDataById, getScoreRule} from "../db/dbQuery.js";
+import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
+import { getClassId, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
+import { getStudentPNumByName, getStudentNameByPNum } from '../db/student/dbStudentQuery';
+import { getExamInfosById, getExamChartDataById } from "../db/exam/dbExamQuery.js";
+import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
+
 import multer from "multer";
 // import fs from "fs";
 
@@ -147,11 +150,6 @@ router.get("/:id/student", isAdminAuthenticated, function(req, res) {
             });    
         });
     })
-    
-    // getStudentInfosByName(req.query.name, req.params.id).then(examList => {
-    //     console.log(examList);
-    //     res.render("admin-class/student", {examList : examList, studentName : req.query.name, user: req.user});
-    // });
 });
 
 router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
@@ -163,10 +161,6 @@ router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
                     res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
                         chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
                 });
-                // getExamInfosById(req.query.round, userInfo.classId, userInfo).then(studentList => {
-                //     res.render("class/exam-info", {username : userInfo.username , round : req.query.round, 
-                //         studentList : studentList, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
-                // });
             });
         });
     });
