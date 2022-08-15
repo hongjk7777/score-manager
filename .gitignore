@@ -1,6 +1,8 @@
 /node_modules
 /src/public/db/mysql.js
-build/
+/build
+/src/server.js
+/src/db/dbConfig.js
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
