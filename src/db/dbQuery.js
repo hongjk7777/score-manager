@@ -4,11 +4,11 @@ import { resolve } from "path";
 import { log } from "console";
 import { async } from "regenerator-runtime";
 
-async function putTotalExamToDB(examInfo, scoreRule, classId) {
+async function putTotalExamToDB(examInfo, problemScoreArr, scoreRule, classId) {
     //TODO:
     db.query("USE classdb");
     await deleteExistedTotalExam(examInfo.round, classId);
-    await insertTotalExam(examInfo, scoreRule, classId);
+    await insertTotalExam(examInfo,  problemScoreArr, scoreRule, classId);
 }
 
 function deleteExistedTotalExam(round, classId) {
@@ -36,13 +36,17 @@ function deleteExistedTotalExam(round, classId) {
     })
 }
 
-function insertTotalExam(examInfo, scoreRule, classId) {
+function insertTotalExam(examInfo, problemScoreArr, scoreRule, classId) {
+    //TODO: 실제로 돌려서 이거 제대로 들어갔는지 확인하기
+    // console.log(problemScoreArr);
     return new Promise(resolve => {
         db.query(`USE classdb`);
         db.query(`INSERT INTO total_exams(round, common_round, score_rule, class_id
-                , total_tester, average, standard_deviation, max_score) VALUES(${examInfo.round}, 
+                , total_tester, average, standard_deviation, max_score, first_problem_score, 
+                    second_problem_score, third_problem_score) VALUES(${examInfo.round}, 
                     ${examInfo.commonRound}, '${scoreRule}', ${classId}, ${examInfo.totalTester},
-                    ${examInfo.average}, ${examInfo.standardDeviation}, ${examInfo.maxScore})`, function(err){
+                    ${examInfo.average}, ${examInfo.standardDeviation}, ${examInfo.maxScore},
+                    ${problemScoreArr[0]}, ${problemScoreArr[1]}, ${problemScoreArr[2]})`, function(err){
             if(err){
                 console.log(err);
             }
@@ -60,7 +64,7 @@ function putScoreToDB(studentId, classId, round , commonRound, firstScore, secon
                 resolve();
             }
 
-            console.log(row.length);
+            // console.log(row.length);
 
             deleteExistedData(row).then(
                 db.query(`INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
@@ -503,7 +507,8 @@ async function getStudentInfosById(id) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
         db.query(`SELECT exams.round, exams.common_round, first_score, second_score, third_score, score_sum, ranking, students.school,
-                seoul_dept, yonsei_dept, total_exams.average, total_exams.standard_deviation, total_exams.total_tester, max_score
+                seoul_dept, yonsei_dept, total_exams.average, total_exams.standard_deviation, total_exams.total_tester, total_exams.max_score,
+                total_exams.first_problem_score, total_exams.second_problem_score, total_exams.third_problem_score
                 FROM exams INNER JOIN total_exams ON exams.round = total_exams.round AND exams.class_id = total_exams.class_id 
                 INNER JOIN students ON students.id = exams.student_id WHERE student_id = ${id}`, function (err, exams) {
             let examList = [];
@@ -524,6 +529,9 @@ async function getStudentInfosById(id) {
                     newExam.ranking = exam.ranking;
                     newExam.commonRound = exam.common_round;
                     newExam.maxScore = exam.max_score;
+                    newExam.firstProblemScore = exam.first_problem_score;
+                    newExam.secondProblemScore = exam.second_problem_score;
+                    newExam.thirdProblemScore = exam.third_problem_score;
 
                     if(exam.seoul_dept) {
                         newExam.seoulDept = exam.seoul_dept;
@@ -1159,9 +1167,9 @@ function deleteClassDB(classId) {
     })
 }
 
-function getStudentPNumByName(studentName) {
+function getStudentPNumByName(studentName, classId) {
     return new Promise(resolve => {
-        db.query(`SELECT phone_num FROM students WHERE name = '${studentName}'`, function(err, row) {
+        db.query(`SELECT phone_num FROM students WHERE name = '${studentName}' AND class_id = ${classId}`, function(err, row) {
             if(err) {
                 console.log(err);
                 resolve("");

@@ -138,10 +138,10 @@ router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), funct
 });
 
 router.get("/:id/student", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name).then(pNum => {
+    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
         getStudentNameByPNum(pNum).then(userInfo => {
             getStudentInfosByPNum(pNum).then(examList => {
-                // console.log(examList);
+                console.log(examList);
                 res.render("admin-class/student-info", {examList : examList, userInfo : userInfo, user: req.user});
                 // res.render("class/exam-list", {examList : examList, userInfo : userInfo, user: req.user});
             });    
@@ -155,7 +155,7 @@ router.get("/:id/student", isAdminAuthenticated, function(req, res) {
 });
 
 router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name).then(pNum => {
+    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
         getStudentNameByPNum(pNum).then(userInfo => {
             getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
                 getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
@@ -176,12 +176,12 @@ router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, r
     getScoreRule(req.query.round, req.params.id).then(scoreRule => {
         // console.log(req.params.id);
         const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
-        res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user});
+        res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user, round: req.query.round});
     });
 });
 
 router.get("/:id/student/exam/problem-info", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name).then(pNum => {
+    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
         getStudentNameByPNum(pNum).then(userInfo => {
             getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
                 console.log(studentInfo);
