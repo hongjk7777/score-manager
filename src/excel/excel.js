@@ -92,7 +92,8 @@ function handleExamDatas(excel, classId) {
     infos.forEach(info => {
         console.log(info);
         const scoreRule = getExamScoreRule(excel, info.round);
-        putTotalExamToDB(info, scoreRule, classId);
+        const problemScoreArr = getProblemScore(scoreRule);
+        putTotalExamToDB(info, problemScoreArr, scoreRule, classId);
     });
 }
 
@@ -132,6 +133,76 @@ function getExamInfos(excel) {
         }
     }
     return infos;
+}
+
+function getProblemScore(scoreRuleStr) {
+    const scoreRuleArr = scoreRuleStr.split('\n');
+    let problemScore = new Array(3).fill(0);
+    let problemNum = 0;
+    let smallProblemNum = 0;
+    let tempScoreArr = [];
+
+    for (let i = 0; i < scoreRuleArr.length; i++) {
+        const scoreRule = scoreRuleArr[i];
+        const problemStr = `${problemNum + 1}.`;
+        const smallProblemStr = `(${smallProblemNum + 1})`
+
+        if(scoreRule.includes(problemStr)){
+            if(problemNum > 0){
+                console.log('문제 배점:', tempScoreArr);
+                const scoreSum = tempScoreArr.reduce((partialSum, a) => partialSum + a, 0);
+                problemScore[problemNum - 1] = scoreSum;
+                tempScoreArr = [];    
+            }
+            
+            problemNum++;
+            smallProblemNum = 0;
+
+            continue;
+        }
+
+        if(scoreRule.includes(smallProblemStr)){
+            scoreRule = scoreRule.replace(smallProblemStr, " ");
+            // console.log(scoreRule);
+            const score = getSmallProblemScore(scoreRule);
+            tempScoreArr.push(score);
+            smallProblemNum++;
+        }
+    }
+
+    const scoreSum = tempScoreArr.reduce((partialSum, a) => partialSum + a, 0);
+    problemScore[problemNum - 1] = scoreSum;
+
+    return problemScore;
+}
+
+function getSmallProblemScore(scoreRule) {
+    if(scoreRule){
+        let index = scoreRule.indexOf('점');
+
+        if(index <= 0) {
+            return 0;
+        }
+
+        //어차피 처음은 (로 시작해서 1까지만 탐색
+        while (index >= 1) {
+            //FIXME: 지금 형식은 3자리 수 배점을 가지면 오류가 생김
+            if(!isNaN(scoreRule[index]) && scoreRule[index] != " ") {
+                if(!isNaN(scoreRule[index - 1]) && scoreRule[index - 1] != " ") {
+                    // console.log(scoreRule.substring(index - 1, index + 1));
+                    return parseInt(scoreRule.substring(index - 1, index + 1));
+                } else {
+                    // console.log(scoreRule.substring(index, index + 1));
+                    return parseInt(scoreRule.substring(index, index + 1));
+                }
+            }
+            index--;    
+        }
+
+        return 0;
+    } else {
+        return 0;
+    }
 }
 
 function getScoreArr(col) {
