@@ -11,7 +11,9 @@ for (let i = 0; i < examRounds.length; i++) {
     const curUrl = window.location.href.split('?')[0];
     console.log(curUrl);
 
+    const round = parseInt(examRounds[i].innerHTML);
+
     infoBtn.addEventListener("click", e => {
-        location.href=`${curUrl}/exam?round=${examRounds[i].innerHTML.charAt(0)}&name=${username}`;
+        location.href=`${curUrl}/exam?round=${round}&name=${username}`;
     })   
 }
