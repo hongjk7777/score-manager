@@ -6,9 +6,11 @@ html(lang="en")
         block nav-header 
             include nav-header.pug
 
-    body 
-        block nav
-            include nav.pug
-        block content 
+    body
+        block login-content
+        #wrapper
+            block nav
+                include nav.pug
+            block content 
         block footer 
             include footer.pug
