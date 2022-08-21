@@ -5,6 +5,9 @@ block append header
     link(rel="stylesheet", href="../public/views/css/nav.css")
     link(rel="icon", type="image/png", href="../public/views/img/favicon.ico")
 
+block prepend content
+    h5.text-center.mt-5 #{className}
+
 block append student-list
     .container
         //- .d-flex.flex-row-reverse
