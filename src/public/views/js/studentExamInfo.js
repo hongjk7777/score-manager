@@ -25,13 +25,13 @@ function writeMyScore(student) {
 }
 
 scoreRuleBtn.addEventListener("click", e => {
-    const examRound = document.querySelector("#exam-round").innerHTML.charAt(0);
+    const examRound = document.querySelector("#exam-round").innerHTML;
     const curUrl = window.location.href.split('?')[0];
     location.href=`${curUrl}/score-rule?round=${examRound}`;
 });
 
 problemInfoBtn.addEventListener("click", e => {
-    const examRound = document.querySelector("#exam-round").innerHTML.charAt(0);
+    const examRound = document.querySelector("#exam-round").innerHTML;
     const studentName = document.querySelector("#username").innerHTML;
     const curUrl = window.location.href.split('?')[0];
     location.href=`${curUrl}/problem-info?round=${examRound}&name=${studentName}`;

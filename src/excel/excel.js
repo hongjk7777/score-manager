@@ -106,7 +106,7 @@ function getExamInfos(excel) {
     const roundRow = worksheet.getRow(2);
 
     let infos = [];
-    console.log(roundRow._cells.length);
+    console.log("총길이는", roundRow._cells.length);
     for (let col = 0; col < roundRow._cells.length; col++) {
         const roundCell = roundRow._cells[col];
 
@@ -114,8 +114,11 @@ function getExamInfos(excel) {
             continue;
         }
 
-        if(!isNaN(parseInt(roundCell.value[0])) && roundCell.value[1] === "회") {
-            const round = parseInt(roundCell.value[0]);
+        const numberSize = countNumberSize(roundCell.value)
+        console.log("몇회냐", roundCell.value.substring(0, numberSize));
+
+        if(!isNaN(parseInt(roundCell.value.substring(0, numberSize))) && roundCell.value[numberSize] === "회") {
+            const round = parseInt(roundCell.value.substring(0, numberSize));
             if(isNewRound(infos, round)) {
                 let info = [];
                 info.round = round;
@@ -136,6 +139,16 @@ function getExamInfos(excel) {
         }
     }
     return infos;
+}
+
+function countNumberSize(str){
+    let index = 0;
+
+    while (index < str.length && !isNaN(str[index]) && str[index] != " ") {
+        index++;
+    }
+
+    return index;
 }
 
 function getProblemScore(scoreRuleStr) {
