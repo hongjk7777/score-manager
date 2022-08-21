@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import db from "../dbConfig.js";
 
 function addClassToDB(className, dayStr) {
@@ -18,6 +19,21 @@ function getClassId(className) {
             }
         })
     })
+}
+
+function getClassNameById(classId){
+    return new Promise(resolve => {
+        db.query(`USE classdb`);
+        db.query(`SELECT name FROM classes WHERE id = '${classId}'`, function(err, aClass) {
+            if(err) {
+                console.log("Failed to load class name with class id");
+                console.log(err);
+                resolve(" ");
+            } else{
+                resolve(aClass[0].name);
+            }
+        })
+    });
 }
 
 function deleteClassDB(classId) {
@@ -83,4 +99,4 @@ function deleteClassFromDB(classId) {
     
 }
 
-export { addClassToDB, getClassId, deleteClassDB, deleteClassFromDB }
+export { addClassToDB, getClassId, getClassNameById, deleteClassDB, deleteClassFromDB }

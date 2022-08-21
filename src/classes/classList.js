@@ -3,7 +3,7 @@ import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
 import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
-import { getClassId, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
+import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
 import { getStudentPNumByName, getStudentNameByPNum } from '../db/student/dbStudentQuery';
 import { getExamInfosById, getExamChartDataById } from "../db/exam/dbExamQuery.js";
 import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
@@ -124,8 +124,11 @@ router.post("/add-class", isAdminAuthenticated, function(req, res) {
 //TODO: 이 아래는 클래스를 따로 빼야함
 
 router.get("/:id", isAdminAuthenticated, function(req, res) {
-    getStudentAndExamInfos(req.params.id).then(infos => res.render("admin-class/class",
-    {id: req.params.id, studentList: infos.studentList, examList: infos.examList, user: req.user}));
+    getClassNameById(req.params.id).then(className => {
+        getStudentAndExamInfos(req.params.id).then(infos => res.render("admin-class/class",
+        {id: req.params.id, studentList: infos.studentList, examList: infos.examList, user: req.user, className: className}));
+    });
+    
 });
 
 //TODO: 완료가 되면 redirect가 되어야 함 현재 db 넣는 게 async await 처리가 안 되어있음
