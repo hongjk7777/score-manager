@@ -14,9 +14,10 @@ nav.navbar.navbar-light.bg-light.border-bottom.shadow-sm
                             img(src="https://identicon-api.herokuapp.com/hongjk7777/25?format=png" alt="avatar image")
                         .dropdown-menu.dropdown-menu-end(aria-labelledby='dropdownMenuButton')
                             li
-                                a.dropdown-item(href='/settings') 비밀번호 변경
-                            li
                                 a.dropdown-item(href='/classList') 내 클래스
+                            li
+                                a.dropdown-item(href='/settings') 비밀번호 변경
+
                             li
                                 form(action="/logout", method="post") 
                                     button.dropdown-item(type="submit") 로그아웃    
@@ -26,9 +27,10 @@ nav.navbar.navbar-light.bg-light.border-bottom.shadow-sm
                             img(src="https://identicon-api.herokuapp.com/hongjk7777/25?format=png" alt="avatar image")
                         .dropdown-menu.dropdown-menu-end(aria-labelledby='dropdownMenuButton')
                             li
-                                a.dropdown-item(href='/settings') 비밀번호 변경
-                            li
                                 a.dropdown-item(href='/class') 시험 성적
+                            li
+                                a.dropdown-item(href='/settings') 비밀번호 변경
+
                             li
                                 form(action="/logout", method="post") 
                                     button.dropdown-item(type="submit") 로그아웃
