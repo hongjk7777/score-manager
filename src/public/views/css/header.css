@@ -1,3 +1,19 @@
 .hidden {
     visibility: hidden;
 }
+
+html, body {
+    height: 100%;
+}
+
+#wrapper {
+    height: auto;
+    min-height: 88%;
+    padding-bottom: 10px;
+}
+
+footer {
+    height: 10px;
+    position: relative;
+    transform: translateY(-100%);
+}
