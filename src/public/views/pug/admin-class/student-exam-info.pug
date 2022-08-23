@@ -132,9 +132,9 @@ block content
                 else 
                     .text-center.fs-4 전체 성적 
                     if(studentInfo.commonRound > 0)
-                        .text-end.fs-6.text-muted.me-3 평균: #{studentInfo.commonAverage}
+                        .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.commonAverage}
                     else 
-                        .text-end.fs-6.text-muted.me-3 평균: #{studentInfo.average}
+                        .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.average}
 
                     canvas#exam-chart(data-chart=chartData) 
 

@@ -32,6 +32,7 @@ function getTotalInfo(studentId, commonRound) {
             totalInfo.commonRanking = getCommonRanking(rows, studentId);
             totalInfo.commonTester = rows.length;
             totalInfo.commonPercent = ((totalInfo.commonRanking/totalInfo.commonTester)*100).toFixed(1);
+            totalInfo.maxScore = getMaxScore(rows);
             rows = rows.map(x => {
                 if(x.score_sum > 0){
                     return x.score_sum;
@@ -71,6 +72,14 @@ function getCommonRanking(rows, studentId) {
     return commonRanking;
 }
 
+function getMaxScore(rows) {
+    if(rows.length > 0) {
+        return rows[0].score_sum;
+    } else {
+        return 0;
+    }
+}
+
 async function getStudentInfosByPNum(studentPhoneNum) {
     const id = await getStudentIdByPNum(studentPhoneNum);
     const classId = await getClassIdByStudent(studentPhoneNum);
@@ -88,6 +97,7 @@ async function getStudentInfosByPNum(studentPhoneNum) {
             exam.commonTester = totalInfo.commonTester;
             exam.commonPercent = totalInfo.commonPercent;   
             exam.commonAverage = totalInfo.commonAverage;
+            exam.maxScore = totalInfo.maxScore;
             // if(exam.commonAverage){
             //     exam.commonAverage = exam.commonAverage.toFixed(2);
             // }
@@ -134,6 +144,8 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
                 exam.commonRanking = examInfo.commonRanking;
                 exam.commonTester = examInfo.commonTester;
                 exam.commonPercent = examInfo.commonPercent;
+                exam.maxScore = examInfo.maxScore;
+
                 // console.log(exam);
 
                 if(exam.seoulDept){
