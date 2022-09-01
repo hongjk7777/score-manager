@@ -233,9 +233,10 @@ function signUpByStudentPhoneNum(studentPhoneNum) {
     var salt = crypto.randomBytes(16);
     const initId = studentPhoneNum.replaceAll('-', '');
     const initPassword = studentPhoneNum += '5';
-    // console.log(initId);
     crypto.pbkdf2(initPassword, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
-      if (err) { return next(err); }
+      console.log(initId, hashedPassword, salt);
+      if (err) { 
+        return next(err); }
       // console.log(hashedPassword);
       db.query("USE classdb");
       db.query('INSERT INTO accounts (username, hashed_password, salt) VALUES (?, ?, ?)', [
@@ -243,9 +244,14 @@ function signUpByStudentPhoneNum(studentPhoneNum) {
         hashedPassword,
         salt
       ]);
+      
       //위 함수가 에러가 나면 어카지?
     });
 }
+
+
+
+// signUpByStudentPhoneNum('01024730603');
 
 export { isAuthenticated, isAdminAuthenticated, signUpByStudentPhoneNum, isAdmin }
 export { router }

@@ -43,6 +43,19 @@ block append enter-score
                     input#excel-file(type="file" name="excel" required)
                     button.btn.btn-secondary(type="submit") 제출
 
+block append init-pw
+    .container
+        //- .d-flex.flex-row-reverse
+        //-     button#class-add-btn.btn.btn-primary.me-5(type="button") 학생 추가
+        ul.mt-4
+            each student in studentList
+                li.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom
+                    .col-9.col-lg-9.d-inline-block
+                        span#init-pw-student.mb-1 #{student.name}
+                    .col-3.text-end
+                        button#init-pw-btn.btn.btn-danger(type="submit") 비밀번호 초기화
+                        
+
 block delete-class-list
     .container
         .d-flex.flex-row-reverse
