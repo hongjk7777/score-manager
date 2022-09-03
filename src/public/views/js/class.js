@@ -4,6 +4,7 @@ const deleteBtn = document.querySelector("#delete-btn");
 deleteClass();
 addStudentLink();
 addExamLink();
+addInitPwBtn();
 
 function deleteClass() {
     deleteBtn.addEventListener("click", (e) => {
@@ -38,6 +39,20 @@ function addExamLink() {
         
         exam.addEventListener("click", (e) => {
             location.href=`${curUrl}/exam?round=${examRound}`
+        });
+    }
+}
+
+function addInitPwBtn() {
+    const studentList = document.querySelectorAll("#init-pw-student");
+    const initPwBtns = document.querySelectorAll("#init-pw-btn");
+    
+    for (let i = 0; i < studentList.length; i++) {
+        const studentName = studentList[i].innerHTML;
+        const initPwBtn =initPwBtns[i];
+        
+        initPwBtn.addEventListener("click", (e) => {
+            location.href=`${curUrl}/init-pw?name=${studentName}`;
         });
     }
 }
