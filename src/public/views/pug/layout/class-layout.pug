@@ -13,6 +13,7 @@ block content
                         button#v-pills-students-tab.nav-link.active(data-bs-toggle='pill' data-bs-target='#v-pills-students' type='button' role='tab' aria-controls='v-pills-students' aria-selected='true') 학생
                         button#v-pills-exams-tab.nav-link(data-bs-toggle='pill' data-bs-target='#v-pills-exams' type='button' role='tab' aria-controls='v-pills-exams' aria-selected='false') 성적
                         button#v-pills-scores-tab.nav-link(data-bs-toggle='pill' data-bs-target='#v-pills-scores' type='button' role='tab' aria-controls='v-pills-scores' aria-selected='false') 성적 입력
+                        button#v-pills-init-pw-tab.nav-link(data-bs-toggle='pill' data-bs-target='#v-pills-init-pw' type='button' role='tab' aria-controls='v-pills-init-pw' aria-selected='false') 비밀번호 초기화
                         button#v-pills-delete-class-tab.nav-link(data-bs-toggle='pill' data-bs-target='#v-pills-delete-class' type='button' role='tab' aria-controls='v-pills-delete-class' aria-selected='false') 삭제
             .col-9
                 #v-pills-tabContent.tab-content
@@ -22,6 +23,8 @@ block content
                         block exam-list
                     #v-pills-scores.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-scores-tab')
                         block enter-score
+                    #v-pills-init-pw.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-init-pw-tab')
+                        block init-pw
                     #v-pills-delete-class.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-delete-class-tab')
                         block delete-class-list
         //- .col-3
