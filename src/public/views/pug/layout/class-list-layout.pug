@@ -7,16 +7,15 @@ block content
     .row.mt-5 
         .col-3
             .col.mx-5.p-5
-                #v-pills-tab.nav.flex-column.nav-pills(role='tablist' aria-orientation='vertical')
-                    a#v-pills-class-tab.nav-link.active(data-toggle='pill' href='#v-pills-class' role='tab' aria-controls='v-pills-class' aria-selected='true') 클래스
-                    a#v-pills-message-tab.nav-link(data-toggle='pill' href='#v-pills-message' role='tab' aria-controls='v-pills-message' aria-selected='false') 메시지
-                    a#v-pills-security-tab.nav-link(data-toggle='pill' href='#v-pills-security' role='tab' aria-controls='v-pills-security' aria-selected='false') 보안
+                #v-pills-tab.nav.flex-column.nav-pills.me-3(role='tablist' aria-orientation='vertical')
+                    button#v-pills-classes-tab.nav-link.active(data-bs-toggle='pill' data-bs-target='#v-pills-classes' type='button' role='tab' aria-controls='v-pills-classes' aria-selected='true') 학생
+                    button#v-pills-common-exams-tab.nav-link(data-bs-toggle='pill' data-bs-target='#v-pills-common-exams' type='button' role='tab' aria-controls='v-pills-common-exams' aria-selected='false') 성적
         .col-9
             #v-pills-tabContent.tab-content
-                #v-pills-class.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='v-pills-class-tab') 
+                #v-pills-classes.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='v-pills-classes-tab')
                     block class-list
-                #v-pills-message.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-message-tab') 
-                #v-pills-security.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-security-tab') 
+                #v-pills-common-exams.tab-pane.fade(role='tabpanel' aria-labelledby='v-pills-common-exams-tab')
+                    block common-exam-list
                 
 
 block append footer 

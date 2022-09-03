@@ -1,17 +1,20 @@
 import express from "express";
 import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
+import { initPassword } from "../auth/pwAuth";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
 import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
 import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
 import { getStudentPNumByName, getStudentNameByPNum } from '../db/student/dbStudentQuery';
-import { getExamInfosById, getExamChartDataById } from "../db/exam/dbExamQuery.js";
+import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../db/exam/dbExamQuery.js";
 import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
+import { makeCommonTestExcel } from "../excel/out/exportExcel";
 
 import multer from "multer";
 // import fs from "fs";
 
 const router = express.Router();
+
 
 
 //set path to save input excels
@@ -85,24 +88,26 @@ function trnasferJsonToDayStr(json) {
 
 //추후에 classdb로 db.query는 분리해야함
 router.get("/", isAdminAuthenticated, function(req, res) {
-    let classArray = [];
-    db.query("USE classdb");
-    db.query("SELECT * FROM classes", function(err, classes){
-        if(err) {
-            console.log("failed to find classes from db");
-        }
-        console.log(classes);
-        classes.forEach(aClass => {
-            let newClass = [];
-            newClass.id = aClass.id;
-            newClass.name = aClass.name;
-            newClass.classDay = getDayStr(aClass.class_day);
-            classArray.push(newClass);
+    getCommonExamCount().then(count => {
+        let classArray = [];
+        db.query("USE classdb");
+        db.query("SELECT * FROM classes", function(err, classes){
+            if(err) {
+                console.log("failed to find classes from db");
+            }
+            console.log(classes);
+            classes.forEach(aClass => {
+                let newClass = [];
+                newClass.id = aClass.id;
+                newClass.name = aClass.name;
+                newClass.classDay = getDayStr(aClass.class_day);
+                classArray.push(newClass);
+            });
+    
+            // console.log(classArray);
+            //TODO: 고치기
+            res.render("classList/classes", {classes : classArray, user: req.user, commonExamCount : count});
         });
-
-        // console.log(classArray);
-        //TODO: 고치기
-        res.render("classList/classes", {classes : classArray, user: req.user});
     });
 });
 
@@ -119,6 +124,20 @@ router.post("/add-class", isAdminAuthenticated, function(req, res) {
     const dayStr = trnasferJsonToDayStr(req.body);
     addClassToDB(req.body.classname, dayStr);
     res.redirect("/classList");
+});
+
+router.get("/export-excel", isAdminAuthenticated, function(req, res) {
+    makeCommonTestExcel(req.query.commonRound, res);
+    // res.setHeader(
+    //     'Content-Type',
+    //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    // );
+
+    // res.setHeader(
+    // 'Content-Disposition',
+    // `attachment; filename=${fileName}.xlsx`,
+    // );
+    // res.redirect("/classList");
 });
 
 //TODO: 이 아래는 클래스를 따로 빼야함
@@ -195,6 +214,15 @@ router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
     getCommonExamRound(req.query.round, req.params.id).then(commonRound => {
         getExamInfosById(req.query.round, req.params.id, req.user).then(studentList => res.render("admin-class/exam", 
         {studentList : studentList, round : req.query.round, commonRound : commonRound, user: req.user}));
+    });
+});
+
+router.get("/:id/init-pw", isAdminAuthenticated, function(req, res) {
+    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
+        // console.log(pNum);
+        initPassword(pNum).then(() => {
+            res.redirect(`/classList/${req.params.id}`);
+        });
     });
 });
 
