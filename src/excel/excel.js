@@ -580,4 +580,4 @@ function checkDeptValidity(dept) {
     return typeof dept === 'string';
 }
 
-export {putExcelValToDB, putDeptValToDB}
+export {putExcelValToDB, putDeptValToDB, removeExcelsDirectory}

@@ -1,6 +1,7 @@
 import db from "../dbConfig.js";
 import { getCommonExamRound } from '../totalExam/dbTotalExamQuery.js';
 import {isAdmin} from "../../auth/auth.js";
+import { resolve } from "path";
 
 function putScoreToDB(studentId, classId, round , commonRound, firstScore, secondScore, thirdScore, scoreSum, ranking) {
     return new Promise(resolve => {
@@ -245,5 +246,21 @@ async function getExamChartDataById(round, classId, user) {
     }
 }
 
+function getCommonExamCount() {
+    return new Promise(resolve => {
+        db.query(`SELECT common_round FROM total_exams ORDER BY common_round DESC`, function(err, rows){
+            if(err) {
+                console.log(err);
+            } else{
+                if(rows.length > 0 && rows[0].common_round > 0){
+                    resolve(rows[0].common_round);
+                } else{
+                    resolve(0);
+                }
+            }
+        })
+    });
+}
 
-export {putScoreToDB, getExamInfosById, getExamList, getExamChartDataById}
+
+export {putScoreToDB, getExamInfosById, getExamList, getExamChartDataById, getCommonExamCount}
