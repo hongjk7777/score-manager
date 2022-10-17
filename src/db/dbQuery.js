@@ -173,5 +173,5 @@ async function getStudentInfoByPNum(studentPhoneNum, round) {
 }
 
 
-export {getStudentAndExamInfos}
+export {getStudentAndExamInfos, getSeoulDeptInfo, getYonseiDeptInfo}
 export {getStudentInfosByPNum, getStudentInfoByPNum}
