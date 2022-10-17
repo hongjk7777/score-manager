@@ -83,7 +83,14 @@ block content
                     if(studentInfo.seoulDept)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 서울대 #{studentInfo.seoulDept} 순위
+                                th(colspan="6") 서울대 지원학과 순위
+                                    select#seoul-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                        each seoulDept in seoulDeptList
+                                            if(seoulDept == studentInfo.seoulDept)
+                                                option.my-dept(value=`${seoulDept}` selected) #{seoulDept} (지원)
+                                            else 
+                                                option(value=`${seoulDept}`) #{seoulDept}
+
                         tbody.table-border-bottom-0
                             tr
                                 if(studentInfo.seoulDeptRanking)
@@ -92,7 +99,13 @@ block content
                     if(studentInfo.yonseiDept)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 연세대 #{studentInfo.yonseiDept} 순위
+                                th(colspan="6") 연세대 지원학과 순위
+                                    select#yonsei-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                            each yonseiDept in yonseiDeptList
+                                                if(yonseiDept == studentInfo.yonseiDept)
+                                                    option.my-dept(value=`${yonseiDept}` selected) #{yonseiDept} (지원)
+                                                else
+                                                    option(value=`${yonseiDept}`) #{yonseiDept}
                                     
                         tbody.table-border-bottom-0
                             tr
@@ -112,13 +125,13 @@ block content
                             
                             if(studentInfo.seoulDeptRanking)
                                 .carousel-item
-                                    .fs-4.text-center 서울대 #{studentInfo.seoulDept} 성적
+                                    #seoul-dept-name.fs-4.text-center 서울대 #{studentInfo.seoulDept} 성적
                                     .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.seoulDeptMaxScore} 평균: #{studentInfo.seoulDeptAverage}
                                     canvas#seoul-exam-chart.d-block.w-100(data-chart=studentInfo.seoulChartData) 
 
                             if(studentInfo.yonseiDeptRanking) 
                                 .carousel-item
-                                    .fs-4.text-center 연세대 #{studentInfo.yonseiDept} 성적 
+                                    #yonsei-dept-name.fs-4.text-center 연세대 #{studentInfo.yonseiDept} 성적 
                                     .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.yonseiDeptMaxScore} 평균: #{studentInfo.yonseiDeptAverage}
                                     canvas#yonsei-exam-chart.d-block.w-100(data-chart=studentInfo.yonseiChartData) 
 
@@ -142,4 +155,5 @@ block content
 
 
 block append footer 
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
     script(src="/public/views/js/studentExamInfo.js") 

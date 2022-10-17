@@ -16,3 +16,15 @@ canvas{
     top: 0;
     bottom: auto;
 }
+
+.form-select {
+    box-shadow: none!important;
+}
+
+.form-select option:hover {
+    background-color: gray;
+}
+
+.my-dept {
+    font-weight: bold;
+}
