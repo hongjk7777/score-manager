@@ -3,11 +3,12 @@ import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
 import { initPassword } from "../auth/pwAuth";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
-import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
+import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum, getSeoulDeptInfo, getYonseiDeptInfo} from "../db/dbQuery.js";
 import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
 import { getStudentPNumByName, getStudentNameByPNum } from '../db/student/dbStudentQuery';
 import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../db/exam/dbExamQuery.js";
 import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
+import { getSeoulDeptList, getYonseiDeptList } from '../db/student/dbStudentDeptQuery.js'
 import { makeCommonTestExcel } from "../excel/out/exportExcel";
 
 import multer from "multer";
@@ -179,12 +180,30 @@ router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
         getStudentNameByPNum(pNum).then(userInfo => {
             getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
                 getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
-                    console.log(studentInfo);
-                    res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
-                        chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
+                    // console.log(studentInfo);
+                    getSeoulDeptList(req.query.round, userInfo.classId).then(seoulDeptList => {
+                        getYonseiDeptList(req.query.round, userInfo.classId).then(yonseiDeptList => {
+                            res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
+                                chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user,
+                                seoulDeptList: seoulDeptList, yonseiDeptList: yonseiDeptList});       
+                        });
+                    });
                 });
             });
         });
+    });
+});
+
+router.get("/:id/student/exam/seoul-dept", function(req, res) {
+    // console.log(req.query.round + req.query.name);
+    getSeoulDeptInfo(req.params.id, req.query.round, req.query.name).then(seoulDeptInfo => {
+        res.send(seoulDeptInfo.seoulChartData);
+    });
+});
+
+router.get("/:id/student/exam/yonsei-dept", function(req, res) {
+    getYonseiDeptInfo(req.params.id, req.query.round, req.query.name).then(yonseiDeptInfo => {
+        res.json(yonseiDeptInfo.yonseiChartData);
     });
 });
 
