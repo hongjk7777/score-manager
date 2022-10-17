@@ -1,6 +1,8 @@
 const students = document.querySelectorAll("#student-info");
 const scoreRuleBtn = document.querySelector("#score-rule-btn");
 const problemInfoBtn = document.querySelector("#problem-info-btn");
+const seoulDeptSelect = document.querySelector("#seoul-dept-select")
+const yonseiDeptSelect = document.querySelector("#yonsei-dept-select")
 
 students.forEach(student => {
     const initName = '***';
@@ -24,14 +26,14 @@ function writeMyScore(student) {
     document.querySelector("#my-ranking").innerHTML = ranking;
 }
 
+const examRound = document.querySelector("#exam-round").innerHTML;
+
 scoreRuleBtn.addEventListener("click", e => {
-    const examRound = document.querySelector("#exam-round").innerHTML;
     const curUrl = window.location.href.split('?')[0];
     location.href=`${curUrl}/score-rule?round=${examRound}`;
 });
 
 problemInfoBtn.addEventListener("click", e => {
-    const examRound = document.querySelector("#exam-round").innerHTML;
     const studentName = document.querySelector("#username").innerHTML;
     const curUrl = window.location.href.split('?')[0];
     location.href=`${curUrl}/problem-info?round=${examRound}&name=${studentName}`;
@@ -42,7 +44,7 @@ function makeChart() {
     const ctx = examChart.getContext('2d');
     const chartDataStr = examChart.dataset.chart;
     let chartData = chartDataStr.substring(1, chartDataStr.length - 1).split(',').map(x => parseInt(x));
-    let backgroundColors = getBackgroundColors();
+    let backgroundColors = getChartColor();
 
     const chart = new Chart(ctx, {
         // type : 'bar' = 막대차트를 의미합니다.
@@ -97,19 +99,20 @@ function getMaxVal(chartData) {
     return max;
 }
 
+let seoulExamChart;
 function makeSeoulChart() {
-    const seoulExamChart = document.getElementById('seoul-exam-chart');
-    if(!seoulExamChart){
+    const seoulExamCanvas = document.getElementById('seoul-exam-chart');
+    if(!seoulExamCanvas){
         return;
     }
     
-    const ctx = seoulExamChart.getContext('2d');
-    console.log(seoulExamChart.dataset);
-    const chartDataStr = seoulExamChart.dataset.chart;
+    const ctx = seoulExamCanvas.getContext('2d');
+    console.log(seoulExamCanvas.dataset);
+    const chartDataStr = seoulExamCanvas.dataset.chart;
     let chartData = chartDataStr.substring(1, chartDataStr.length - 1).split(',').map(x => parseInt(x));
-    let backgroundColors = getBackgroundColors();
+    let backgroundColors = getChartColor();
 
-    let chart = new Chart(ctx, {
+    seoulExamChart = new Chart(ctx, {
         // type : 'bar' = 막대차트를 의미합니다.
         type: 'bar', // 
         data: {
@@ -155,24 +158,25 @@ function makeSeoulChart() {
 
     const maxVal = getMaxVal(chartData);
     if(maxVal < 5){
-        chart.options.scales.yAxes[0].ticks.max = 5;
-        chart.options.scales.yAxes[0].ticks.stepSize = 1;
-        chart.update();
+        seoulExamChart.options.scales.yAxes[0].ticks.max = 5;
+        seoulExamChart.options.scales.yAxes[0].ticks.stepSize = 1;
+        seoulExamChart.update();
     }
 }
 
+let yonseiExamChart;
 function makeYonseiChart() {
-    const yonseiExamChart = document.getElementById('yonsei-exam-chart');
-    if(!yonseiExamChart){
+    const yonseiExamCanvas = document.getElementById('yonsei-exam-chart');
+    if(!yonseiExamCanvas){
         return;
     }
     
-    const ctx = yonseiExamChart.getContext('2d');
-    const chartDataStr = yonseiExamChart.dataset.chart;
+    const ctx = yonseiExamCanvas.getContext('2d');
+    const chartDataStr = yonseiExamCanvas.dataset.chart;
     let chartData = chartDataStr.substring(1, chartDataStr.length - 1).split(',').map(x => parseInt(x));
-    let backgroundColors = getBackgroundColors();
+    let backgroundColors = getChartColor();
 
-    const chart = new Chart(ctx, {
+    yonseiExamChart = new Chart(ctx, {
         // type : 'bar' = 막대차트를 의미합니다.
         type: 'bar', // 
         data: {
@@ -207,13 +211,13 @@ function makeYonseiChart() {
 
     const maxVal = getMaxVal(chartData);
     if(maxVal < 5){
-        chart.options.scales.yAxes[0].ticks.max = 5;
-        chart.options.scales.yAxes[0].ticks.stepSize = 1;
-        chart.update();
+        yonseiExamChart.options.scales.yAxes[0].ticks.max = 5;
+        yonseiExamChart.options.scales.yAxes[0].ticks.stepSize = 1;
+        yonseiExamChart.update();
     }
 }
 
-function getBackgroundColors() {
+function getChartColor() {
     let backgroundColors = Array(10).fill("gray");
 
     const myScoreIndex = Math.ceil(parseInt(document.querySelector('#score-sum').innerHTML) / 5) - 1;
@@ -224,6 +228,75 @@ function getBackgroundColors() {
     backgroundColors[myScoreIndex] = "rgb(255, 99, 132)";
 
     return backgroundColors;
+}
+
+
+const curUrl = window.location.href.split('?')[0];
+
+function handelSeoulDeptChange(e) {
+    const deptName = e.target.value;
+
+    axios({
+        url: `${curUrl}/seoul-dept?round=${examRound}&name=${deptName}`, 
+        method: 'get'
+    }).then(function(res){
+        console.log(res.data);
+        changeChartData(seoulExamChart, res.data);
+        changeSeoulDeptName(deptName);
+        changeChartColor(seoulExamChart);
+    });
+}
+
+function handelYonseiDeptChange(e) {
+    const deptName = e.target.value;
+    axios({
+        url: `${curUrl}/yonsei-dept?round=${examRound}&name=${deptName}`, 
+        method: 'get'
+    }).then(function(res){
+        console.log(res.data);
+        changeChartData(yonseiExamChart, res.data);
+        changeYonseiDeptName(deptName);
+        changeChartColor(yonseiExamChart);
+    });
+}
+
+function changeChartData(examChart, newDataSet, deptName){
+    removeExamChart(examChart);
+    addExamChart(examChart, newDataSet);
+    examChart.update(); 
+}
+
+function removeExamChart(examChart) {
+    examChart.data.datasets[0].data = [];
+}
+
+function addExamChart(examChart, newDataSet) {
+    newDataSet.forEach(newData => {
+        examChart.data.datasets[0].data.push(newData);
+    });
+}
+
+function changeSeoulDeptName(deptName) {
+    const seoulDeptName = document.querySelector("#seoul-dept-name");
+    seoulDeptName.innerText = `서울대 ${deptName} 성적`;
+}
+
+function changeYonseiDeptName(deptName) {
+    const yonseiDeptName = document.querySelector("#yonsei-dept-name");
+    yonseiDeptName.innerText = `연세대 ${deptName} 성적`;
+}
+
+function changeChartColor(examChart) {
+    examChart.data.datasets[0].backgroundColor = Array(10).fill("gray");
+    examChart.update(); 
+}
+
+if(seoulDeptSelect){
+    seoulDeptSelect.addEventListener("change", handelSeoulDeptChange);
+}
+
+if(yonseiDeptSelect){
+    yonseiDeptSelect.addEventListener("change", handelYonseiDeptChange);
 }
 
 makeChart();
