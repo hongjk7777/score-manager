@@ -1,5 +1,6 @@
 import db from "../dbConfig.js";
 import {signUpByStudentPhoneNum} from "../../auth/auth.js"
+import { getCommonExamRound } from "../../db/totalExam/dbTotalExamQuery.js"
 
 //FIXME: 이거 없애야 함 똑같은 이름을 가진 학생이 잇을수도
 function getStudentIdByName(studentName, classId, studentPhoneNum) {
@@ -203,6 +204,7 @@ async function getStudentInfosById(id) {
 }
 
 function getClassIdByStudent(studentPhoneNum){
+    // getCommonExamRound(round, classId);
     return new Promise(resolve => {
         db.query(`SELECT class_id FROM students WHERE phone_num = '${studentPhoneNum}'`, function(err, row) {
             if(err) {

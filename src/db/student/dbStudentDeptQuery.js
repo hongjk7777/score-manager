@@ -1,4 +1,6 @@
+import { resolve } from "path";
 import db from "../dbConfig.js";
+import { getCommonExamRound } from '../totalExam/dbTotalExamQuery.js'
 
 function addSeoulDeptToDB(seoulDept, studentId, commonRound) {
     return new Promise(resolve =>  {
@@ -33,46 +35,52 @@ function addYonseiDeptToDB(yonseiDept, studentId, commonRound) {
 function getSeoulDeptInfo(studentId, commonRound, seoulDept) {
     return new Promise(resolve => {
         db.query("USE classdb");
-        db.query(`SELECT score_sum, student_id FROM exams WHERE common_round = ${commonRound} 
-                AND seoul_dept = '${seoulDept}' ORDER BY score_sum DESC`, function(err, rows) {
+        // getCommonExamRound(round, classId).then(commonRound => {
+            db.query(`SELECT score_sum, student_id FROM exams WHERE common_round = ${commonRound} 
+                    AND seoul_dept = '${seoulDept}' ORDER BY score_sum DESC`, function(err, rows) {
 
-            let seoulDeptInfo = [];
+                let seoulDeptInfo = [];
 
-            if(err) {
-                console.log(err);
+                if(err) {
+                    console.log(err);
+                    resolve(seoulDeptInfo);
+                }
+
+                seoulDeptInfo.seoulDeptTester = rows.length;
+                
+                //TODO: 아래 두개를 합치는 게 더 빠를 듯
+                seoulDeptInfo.seoulChartData = getChartData(rows);
+                seoulDeptInfo.seoulDeptRanking = getDeptRanking(rows, studentId);
+                seoulDeptInfo.seoulDeptAverage = getDeptAverage(rows);
+                seoulDeptInfo.seoulDeptMaxScore = getDeptMaxScore(rows);
                 resolve(seoulDeptInfo);
-            }
+            });
 
-            seoulDeptInfo.seoulDeptTester = rows.length;
-            
-            //TODO: 아래 두개를 합치는 게 더 빠를 듯
-            seoulDeptInfo.seoulChartData = getChartData(rows);
-            seoulDeptInfo.seoulDeptRanking = getDeptRanking(rows, studentId);
-            seoulDeptInfo.seoulDeptAverage = getDeptAverage(rows);
-            seoulDeptInfo.seoulDeptMaxScore = getDeptMaxScore(rows);
-            resolve(seoulDeptInfo);
-        });
+        // });
     });
 }
 
 function getYonseiDeptInfo(studentId, commonRound, yonseiDept) { 
     return new Promise(resolve => {
         db.query("USE classdb");
-        db.query(`SELECT score_sum, student_id FROM exams WHERE common_round = ${commonRound} 
-                AND yonsei_dept = '${yonseiDept}' ORDER BY score_sum DESC`, function(err, rows) {
-            let yonseiDeptInfo = [];
-            if(err) {
-                console.log(err);
-                resolve(yonseiDeptInfo);
-            }
-            yonseiDeptInfo.yonseiDeptTester = rows.length;
+        // getCommonExamRound(round, classId).then(commonRound => {
+            db.query(`SELECT score_sum, student_id FROM exams WHERE common_round = ${commonRound} 
+                    AND yonsei_dept = '${yonseiDept}' ORDER BY score_sum DESC`, function(err, rows) {
+                let yonseiDeptInfo = [];
+                if(err) {
+                    console.log(err);
+                    resolve(yonseiDeptInfo);
+                }
+                yonseiDeptInfo.yonseiDeptTester = rows.length;
 
-            yonseiDeptInfo.yonseiChartData = getChartData(rows);
-            yonseiDeptInfo.yonseiDeptRanking = getDeptRanking(rows, studentId);
-            yonseiDeptInfo.yonseiDeptAverage = getDeptAverage(rows);
-            yonseiDeptInfo.yonseiDeptMaxScore = getDeptMaxScore(rows);
-            resolve(yonseiDeptInfo);
-        });
+                yonseiDeptInfo.yonseiChartData = getChartData(rows);
+                yonseiDeptInfo.yonseiDeptRanking = getDeptRanking(rows, studentId);
+                yonseiDeptInfo.yonseiDeptAverage = getDeptAverage(rows);
+                yonseiDeptInfo.yonseiDeptMaxScore = getDeptMaxScore(rows);
+                resolve(yonseiDeptInfo);
+            });
+        // });
+        
     });
 }
 
@@ -141,4 +149,50 @@ function getDeptMaxScore(rows) {
     return maxScore;
 }
 
-export {addSeoulDeptToDB, addYonseiDeptToDB, getSeoulDeptInfo, getYonseiDeptInfo}
+function getSeoulDeptList(round, classId){
+    return new Promise(resolve => {
+        db.query("USE classdb");
+        getCommonExamRound(round, classId).then(commonRound => {
+                db.query(`SELECT * FROM exams WHERE common_round = ${commonRound} AND NOT seoul_dept IS NULL 
+                    GROUP BY seoul_dept ORDER BY seoul_dept;`, function(err, rows) {
+                    let seoulDeptList = [];
+                    if(err) {
+                        console.log(err);
+                        resolve(seoulDeptList);
+                    }
+
+                    rows.forEach(row => {
+                        seoulDeptList.push(row.seoul_dept);
+                    });
+                    
+                    resolve(seoulDeptList);
+            });
+        });
+    });
+}
+
+function getYonseiDeptList(round, classId){
+    return new Promise(resolve => {
+        db.query("USE classdb");
+        getCommonExamRound(round, classId).then(commonRound =>{
+                db.query(`SELECT * FROM exams WHERE common_round = ${commonRound} AND NOT yonsei_dept IS NULL 
+                        GROUP BY yonsei_dept ORDER BY yonsei_dept;`, function(err, rows) {
+                    let yonseiDeptList = [];
+                    if(err) {
+                        console.log(err);
+                        resolve(yonseiDeptList);
+                    }
+
+                    rows.forEach(row => {
+                        yonseiDeptList.push(row.yonsei_dept);
+                    });
+                    
+                    resolve(yonseiDeptList);
+                });
+            }
+        );
+        
+    });
+}
+
+export {addSeoulDeptToDB, addYonseiDeptToDB, getSeoulDeptInfo, getYonseiDeptInfo, getSeoulDeptList, getYonseiDeptList}
