@@ -62,32 +62,31 @@
 
 - 성적 기록 확인
     
-    ![시험 목록 조회.png](./readmeResource/examList.png)
+    ![시험 목록 조회.png](./readmeImg/examList.png)
     
 
 - 성적 세부 사항 확인
     
-    ![성적 세부사항.png](/readmeResource/examInfo.png)
+    ![성적 세부사항.png](./readmeImg/examInfo.png)
     
 
 - 문제별 세부 사항
 
-    ![문제별 세부사항.PNG](/readmeResource/problemInfo.png)
+    ![문제별 세부사항.PNG](./readmeImg/problemInfo.png)
 
 ### 관리자
 
 - 관리하는 반 목록 화면
-adminExamList.png
-![Untitled](/readmeResource/classList.png)
+![Untitled](./readmeImg/classList.png)
 
 - 반에 속해 있는 학생 목록
 
-![Untitled](/readmeResource/userList.png)
+![Untitled](./readmeImg/userList.png)
 
 - 시험 목록
 
-![Untitled](/readmeResource/adminExamList.png)
+![Untitled](./readmeImg/adminExamList.png)
 
 - 성적 입력
 
-![Untitled](/readmeResource/examInput.png)
+![Untitled](./readmeImg/examInput.png)
