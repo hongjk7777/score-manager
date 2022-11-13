@@ -26,8 +26,12 @@
 ## 🔨 사용 기술
 
 ---
+* 프로그래밍 언어: JavaScript
+* 백엔드: Node.js
+* 테스트: Jest
+* DB : AWS RDS, MySQL
+* 배포: AWS ElasticBeanstalk
 
-[Skill List (2)](https://www.notion.so/608acbfd628d4cd8a118bb141ad8281c)
 
 ## 📃 구현기능 목록
 
