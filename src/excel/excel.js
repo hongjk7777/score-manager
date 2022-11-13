@@ -581,3 +581,6 @@ function checkDeptValidity(dept) {
 }
 
 export {putExcelValToDB, putDeptValToDB, removeExcelsDirectory}
+
+
+export {getScoreStartCol, getMaxCol, getStudentNum, getSchoolCol, getPhoneNumCol, getStudentStartRow, countNumberSize}
