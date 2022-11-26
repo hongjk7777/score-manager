@@ -1,13 +1,14 @@
 import crypto from "crypto";
 import { resolve } from "path";
 import db from "../db/dbConfig";
+import { getInitPassword } from "./initPw";
 
 function initPassword(studentPhoneNum) {
     return new Promise(resolve => {
         const query = `SELECT id FROM accounts WHERE username = '${studentPhoneNum}'`;
         console.log(query);
         var salt = crypto.randomBytes(16);
-        const initPassword = studentPhoneNum += '5';
+        const initPassword = getInitPassword(studentPhoneNum);
         db.query("USE classdb");
         db.query(query, function(err, row) {
             console.log(row);
