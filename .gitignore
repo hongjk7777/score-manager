@@ -10,3 +10,4 @@ build/server.js
 src/config.json
 test/testResource/testExcel.xlsx
 src/auth/initPw.js
+package-lock.json
