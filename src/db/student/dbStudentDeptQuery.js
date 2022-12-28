@@ -153,7 +153,7 @@ function getSeoulDeptList(round, classId){
     return new Promise(resolve => {
         db.query("USE classdb");
         getCommonExamRound(round, classId).then(commonRound => {
-                db.query(`SELECT * FROM exams WHERE common_round = ${commonRound} AND NOT seoul_dept IS NULL 
+                db.query(`SELECT seoul_dept FROM exams WHERE common_round = ${commonRound} AND NOT seoul_dept IS NULL 
                     GROUP BY seoul_dept ORDER BY seoul_dept;`, function(err, rows) {
                     let seoulDeptList = [];
                     if(err) {
@@ -164,6 +164,7 @@ function getSeoulDeptList(round, classId){
                     rows.forEach(row => {
                         seoulDeptList.push(row.seoul_dept);
                     });
+
                     
                     resolve(seoulDeptList);
             });
@@ -175,7 +176,7 @@ function getYonseiDeptList(round, classId){
     return new Promise(resolve => {
         db.query("USE classdb");
         getCommonExamRound(round, classId).then(commonRound =>{
-                db.query(`SELECT * FROM exams WHERE common_round = ${commonRound} AND NOT yonsei_dept IS NULL 
+                db.query(`SELECT yonsei_dept FROM exams WHERE common_round = ${commonRound} AND NOT yonsei_dept IS NULL 
                         GROUP BY yonsei_dept ORDER BY yonsei_dept;`, function(err, rows) {
                     let yonseiDeptList = [];
                     if(err) {
