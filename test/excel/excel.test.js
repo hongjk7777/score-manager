@@ -6,7 +6,7 @@ const workbook = new ExcelJS.Workbook();
 let testExcel, worksheet;
 
 beforeEach(async () => {
-    testExcel = await workbook.xlsx.readFile('test\\testResource\\testExcel.xlsx');
+    testExcel = await workbook.xlsx.readFile("test/testResource/testExcel.xlsx");
     worksheet = testExcel.worksheets[0];
 });
 
