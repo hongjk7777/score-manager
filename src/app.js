@@ -1,3 +1,5 @@
+import 'reflect-metadata'; // We need this in order to use @Decorators
+
 import express from "express";
 import passport from "passport";
 import bodyParser from "body-parser";
@@ -6,12 +8,14 @@ import MySQLStore from "express-mysql-session";
 import compression from "compression";
 import classRouter from "./classes/class.js";
 import adminRouter from "./classes/classList.js";
-import {router as authRouter, isAuthenticated} from "./auth/auth.js";
+import {router as authRouter} from "./auth/authController.js";
 import settingsRouter from "./settings/profile.js";
 import favicon from "serve-favicon";
 import path from "path";
 import config from "./config.json";
 import { getCommontTestExcel } from "./db/out/export";
+
+
 
 const app = express();
 
