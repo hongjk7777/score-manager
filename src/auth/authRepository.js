@@ -1,4 +1,4 @@
-import { Container } from "typedi";
+import { Container, Service } from "typedi";
 import { asyncDB } from "../db/dbConfig";
 import User from "../model/user";
 
@@ -13,6 +13,7 @@ export default class AuthRepository {
         return results.warningStatus === 0;
     }
 
+    //TODO: 지금 상태로 나가면 안 될 듯? DTO라도
     async findOneByUsername(username) {
         const query = `SELECT * FROM accounts WHERE username = '${username}'`
 
@@ -22,7 +23,27 @@ export default class AuthRepository {
             return null;
         }
 
-        return new User(rows[0].username);
+        return new User(rows[0].username, rows[0].hashed_password, rows[0].salt);
+    }
+
+    async findIdByUsername(username) {
+        const query = `SELECT id FROM accounts WHERE username = '${username}'`
+
+        const [rows] = await asyncDB.execute(query);
+
+        if (rows.length === 0) {
+            return null;
+        }
+
+        return rows[0].id;
+    }
+
+    async updatePasswordById(id, hashedPassword, salt) {
+        const query = `UPDATE accounts SET hashed_password = '${hashedPassword}', salt = '${salt}' WHERE id = ${salt}`;
+
+        const [results] = await asyncDB.execute(query);
+
+        return results.warningStatus === 0;
     }
 
     async deleteByUsername(username) {
@@ -35,4 +56,4 @@ export default class AuthRepository {
 
 }
 
-Container.set("authRepository", AuthRepository)
+//Container.set(AuthRepository, AuthRepository);
