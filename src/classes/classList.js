@@ -1,6 +1,5 @@
 import express from "express";
-import {isAdminAuthenticated, isAuthenticated} from "../auth/auth.js";
-import { initPassword } from "../auth/pwAuth";
+import {isAdminAuthenticated} from "../auth/authMiddleware.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../db/dbConfig";
 import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum, getSeoulDeptInfo, getYonseiDeptInfo} from "../db/dbQuery.js";
@@ -12,11 +11,12 @@ import { getSeoulDeptList, getYonseiDeptList } from '../db/student/dbStudentDept
 import { makeCommonTestExcel } from "../excel/out/exportExcel";
 
 import multer from "multer";
+import AuthService from "../auth/authService.js";
 // import fs from "fs";
 
 const router = express.Router();
 
-
+const authService = new AuthService();
 
 //set path to save input excels
 const upload = multer({dest: 'excels/'});
@@ -236,10 +236,11 @@ router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
     });
 });
 
+//TODO: 여기도 async await 라우터에서 데코레이터 패턴으로 처리해줘야 할ㄷ듯
 router.get("/:id/init-pw", isAdminAuthenticated, function(req, res) {
     getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
         // console.log(pNum);
-        initPassword(pNum).then(() => {
+        authService.initPassword(pNum).then(() => {
             res.redirect(`/classList/${req.params.id}`);
         });
     });
