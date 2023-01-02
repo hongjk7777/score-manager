@@ -4,7 +4,7 @@ import crypto from "crypto";
 import db from "../db/dbConfig";
 import AuthRepository from "./authRepository";
 import AuthService from "./authService";
-import userDTO from "../dto/authDTO";
+import AuthDTO from "../dto/authDTO";
 
 /* Configure password authentication strategy.
  *
@@ -27,7 +27,13 @@ passport.use(new LocalStrategy(async function verify(username, password, cb) {
         return cb(null, false, { message: '해당하는 유저가 없습니다.' });
     }
 
-    checkPassword(user, password, cb);
+    if(checkPassword(user, password)) {
+        return cb(null, new AuthDTO(user.getUsername()));
+    }
+
+    return cb(null, false, { message: '비밀번호가 틀렸습니다' });
+
+    // checkPassword(user, password, cb);
 
 }));
 
@@ -61,23 +67,11 @@ passport.deserializeUser(function(user, cb) {
     // console.log(user);
 });
 
-
 //TODO: crypto.pbkdf2 async await 하기
-function checkPassword(user, password, cb) {
-    let success = false;
-    crypto.pbkdf2( password, user.getSalt(), 310000, 32, 'sha256', function(err, hashedPassword) {
-        if (err) { 
-            return cb(err); 
-        }
+function checkPassword(user, password) {
+    const inputPassword = crypto.pbkdf2Sync( password, user.getSalt(), 310000, 32, 'sha256').toString();
 
-        if (user.getHashedPassword().toString() === hashedPassword.toString()) {
-            return cb(null, new userDTO(user.getUsername()));
-        }
-
-        return cb(null, false, { message: '비밀번호가 틀렸습니다' });
-    });
-
-    return success;
+    return user.getHashedPassword().toString() === inputPassword;
 }
 
 export default passport;

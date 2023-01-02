@@ -129,6 +129,7 @@ router.post("/change-password", function(req, res, next) {
     const username = req.user.username;
     const newPassword = req.body.newPassword;
 
+    //TODO: 비동기 처리 해야할 거 같은데 한 번 더 감싸면 되나?
     authService.changePassword(username, newPassword);
     
     req.logout(function(err) {

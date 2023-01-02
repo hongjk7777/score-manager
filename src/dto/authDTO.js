@@ -1,4 +1,4 @@
-export default class userDTO {
+export default class AuthDTO {
     username
 
     constructor (username) {
