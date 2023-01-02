@@ -39,7 +39,7 @@ export default class AuthRepository {
     }
 
     async updatePasswordById(id, hashedPassword, salt) {
-        const query = `UPDATE accounts SET hashed_password = '${hashedPassword}', salt = '${salt}' WHERE id = ${salt}`;
+        const query = `UPDATE accounts SET hashed_password = '${hashedPassword}', salt = '${salt}' WHERE id = '${id}'`;
 
         const [results] = await asyncDB.execute(query);
 
