@@ -1,5 +1,5 @@
 import express from "express"
-import {isAuthenticated} from "../auth/auth.js"
+import { isAuthenticated } from "../auth/authMiddleware";
 
 const router = express.Router();
 

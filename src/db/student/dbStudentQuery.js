@@ -1,6 +1,8 @@
 import db from "../dbConfig.js";
-import {signUpByStudentPhoneNum} from "../../auth/auth.js"
-import { getCommonExamRound } from "../../db/totalExam/dbTotalExamQuery.js"
+import { getCommonExamRound } from "../../db/totalExam/dbTotalExamQuery.js";
+import AuthService from "../../auth/authService.js";
+
+const authService = new AuthService();
 
 //FIXME: 이거 없애야 함 똑같은 이름을 가진 학생이 잇을수도
 function getStudentIdByName(studentName, classId, studentPhoneNum) {
@@ -111,6 +113,7 @@ function removeSamePNumStudent(studentName, studentPhoneNum, classId, schoolName
     });
 }
 
+//TODO: await을 안해도 되려나?
 function addStudentToDB(studentName, studentPhoneNum, classId, schoolName) {
     return new Promise(resolve => {
         db.query("USE classdb");
@@ -120,7 +123,7 @@ function addStudentToDB(studentName, studentPhoneNum, classId, schoolName) {
                 if(err) {
                     console.log(err);                        
                 }
-                signUpByStudentPhoneNum(studentPhoneNum);
+                authService.signUpByPhoneNum(studentPhoneNum);
                 resolve();
         });
     });

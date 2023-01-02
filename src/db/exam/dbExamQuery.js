@@ -1,7 +1,9 @@
 import db from "../dbConfig.js";
 import { getCommonExamRound } from '../totalExam/dbTotalExamQuery.js';
-import {isAdmin} from "../../auth/auth.js";
 import { resolve } from "path";
+import AuthService from "../../auth/authService.js";
+
+const authService = new AuthService();
 
 function putScoreToDB(studentId, classId, round , commonRound, firstScore, secondScore, thirdScore, scoreSum, ranking) {
     return new Promise(resolve => {
@@ -112,7 +114,7 @@ async function getExamInfosById(round, classId, user) {
 
                         studentInfo.ranking = ranking++ - sameCount;
 
-                        if(isAdmin(user) || user.id === studentScore.id) {
+                        if(authService.isAdmin(user) || user.id === studentScore.id) {
                             studentInfo.name = studentScore.name;
                         } else {
                             studentInfo.name = '***';
@@ -168,7 +170,7 @@ async function getExamInfosById(round, classId, user) {
 
                         studentInfo.ranking = ranking++ - sameCount;
 
-                        if(isAdmin(user) || user.username === studentScore.name) {
+                        if(authService.isAdmin(user) || user.username === studentScore.name) {
                             studentInfo.name = studentScore.name;
                         } else {
                             studentInfo.name = '***';
