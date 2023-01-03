@@ -1,12 +1,10 @@
 /node_modules
 /src/public/db/mysql.js
 /build
-/src/db/dbConfig.js
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-build/server.js
 src/config.json
 test/testResource/testExcel.xlsx
 src/auth/initPw.js
