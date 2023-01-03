@@ -69,9 +69,14 @@ passport.deserializeUser(function(user, cb) {
 
 //TODO: crypto.pbkdf2 async await 하기
 function checkPassword(user, password) {
+    const hexPassword = crypto.pbkdf2Sync( password, user.getSalt(), 310000, 32, 'sha256').toString("hex");
+    //이전 버전에서는 'hex'로 저장하지 않아서 예전 버전 비밀번호 호환용이다
     const inputPassword = crypto.pbkdf2Sync( password, user.getSalt(), 310000, 32, 'sha256').toString();
 
-    return user.getHashedPassword().toString() === inputPassword;
+    console.log(user.getHashedPassword());
+    console.log(hexPassword);
+
+    return (user.getHashedPassword().toString() === hexPassword) || (user.getHashedPassword().toString() === inputPassword);
 }
 
 export default passport;
