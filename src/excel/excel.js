@@ -8,11 +8,14 @@ import { putTotalExamToDB } from '../db/totalExam/dbTotalExamQuery.js'
 import { addStudentToDB, removeSamePNumStudent, getStudentIdByName } from '../db/student/dbStudentQuery'
 import { putScoreToDB } from '../db/exam/dbExamQuery'
 import { resolve } from "path";
+import WorksheetService from "./worksheetService.js";
 
 /* 
 TODO:
 양식을 지정해서 쓰게 해주는 것도 좋을 듯?
 */
+
+const worksheetService = new WorksheetService();
 
 async function putExcelValToDB(file, classId) {
     //이전에 사용했던 excel 파일을 지우고 다시 만든다.
@@ -159,7 +162,7 @@ function getProblemScore(scoreRuleStr) {
     let tempScoreArr = [];
 
     for (let i = 0; i < scoreRuleArr.length; i++) {
-        const scoreRule = scoreRuleArr[i];
+        let scoreRule = scoreRuleArr[i];
         const problemStr = `${problemNum + 1}.`;
         const smallProblemStr = `(${smallProblemNum + 1})`
 
@@ -287,8 +290,10 @@ function getCommonRound(commonRow, col) {
 
 
 function getExamScoreRule(excel, round) {
-    const sheetName = `테스트(${round}) 채점기준`;
-    const worksheet = excel.getWorksheet(sheetName);
+    const sheetName = `테스트(${round})`;
+    const worksheetId = worksheetService.findWorkbookIdByName(sheetName, excel);
+
+    const worksheet = excel.getWorksheet(worksheetId);
     const col = worksheet.getColumn(1);
     let scoreRule = "";
     col.eachCell({includeEmpty : true}, function(cell, colNumber) {
@@ -468,8 +473,8 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
         const firstScore = row.getCell(col).value;
         const secondScore = row.getCell(col + 1).value;
         const thirdScore = row.getCell(col + 2).value;
-        const scoreSum = row.getCell(col + 3).value? row.getCell(col + 3).value.result : 0;
-        const ranking = row.getCell(col + 4).value? row.getCell(col + 4).value.result : 0;
+        const scoreSum = getCellValue(row.getCell(col + 3));
+        const ranking = getCellValue(row.getCell(col + 4));
         const commonRound = await getCommonExamRound(round, classId);
 
 
@@ -479,6 +484,18 @@ async function putStudentDatasToDB(row, scoreStartCol, phoneNumCol, schoolStartC
         }
         // console.log(studentName + firstScore + secondScore + thirdScore + scoreSum + ranking);
         putScoreToDB(studentId, classId, round, commonRound, firstScore, secondScore, thirdScore, scoreSum, ranking);
+    }
+}
+
+function getCellValue(cell) {
+    if(cell.value) {
+        if(cell.value.result) {
+            return cell.value.result;
+        } else {
+            return cell.value;
+        }
+    } else {
+        return 0;
     }
 }
 
