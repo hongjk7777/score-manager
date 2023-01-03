@@ -17,6 +17,10 @@ class AuthService {
     
         const newUser = new User(initId, hashedPassword, salt);
 
+        if(await this.#authRepository.findOneByUsername(initId)) {
+            return;
+        }
+ 
         return await this.#authRepository.save(newUser);
 
     }
