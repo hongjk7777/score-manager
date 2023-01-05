@@ -1,12 +1,24 @@
 import { Workbook } from "exceljs";
+import Exam from "../model/exam";
+import ExamScore from "../model/examScore";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
+import CellService from "./cellService";
+import ExamService from "./examService";
 
 //TODO: cell에서 하는 작업음 cellService로 분리하는 게 더 나을 듯?
-export default class WorksheetService {
+export default class WorksheetService {    
+    static indexRow = 2;
+    static commonRoundRow = 1;
+
+    #cellService = new CellService();
+    #examService = new ExamService();
+
 
     findWorksheetByName(name, excel) {
         let worksheetId = -1;
+
         excel.eachSheet((worksheet, id) => {
+            console.log('워크싯 이름: ' + worksheet.name);
             if(worksheet.name.includes(name)) {
                 worksheetId = id;
             }
@@ -16,89 +28,58 @@ export default class WorksheetService {
             return null;
         }
 
-        return excel.worksheets[worksheetId];
+        return excel.getWorksheet(worksheetId);
     }
 
+    //REFACTOR: round정보를 합쳐야 하나?
     handleExamDatas(worksheet, classId) {
-        const roundRows = this.#getRoundRow(worksheet);
-        const roundSize = this.#getRoundSize(worksheet);
+        const roundIndexRows = this.#getRoundIndexRow(worksheet);
+        const commonRoundRow = this.#getCommonRoundRow(worksheet);
+        let examDatas = new Array();
         let curRound = 1;
+        let curCommonRound = 1;
 
-        roundRows.eachCell((cell, col) => {
-            if(this.#isRoundCell(cell)) {
-                const round = this.#getRound(cell, curRound);
+        roundIndexRows.eachCell((cell, col) => {
+            if(this.#cellService.isRoundCell(cell)) {
+                const round = this.#cellService.getRound(cell, curRound);
+                const commonRound = this.#cellService.getCommonRound(commonRoundRow.getCell(col), curCommonRound);
+                const examScores = this.#getExamScores(worksheet, col, classId);
 
-                this.#saveExamsDatas(worksheet, round, col);
+                // examDatas.push(new Exam(round, commonRound, examScores.scores, undefined, examScores))
+
                 curRound++;
+                if(commonRound > 0) {
+                    curCommonRound++;
+                }
             }
         }); 
+
+        // return 여기서 배열로 반환해야할듯
     }
 
-    #getRoundRow(worksheet) {
+    #getRoundIndexRow(worksheet) {
         //TODO: 현재는 3번째 줄을 받아오는데 좀 더 범용성 있계?
-        return worksheet.getRow(2);
+        return worksheet.getRow(this.indexRow);
     }
 
-    #isRoundCell(cell) {
-        if(cell.value) {
-            return cell.value.includes('회'); 
-        }
-
-        return false;
-    }
-
-    #getRound(cell, curRound) {
-        if(cell.value) {
-            const roundStr = cell.value.split('회', 1)[0];
-            const regex = /[^0-9]/g;
-            const result = roundStr.replace(regex, "");
-            const round = parseInt(result);
-
-            if(!isNaN(round) && round == curRound + 1) {
-                return round;
-            }
-        }
-
-        throw SyntaxError(ExcelErrorMsg.NO_EXAM_ROUND_INDEX);
+    #getCommonRoundRow(worksheet) {
+        return worksheet.getRow(this.commonRoundRow);
     }
     
-    #saveExamsDatas(worksheet, round, col) {
+    #getExamScores(worksheet, col, classId) {
         //한 행씩 아래로 내려가면서 이름 있는지 확인하고 -> 하나의 객체 만들어서 저장
         //끝나고 나서 합계 구하기
         const firstScoreCol = worksheet.getCol(col);
+        let examScores = new Array();
 
         firstScoreCol.eachCell((cell, row) => {
-            if(this.#isScore(cell)) {
-                const scores = this.#getScores(worksheet, col);
-                this.#saveStudentsDatas(scores);
+            if(this.#cellService.isScore(cell)) {
+                const scores = this.#cellService.getScores(worksheet, row, col);
+                const student = this.#cellService.getStudent(worksheet, row, classId);
+                examScores.push(new ExamScore(scores, student));
             }
         });
-    }
 
-    #isScore(cell) {
-        if(cell.value) {
-            const score = parseInt(cell.value);
-
-            //TODO: 그냥 비어있을 때도 저 에러 뜨는지 확인해 봐야 함 그냥 비어 있을수도 있음
-            if(!isNaN(score) && !(cell.value.includes('회'))) {
-                throw SyntaxError(score + ExcelErrorMsg.NO_EXAM_ROUND_INDEX);
-            }   
-
-            return true;
-        }
-
-        return false;
-    }
-
-    #getScores(worksheet, col) {
-        return new Array();
-    }
-
-    #saveStudentsDatas(cell, round, col) {
-        let scores = new Array();
-
-        for (let i = 0; i < 3; i++) {
-            scores.push(this.#getScore(i));
-        }
+        return examScores;
     }
 }
