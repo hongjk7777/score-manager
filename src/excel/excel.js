@@ -291,9 +291,7 @@ function getCommonRound(commonRow, col) {
 
 function getExamScoreRule(excel, round) {
     const sheetName = `테스트(${round})`;
-    const worksheetId = worksheetService.findWorkbookIdByName(sheetName, excel);
-
-    const worksheet = excel.getWorksheet(worksheetId);
+    const worksheet = worksheetService.findWorksheetByName(sheetName, excel);
     const col = worksheet.getColumn(1);
     let scoreRule = "";
     col.eachCell({includeEmpty : true}, function(cell, colNumber) {
