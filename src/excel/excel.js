@@ -229,7 +229,7 @@ function getScoreArr(col) {
     col.eachCell({includeEmpty : true}, function(cell, rowNum) {
         if(cell.value?.result) {
             if(cell.value?.formula){
-                if(cell.value.formula.includes("SUM")){
+                if(cell.value.formula.includes("SUM") && !cell.value.formula.includes("SQRT")){
                     if(cell.value.result != 0) {
                         scoreArr.push(cell.value.result);
                     }
