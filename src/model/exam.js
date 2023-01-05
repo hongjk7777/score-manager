@@ -7,7 +7,7 @@ export default class Exam {
     studentId;
     classId;
 
-    constructor(round, commonRound, scores, ranking, 
+    constructor(round, commonRound, scores, ranking = 0, 
                 studentId, classId) {
         this.round = round;
         this.commonRound = commonRound;
