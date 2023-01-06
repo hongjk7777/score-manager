@@ -1,8 +1,11 @@
+import StudentRepository from "../db/student/studentRepository";
 import Student from "../model/student";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 
 export default class CellService {
+    #studentRepository = new StudentRepository();
+
     isRoundCell(cell) {
         if(cell.value) {
             return cell.value.includes('회'); 
@@ -77,7 +80,7 @@ export default class CellService {
     }
 
     #getScore(worksheet, row, col) {
-        const scoreCell = worksheet.getCol(startCol).getCell(row);
+        const scoreCell = worksheet.getColumn(startCol).getCell(row);
 
         if (scoreCell) {
             return scoreCell.value;
@@ -86,18 +89,21 @@ export default class CellService {
         return null;
     }
 
-    getStudent(worksheet, row) {
-        //TODO: 이거 비효율
-        const name = this.#getName(worksheet, row);
-        const phoneNum = this.#getPhoneNum();
+    getStudent(worksheet, row, classId) {
+        const phoneNum = this.#getPhoneNum(worksheet, row);
+        const student = this.#studentRepository.findOneByPhoneNum(phoneNum);
+
+        if(student === null) {
+            throw SyntaxError(ExcelErrorMsg.NO_EXISTENT_STUDENT);
+        }
 
         //TODO: 여기 뒤에 2개 안 넣어도 되려나
-        return new Student(name, phoneNum);
+        return student;
     }
 
     #getName(worksheet, row) {
         const nameCol = this.#getNameCol(worksheet);
-        const nameCell = worksheet.getCol(nameCol).getCell(row);
+        const nameCell = worksheet.getColumn(nameCol).getCell(row);
         
         if(nameCell) {
             return nameCell.value;
@@ -126,7 +132,7 @@ export default class CellService {
 
     #getPhoneNum(worksheet, row) {
         const phoneNumCol = this.#getPhoneNumCol(worksheet);
-        const phoneNumCell = worksheet.getCol(phoneNumCol).getCell(row);
+        const phoneNumCell = worksheet.getColumn(phoneNumCol).getCell(row);
 
         if(phoneNumCell) {
             return phoneNumCell.value;
