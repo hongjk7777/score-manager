@@ -92,7 +92,7 @@ router.get("/", isAdminAuthenticated, function(req, res) {
     getCommonExamCount().then(count => {
         let classArray = [];
         db.query("USE classdb");
-        db.query("SELECT * FROM classes", function(err, classes){
+        db.query("SELECT * FROM classes WHERE id > 30", function(err, classes){
             if(err) {
                 console.log("failed to find classes from db");
             }
