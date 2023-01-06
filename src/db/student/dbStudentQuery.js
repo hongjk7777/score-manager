@@ -132,7 +132,7 @@ function addStudentToDB(studentName, studentPhoneNum, classId, schoolName) {
 function getStudentList(classId) {
     return new Promise(resolve => {
         db.query(`USE classdb`);
-        db.query(`SELECT id, name FROM students WHERE class_id = ${classId}`, function(err, rows) {
+        db.query(`SELECT id, name FROM students WHERE class_id = ${classId} ORDER BY name;`, function(err, rows) {
             let studentList = [];
 
             if(err) {
