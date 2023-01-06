@@ -158,4 +158,23 @@ export default class CellService {
 
         return phoneNumCol;
     }
+
+    getScoreRule(cell) {
+        if(cell.value){
+            //cell 내부에서 font가 다른 경우 richText로 나눠져서 해당 처리를 함
+            if(cell.value.richText){
+                cell.value.richText.forEach(obj => {
+                    scoreRule += obj.text;
+                });
+                
+            } else{
+                scoreRule += cell.value;
+            }
+            scoreRule += "\n";
+
+        } else{
+            scoreRule += "$";
+            scoreRule += "\n";
+        }
+    }
 }
