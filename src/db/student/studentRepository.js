@@ -23,6 +23,21 @@ export default class StudentRepository {
         return this.#convertToStudents(rows);
     }
 
+    //TODO: 이거 테케
+    async findOneByPhoneNum(phoneNum) {
+        const query = `SELECT * FROM students WHERE phone_num = ${phoneNum}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return null;
+        }
+
+        const student = rows[0];
+
+        return new Student(student.name, student.phone_num, student.class_id, student.id);
+    }
+
     async deleteByClassId(classId) {
         const query = `DELETE FROM students WHERE class_id = ${classId}`;
         

@@ -2,6 +2,7 @@ import ExcelJS from "exceljs";
 import ExamRepository from "../db/exam/examRepository";
 import StudentRepository from "../db/student/studentRepository";
 import TotalExamRepository from "../db/totalExam/totalExamRepository";
+import TotalExam from "../model/totalExam";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 
@@ -28,9 +29,10 @@ export default class ExcelService {
                 //개인별 성적이 없을 경우 예외처리
             }
 
-            this.#worksheetService.handleExamDatas(personalSheet, classId);
+            const roundExams = this.#worksheetService.extractRoundExams(personalSheet, classId);
+            this.#saveRoundExams(excel, roundExams, classId);
             //TODO: 아래 함수들 구현 요망
-            //const worksheet = excel.worksheets[0];
+            const worksheet = excel.worksheets[0];
             //handleStudentDatas(worksheet, classId);
         }
         
@@ -82,5 +84,69 @@ export default class ExcelService {
         await this.#examRepository.deleteByClassId(classId);
         await this.#studentRepository.deleteByClassId(classId);
         await this.#totalExamRepository.deleteByClassId(classId);
+    }
+
+    #saveRoundExams(excel, roundExams, classId) {
+        roundExams.forEach((roundExam, round) => {
+            this.#saveRoundExamInfo(excel, roundExam, round + 1, classId);
+            this.#saveRoundExamData(roundExam);
+        });
+    }
+
+    #saveRoundExamInfo(excel, roundExam, round, classId) {
+        const commonRound = this.#getCommonRound(roundExam);
+        const scoreRuleWorksheet = this.#worksheetService.findWorksheetByName(`테스트(${round})`, excel);
+        const scoreRule = this.#worksheetService.getScoreRule(scoreRuleWorksheet);
+        const problemScores = this.#parseProblemScore(scoreRule);
+        const examInfo = this.#calculateExamInfo(roundExam);
+
+        new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
+                    examInfo.average, examInfo.standardDev, examInfo.maxScore, problemScores)
+    }
+
+    #getCommonRound(roundExam) {
+        if(roundExam.length > 0) {
+            return roundExam[0].commonRound;
+        }
+
+        return -1;
+    }
+
+    #parseProblemScore(scoreRule) {
+        
+        return [0, 0, 0];
+    }
+
+    #calculateExamInfo(roundExam) {
+        const scores = roundExam.map(exam => exam.scoreSum);
+        const totalTester = scores.length;
+        const average = (scores.reduce((partialSum, nextVal) => partialSum + nextVal) / totalTester)
+                        .toFixed(2);
+        const stdDev = Math.sqrt(scores.map(x => Math.pow(x - average, 2))
+                                        .reduce((partialSum, nextVal) => partialSum + nextVal)
+                                        / totalTester);
+        const maxScore = Math.max.apply(null, scores);
+
+        return new ExamInfo(totalTester, average, stdDev, maxScore);
+    }
+
+    #saveRoundExamData(roundExam) {
+        roundExam.forEach(exam => {
+            this.#examRepository.save(exam);    
+        });
+    }
+}
+
+class ExamInfo {
+    totalTester;
+    average;
+    standardDev;
+    maxScore;
+
+    constructor(totalTester, average, standardDev, maxScore) {
+        this.totalTester = totalTester;
+        this.average = average;
+        this.standard = standardDev;
+        this.maxScore = maxScore;
     }
 }
