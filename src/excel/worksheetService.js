@@ -1,4 +1,5 @@
 import { Workbook } from "exceljs";
+import StudentRepository from "../db/student/studentRepository";
 import Exam from "../model/exam";
 import ExamScore from "../model/examScore";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
@@ -12,13 +13,13 @@ export default class WorksheetService {
 
     #cellService = new CellService();
     #examService = new ExamService();
+    #studentRepository = new StudentRepository();
 
 
     findWorksheetByName(name, excel) {
         let worksheetId = -1;
 
         excel.eachSheet((worksheet, id) => {
-            console.log('워크싯 이름: ' + worksheet.name);
             if(worksheet.name.includes(name)) {
                 worksheetId = id;
             }
@@ -82,8 +83,10 @@ export default class WorksheetService {
 
         firstScoreCol.eachCell((cell, row) => {
             if(this.#cellService.isScore(cell)) {
-                const scores = this.#cellService.getScores(worksheet, row, col);
-                const student = this.#cellService.getStudent(worksheet, row, classId);
+                const scoreCells = this.#getScoreCells(worksheet, row, col);
+                const scores = this.#cellService.getScores(scoreCells);
+
+                const student = this.#getStudent(worksheet, row, classId);
 
                 examScores.push(new ExamScore(scores, student));
             }
@@ -92,18 +95,64 @@ export default class WorksheetService {
         return examScores;
     }
 
+    #getScoreCells(worksheet, row, col) {
+        const firstScoreCell = worksheet.getColumn(col).getCell(row);
+        const secondScoreCell = worksheet.getColumn(col + 1).getCell(row);
+        const thirdScoreCell = worksheet.getColumn(col + 2).getCell(row);
+
+        return [firstScoreCell, secondScoreCell, thirdScoreCell];
+    }
+
+    async #getStudent(worksheet, row, classId) {
+        const phoneNum = this.#getPhoneNum(worksheet, row);
+        const student = await this.#studentRepository.findOneByPhoneNum(phoneNum);
+
+        if(student === null) {
+            throw new SyntaxError(ExcelErrorMsg.NO_EXISTENT_STUDENT);
+        }
+
+        //TODO: 여기 뒤에 2개 안 넣어도 되려나
+        return student;
+    }
+
+    #getPhoneNum(worksheet, row) {
+        const phoneNumCol = this.#getPhoneNumCol(worksheet);
+        const phoneNumCell = worksheet.getColumn(phoneNumCol).getCell(row);
+
+        if(phoneNumCell) {
+            return phoneNumCell.value;
+        }
+
+        return null;
+    }
+
+    #getPhoneNumCol(worksheet) {
+        const indexRow = worksheet.getRow(WorksheetService.indexRow);
+        let phoneNumCol = -1;
+
+        indexRow.eachCell((cell, col) => {
+            if(cell.value && cell.value.includes("학부모")) {
+                phoneNumCol = col;
+                return;
+            }
+        });
+
+        if(phoneNumCol < 0) {
+            throw new SyntaxError(ExcelErrorMsg.NO_PHONE_NUM_COL);
+        }
+
+        return phoneNumCol;
+    }
+
     getScoreRule(worksheet) {
         const scoreRulesCol = worksheet.getColumn(1);
         let scoreRule = "";
-        
+        const that = this;
+
         scoreRulesCol.eachCell({includeEmpty : true}, function(cell) {            
-            scoreRule += parseScoreRule(cell);
+            scoreRule += that.#cellService.getScoreRule(cell);
         });
 
         return scoreRule;
-    }
-
-    parseScoreRule(cell) {
-        this.#cellService.getScoreRule(cell);
     }
 }
