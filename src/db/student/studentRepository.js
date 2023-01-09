@@ -25,7 +25,7 @@ export default class StudentRepository {
 
     //TODO: 이거 테케
     async findOneByPhoneNum(phoneNum) {
-        const query = `SELECT * FROM students WHERE phone_num = ${phoneNum}`;
+        const query = `SELECT * FROM students WHERE phone_num = '${phoneNum}'`;
 
         const [rows] = await asyncDB.execute(query);
 
