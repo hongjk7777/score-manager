@@ -114,8 +114,8 @@ export default class CellService {
 
     isScore(cell) {
         if(cell.value) {
-            const score = parseInt(cell.value);
-
+            const score = cell.value;
+            
             //TODO: 그냥 비어있을 때도 저 에러 뜨는지 확인해 봐야 함 그냥 비어 있을수도 있음
             if(isNaN(score)) {
                 throw new SyntaxError(ExcelErrorMsg.INCORRECT_EXAM_SCORE);
@@ -134,15 +134,19 @@ export default class CellService {
             const score = this.#getScore(scoreCell);
             scores.push(score);
         })
-
-        console.log(scores);
         
         return scores;
     }
 
     #getScore(scoreCell) {        
         if (scoreCell.value) {
-            const score = this.#parseIntWithoutStr(scoreCell.value);
+            let score = 0; 
+
+            if(typeof scoreCell.value === 'number') {
+                score = scoreCell.value;
+            } else if(typeof scoreCell.value === 'string') {
+                score = this.#parseIntWithoutStr(scoreCell.value);
+            }
             
             if(isNaN(score)) {
                 throw new SyntaxError(ExcelErrorMsg.INCORRECT_EXAM_SCORE);

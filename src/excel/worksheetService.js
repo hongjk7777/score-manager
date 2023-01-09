@@ -196,10 +196,10 @@ export default class WorksheetService {
         return examScores;
     }
 
-    #getScoreCells(worksheet, row, col) {
-        const firstScoreCell = worksheet.getColumn(col).getCell(row);
-        const secondScoreCell = worksheet.getColumn(col + 1).getCell(row);
-        const thirdScoreCell = worksheet.getColumn(col + 2).getCell(row);
+    #getScoreCells(worksheet, rowNum, colNum) {
+        const firstScoreCell = worksheet.getRow(rowNum).getCell(colNum);
+        const secondScoreCell = worksheet.getRow(rowNum).getCell(colNum + 1);
+        const thirdScoreCell = worksheet.getRow(rowNum).getCell(colNum + 2);
 
         return [firstScoreCell, secondScoreCell, thirdScoreCell];
     }
