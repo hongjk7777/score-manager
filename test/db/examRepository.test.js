@@ -49,7 +49,7 @@ describe('repo 통합 테스트', () => {
 
     afterEach(async () => {
         //테스트 student 삭제
-        await studentRepository.deleteByClassId(testCourse.id);
+        await studentRepository.deleteByCourseId(testCourse.id);
 
         const findStudents = await studentRepository.findByClassId(testCourse.id);
         expect(findStudents.length).toBe(0);
