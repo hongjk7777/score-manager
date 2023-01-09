@@ -15,11 +15,11 @@ export default class ExcelService {
     #worksheetService = new WorksheetService();
 
 
-    async putExcelValToDB(file, classId) {
+    async putExcelValToDB(file, courseId) {
         this.#initExcelDirectory(file);
     
         const excel = await this.#getExcel(file);
-        const success = await this.#deleteClassPrevDB(classId);
+        const success = await this.#deleteClassPrevDB(courseId);
 
         if(success) {
             const personalSheetName = '개인';
@@ -29,8 +29,11 @@ export default class ExcelService {
                 //개인별 성적이 없을 경우 예외처리
             }
 
-            const roundExams = this.#worksheetService.extractRoundExams(personalSheet, classId);
-            this.#saveRoundExams(excel, roundExams, classId);
+            const students = this.#worksheetService.extractStudents(worksheet, courseId);
+            this.#saveStudents(students);
+
+            const roundExams = await this.#worksheetService.extractRoundExams(personalSheet, courseId);
+            this.#saveRoundExams(excel, roundExams, courseId);
             //TODO: 아래 함수들 구현 요망
             const worksheet = excel.worksheets[0];
             //handleStudentDatas(worksheet, classId);
@@ -82,7 +85,7 @@ export default class ExcelService {
 
     async #deleteClassPrevDB(classId) {
         await this.#examRepository.deleteByClassId(classId);
-        await this.#studentRepository.deleteByClassId(classId);
+        await this.#studentRepository.deleteByCourseId(classId);
         await this.#totalExamRepository.deleteByClassId(classId);
     }
 
@@ -113,7 +116,7 @@ export default class ExcelService {
     }
 
     #parseProblemScore(scoreRule) {
-        
+
         return [0, 0, 0];
     }
 
@@ -128,6 +131,12 @@ export default class ExcelService {
         const maxScore = Math.max.apply(null, scores);
 
         return new ExamInfo(totalTester, average, stdDev, maxScore);
+    }
+
+    #saveStudents(students) {
+        students.forEach(student => {
+            this.#studentRepository.save(student);    
+        });
     }
 
     #saveRoundExamData(roundExam) {
