@@ -2,9 +2,75 @@ import ExcelErrorMsg from "../validator/excelErrorMsg";
 
 export default class CellService {
 
-    isRoundCell(cell) {
+    isRoundIndexCell(cell) {
         if(cell.value) {
-            return cell.value.includes('회'); 
+            return cell.value.includes('회') && cell.value.includes('(1)'); 
+        }
+
+        return false;
+    }
+
+    isNameIndexCell(cell) {
+        if(cell.value) {
+            return cell.value.includes('이름'); 
+        }
+
+        return false;
+    }
+
+    isPhoneNumIndexCell(cell) {
+        if(cell.value) {
+            return cell.value.includes('학부모') || cell.value.includes('전번'); 
+        }
+
+        return false;
+    }
+
+    isStudentNumIndexCell(cell) {
+        if(cell.value) {
+            return cell.value.includes('순번'); 
+        }
+
+        return false;
+    }
+
+    isStudentNumCell(cell) {
+        if(cell.value) {
+            if(typeof cell.value === 'number') {
+                return true;
+            } else if(typeof cell.value === 'string') {
+                return !isNaN(cell.value);
+            }
+        }
+
+        return false;
+    }
+
+    getPhoneNum(cell) {
+
+        if(cell.value) {
+            return this.#parseOnlyNumber(cell.value);
+        }
+
+        return '';
+    }
+
+    #parseOnlyNumber(str) {
+        const regex = /[^0-9]/g;
+        const result = str.replace(regex, "");
+
+        return result;
+    }
+
+    isStudentNameCell(cell) {
+        if(cell.value) {
+            const name = cell.value.replaceAll(' ', '');
+            
+            if(name == '' || name == '이름') {
+                return false;
+            }
+
+            return true;
         }
 
         return false;
@@ -14,7 +80,6 @@ export default class CellService {
         if(cell.value) {
             const roundStr = cell.value.split('회', 1)[0];
             const round = this.#parseIntWithoutStr(roundStr);
-
             if(!isNaN(round) && round == curRound + 1) {
                 return round;
             }

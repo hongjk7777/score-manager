@@ -32,6 +32,107 @@ export default class WorksheetService {
         return excel.getWorksheet(worksheetId);
     }
 
+    extractStudents(worksheet, courseId) {
+        const students = this.#getStudents(worksheet, courseId);
+
+        return students;
+    }
+
+    #getStudents(worksheet, classId) {
+        const students = new Array();
+        const indexRow = this.#getIndexRow(worksheet);
+        const nameCol = this.#getNameCol(indexRow);
+        const phoneNumCol = this.#getPhoneNumCol(indexRow);
+        const studentNumCol = this.#getStudentNumCol(indexRow);
+        const studentRows = this.#getStudentRows(worksheet, nameCol, studentNumCol);
+
+        studentRows.forEach((row) => {
+            const name = this.#getName(row, nameCol);
+            const phoneNum = this.#cellService.getPhoneNum(row, phoneNumCol);
+
+            students.push(new Student(name, phoneNum, classId));
+        })
+
+        return students;
+    }
+
+    #getNameCol(indexRow) {
+        let nameCol = -1;
+
+        indexRow.eachCell((cell, col) => {
+            if(this.#cellService.isNameIndexCell(cell)) {
+                nameCol = col;
+                return;
+            }
+        });
+
+        if(nameCol === -1) {
+            throw SyntaxError(ExcelErrorMsg.NO_STUDENT_NAME_COL);
+        }
+
+        return nameCol;
+    }
+
+    #getPhoneNumCol(indexRow) {
+        let phoneNumCol = -1;
+
+        indexRow.eachCell((cell, col) => {
+            if(this.#cellService.isPhoneNumIndexCell(cell)) {
+                phoneNumCol = col;
+                return;
+            }
+        });
+
+        if(phoneNumCol === -1) {
+            throw SyntaxError(ExcelErrorMsg.NO_STUDENT_NAME_COL);
+        }
+
+        return phoneNumCol;
+    }
+
+    #getStudentNumCol(indexRow) {
+        let studentNumCol = -1;
+
+        indexRow.eachCell((cell, col) => {
+            if(this.#cellService.isStudentNumIndexCell(cell)) {
+                studentNumCol = col;
+                return;
+            }
+        });
+
+        if(studentNumCol === -1) {
+            throw SyntaxError(ExcelErrorMsg.NO_STUDENT_NUM_INDEX);
+        }
+
+        return studentNumCol;
+    }
+
+    #getStudentRows(worksheet, nameCol, studentNumCol) {
+        const studentRows = new Array();
+
+        worksheet.eachRow((row) => {
+            const studentNumCell = row.getCell(studentNumCol);
+            const studentNameCell = row.getCell(nameCol);
+
+            if(this.#cellService.isStudentNumCell(studentNumCell) &&
+                this.#cellService.isStudentNameCell(studentNameCell)) {
+                studentRows.push(row);
+            }
+        })
+
+        return studentRows;
+    }
+
+    #getName(row, nameCol) {
+        const nameCell = row.getCell(nameCol);
+
+        if(nameCell.value) {
+            return nameCell.value;
+        }
+
+        throw new SyntaxError(ExcelErrorMsg.INCORRECT_STUDENT_NAME_INDEX);
+    }
+
     //REFACTOR: 함수가 너무 길어서 이해하기 힘듬
     extractRoundExams(worksheet, classId) {
         const roundIndexRows = this.#getRoundIndexRow(worksheet);
@@ -103,8 +204,11 @@ export default class WorksheetService {
         return [firstScoreCell, secondScoreCell, thirdScoreCell];
     }
 
-    async #getStudent(worksheet, row, classId) {
-        const phoneNum = this.#getPhoneNum(worksheet, row);
+    async #findStudent(worksheet, rowNum, classId) {
+        const indexRow = this.#getIndexRow(worksheet);
+        const phoneNumCol = this.#getPhoneNumCol(indexRow);
+        const phoneNumCell = worksheet.getRow(rowNum).getCell(phoneNumCol);
+        const phoneNum = this.#cellService.getPhoneNum(phoneNumCell);
         const student = await this.#studentRepository.findOneByPhoneNum(phoneNum);
 
         if(student === null) {
@@ -113,35 +217,6 @@ export default class WorksheetService {
 
         //TODO: 여기 뒤에 2개 안 넣어도 되려나
         return student;
-    }
-
-    #getPhoneNum(worksheet, row) {
-        const phoneNumCol = this.#getPhoneNumCol(worksheet);
-        const phoneNumCell = worksheet.getColumn(phoneNumCol).getCell(row);
-
-        if(phoneNumCell) {
-            return phoneNumCell.value;
-        }
-
-        return null;
-    }
-
-    #getPhoneNumCol(worksheet) {
-        const indexRow = worksheet.getRow(WorksheetService.indexRow);
-        let phoneNumCol = -1;
-
-        indexRow.eachCell((cell, col) => {
-            if(cell.value && cell.value.includes("학부모")) {
-                phoneNumCol = col;
-                return;
-            }
-        });
-
-        if(phoneNumCol < 0) {
-            throw new SyntaxError(ExcelErrorMsg.NO_PHONE_NUM_COL);
-        }
-
-        return phoneNumCol;
     }
 
     getScoreRule(worksheet) {
