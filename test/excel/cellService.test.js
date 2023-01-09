@@ -3,25 +3,153 @@ import ExcelErrorMsg from "../../src/validator/excelErrorMsg";
 
 const cellService = new CellService();
 
-describe('isRoundCell 테스트', () => {
+describe('isRoundIndexCell 테스트', () => {
     test('한 자릿수 정상 테스트', () => {
-        const testCell = {'value' : '1회'};
+        const testCell = {'value' : '1회(1)'};
         
-        expect(cellService.isRoundCell(testCell)).toBe(true);
+        expect(cellService.isRoundIndexCell(testCell)).toBe(true);
     })
 
     test('두 자릿수 정상 테스트', () => {
-        const testCell = {'value' : '12회'};
+        const testCell = {'value' : '12회(1)'};
         
-        expect(cellService.isRoundCell(testCell)).toBe(true);
+        expect(cellService.isRoundIndexCell(testCell)).toBe(true);
     })
 
-    test('비정상 테스트', () => {
-        const testCell = {'value' : '1화'};
+    test('회차 index가 아닐 경우 테스트', () => {
+        const testCell = {'value' : '1회'};
         const testCell2 = {'value' : '114511'};
         
-        expect(cellService.isRoundCell(testCell)).toBe(false);
-        expect(cellService.isRoundCell(testCell2)).toBe(false);
+        expect(cellService.isRoundIndexCell(testCell)).toBe(false);
+        expect(cellService.isRoundIndexCell(testCell2)).toBe(false);
+    })
+})
+
+describe('isNameIndexCell 테스트', () => {
+    test('띄어쓰기 없는 정상 테스트', () => {
+        const testCell = {'value' : '이름'};
+        
+        expect(cellService.isNameIndexCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기 있는 정상 테스트', () => {
+        const testCell = {'value' : ' 이름  '};
+        
+        expect(cellService.isNameIndexCell(testCell)).toBe(true);
+    })
+
+    test('이름 index가 아닐 경우 테스트', () => {
+        const testCell = {'value' : '1회(1)'};
+        const testCell2 = {'value' : '학부모전번'};
+        
+        expect(cellService.isNameIndexCell(testCell)).toBe(false);
+        expect(cellService.isNameIndexCell(testCell2)).toBe(false);
+    })
+})
+
+describe('isPhoneNumIndexCell 테스트', () => {
+    test('띄어쓰기가 없는 경우 정상 테스트', () => {
+        const testCell = {'value' : '학부모전번'};
+        
+        expect(cellService.isPhoneNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기가 있는 경우 정상 테스트', () => {
+        const testCell = {'value' : '학부모 전번'};
+        
+        expect(cellService.isPhoneNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('학부모만 있는 경우 정상 테스트', () => {
+        const testCell = {'value' : '학부모'};
+        
+        expect(cellService.isPhoneNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('전번만 있는 경우 정상 테스트', () => {
+        const testCell = {'value' : '전번'};
+        
+        expect(cellService.isPhoneNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('전화번호 index가 아닐 경우 테스트', () => {
+        const testCell = {'value' : '1회(1)'};
+        const testCell2 = {'value' : '이름'};
+        
+        expect(cellService.isPhoneNumIndexCell(testCell)).toBe(false);
+        expect(cellService.isPhoneNumIndexCell(testCell2)).toBe(false);
+    })
+})
+
+describe('isStudentNumIndexCell 테스트', () => {
+    test('띄어쓰기 없는 정상 테스트', () => {
+        const testCell = {'value' : '순번'};
+        
+        expect(cellService.isStudentNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기 있는 정상 테스트', () => {
+        const testCell = {'value' : ' 순번  '};
+        
+        expect(cellService.isStudentNumIndexCell(testCell)).toBe(true);
+    })
+
+    test('순번 index가 아닐 경우 테스트', () => {
+        const testCell = {'value' : '1회(1)'};
+        const testCell2 = {'value' : '학부모전번'};
+        
+        expect(cellService.isStudentNumIndexCell(testCell)).toBe(false);
+        expect(cellService.isStudentNumIndexCell(testCell2)).toBe(false);
+    })
+})
+
+describe('isStudentNumCell 테스트', () => {
+    test('정수 정상 테스트', () => {
+        const testCell = {'value' : 1};
+        
+        expect(cellService.isStudentNumCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기 없는 문자열 정상 테스트', () => {
+        const testCell = {'value' : '1'};
+        
+        expect(cellService.isStudentNumCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기 있는 문자열 정상 테스트', () => {
+        const testCell = {'value' : ' 12  '};
+        
+        expect(cellService.isStudentNumCell(testCell)).toBe(true);
+    })
+
+    test('학생 순번이 아닐 경우 테스트', () => {
+        const testCell = {'value' : '1회(1)'};
+        const testCell2 = {'value' : '학부모전번'};
+        
+        expect(cellService.isStudentNumCell(testCell)).toBe(false);
+        expect(cellService.isStudentNumCell(testCell2)).toBe(false);
+    })
+})
+
+describe('isStudentNameCell 테스트', () => {
+    test('띄어쓰기 없는 정상 테스트', () => {
+        const testCell = {'value' : '학생1'};
+        
+        expect(cellService.isStudentNameCell(testCell)).toBe(true);
+    })
+
+    test('띄어쓰기 있는 정상 테스트', () => {
+        const testCell = {'value' : ' 학생2  '};
+        
+        expect(cellService.isStudentNameCell(testCell)).toBe(true);
+    })
+
+    test('학생 이름이 아닐 거나 비어 있을 경우 테스트', () => {
+        const testCell = {'value' : '이름'};
+        const testCell2 = {'value' : ''};
+        
+        expect(cellService.isStudentNameCell(testCell)).toBe(false);
+        expect(cellService.isStudentNameCell(testCell2)).toBe(false);
     })
 })
 
@@ -115,26 +243,44 @@ describe('getCommonRound 테스트', () => {
 })
 
 describe('isScore 테스트', () => {
-    test('한 자릿수 정상 테스트', () => {
+    test('한 자릿수 정수 정상 테스트', () => {
+        const testCell = {'value' : 1};
+        
+        expect(cellService.isScore(testCell)).toBe(true);
+    })
+
+    test('두 자릿수 정수 정상 테스트', () => {
+        const testCell = {'value' : 12};
+        
+        expect(cellService.isScore(testCell)).toBe(true);
+    })
+
+    test('세 자릿수 정수 정상 테스트', () => {
+        const testCell = {'value' : 123};
+        
+        expect(cellService.isScore(testCell)).toBe(true);
+    })
+
+    test('한 자릿수 문자열 정상 테스트', () => {
         const testCell = {'value' : `1`};
         
         expect(cellService.isScore(testCell)).toBe(true);
     })
 
-    test('두 자릿수 정상 테스트', () => {
+    test('두 자릿수 문자열 정상 테스트', () => {
         const testCell = {'value' : `12`};
         
         expect(cellService.isScore(testCell)).toBe(true);
     })
 
-    test('세 자릿수 정상 테스트', () => {
+    test('세 자릿수 문자열 정상 테스트', () => {
         const testCell = {'value' : `123`};
         
         expect(cellService.isScore(testCell)).toBe(true);
     })
 
     test('띄어쓰기 있을 경우 정상 테스트', () => {
-        const testCell = {'value' : `1 2 3  `};
+        const testCell = {'value' : `  123  `};
         
         expect(cellService.isScore(testCell)).toBe(true);
     })
