@@ -63,7 +63,7 @@ describe('getScoreRule 테스트', () => {
     });
 })
 
-describe('getScoreRule 테스트', () => {
+describe('findWorksheetByName 테스트', () => {
     test('띄어쓰기 없는 경우 정상 테스트', async () => {
         const partialWorksheetName = '테스트(1)';
         const worksheet = worksheetService.findWorksheetByName(partialWorksheetName, excel);
@@ -85,3 +85,16 @@ describe('getScoreRule 테스트', () => {
         expect(worksheet.name).toBe(realWorksheet.name);
     });
 })
+
+describe('extractStudents 테스트', () => {
+    test('띄어쓰기 없는 경우 정상 테스트', async () => {
+        const personalWorksheetName = '개인별';
+        const worksheet = worksheetService.findWorksheetByName(personalWorksheetName, excel);
+        const students = worksheetService.extractStudents(worksheet, courseId);
+
+        const testStudentLength = 66;
+        
+        expect(students.length).toBe(testStudentLength);
+    });
+})
+
