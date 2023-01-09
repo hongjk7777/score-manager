@@ -26,7 +26,7 @@ describe('repo 통합 테스트', () => {
         let findStudents = await studentRepository.findByClassId(testCourse.id);
         expect(findStudents.length).toBe(1);
 
-        await studentRepository.deleteByClassId(testCourse.id);
+        await studentRepository.deleteByCourseId(testCourse.id);
 
         findStudents = await studentRepository.findByClassId(testCourse.id);
         expect(findStudents.length).toBe(0);
