@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import fs from "fs"
 import ExamRepository from "../db/exam/examRepository";
 import StudentRepository from "../db/student/studentRepository";
 import TotalExamRepository from "../db/totalExam/totalExamRepository";
@@ -19,17 +20,17 @@ export default class ExcelService {
         this.#initExcelDirectory(file);
     
         const excel = await this.#getExcel(file);
-        const success = await this.#deleteClassPrevDB(courseId);
+        const success = await this.deleteClassPrevDB(courseId);
 
         if(success) {
             const personalSheetName = '개인';
-            const personalSheet = this.#worksheetService.findWorksheetByName(personalSheetName);
+            const personalSheet = this.#worksheetService.findWorksheetByName(personalSheetName, excel);
             if (personalSheet == null) {
                 throw new RangeError(ExcelErrorMsg.NO_PERSONAL_PAGE);
                 //개인별 성적이 없을 경우 예외처리
             }
 
-            const students = this.#worksheetService.extractStudents(worksheet, courseId);
+            const students = this.#worksheetService.extractStudents(personalSheet, courseId);
             this.#saveStudents(students);
 
             const roundExams = await this.#worksheetService.extractRoundExams(personalSheet, courseId);
@@ -83,10 +84,14 @@ export default class ExcelService {
         return excel;
     }
 
-    async #deleteClassPrevDB(classId) {
-        await this.#examRepository.deleteByClassId(classId);
-        await this.#studentRepository.deleteByCourseId(classId);
-        await this.#totalExamRepository.deleteByClassId(classId);
+    async deleteClassPrevDB(classId) {
+        let success = false;
+
+        success = await this.#examRepository.deleteByClassId(classId);
+        success = await this.#studentRepository.deleteByCourseId(classId);
+        success = await this.#totalExamRepository.deleteByClassId(classId);
+
+        return success;
     }
 
     #saveRoundExams(excel, roundExams, classId) {
@@ -103,8 +108,10 @@ export default class ExcelService {
         const problemScores = this.#parseProblemScore(scoreRule);
         const examInfo = this.#calculateExamInfo(roundExam);
 
-        new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
+        const totalExam = new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
                     examInfo.average, examInfo.standardDev, examInfo.maxScore, problemScores)
+
+        this.#totalExamRepository.save(totalExam);
     }
 
     #getCommonRound(roundExam) {
@@ -155,7 +162,7 @@ class ExamInfo {
     constructor(totalTester, average, standardDev, maxScore) {
         this.totalTester = totalTester;
         this.average = average;
-        this.standard = standardDev;
+        this.standardDev = standardDev;
         this.maxScore = maxScore;
     }
 }
