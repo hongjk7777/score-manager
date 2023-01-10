@@ -1,12 +1,14 @@
 import ExcelJS from "exceljs";
 import { async } from "regenerator-runtime";
 import CourseRepository from "../../src/db/class/courseRepository";
+import StudentRepository from "../../src/db/student/studentRepository";
 import WorksheetService from "../../src/excel/worksheetService";
 
 const workbook = new ExcelJS.Workbook();
 const path = 'test/testResource/testExcel.xlsx';
 
 const worksheetService = new WorksheetService();
+const studentRepository = new StudentRepository();
 const courseRepository = new CourseRepository();
 const testClassName = 'worksheetTest';
 let courseId;
@@ -18,6 +20,11 @@ beforeAll(async () => {
     courseId = await createClass();
 })
 
+afterAll(async () => {
+    await studentRepository.deleteByCourseId(courseId);
+    await deleteClass();
+})
+
 async function createClass() {
     expect(await courseRepository.save(testClassName)).toBe(true);
 
@@ -26,10 +33,6 @@ async function createClass() {
 
     return findCourse.id;
 }
-
-afterAll(async () => {
-    await deleteClass();
-})
 
 async function deleteClass() {
     expect(await courseRepository.deleteById(courseId)).toBe(true);
@@ -98,3 +101,28 @@ describe('extractStudents 테스트', () => {
     });
 })
 
+describe('extractRoundExams 테스트', () => {
+    test('띄어쓰기 없는 경우 정상 테스트', async () => {
+        const personalWorksheetName = '개인별';
+        const worksheet = worksheetService.findWorksheetByName(personalWorksheetName, excel);
+
+        const students = worksheetService.extractStudents(worksheet, courseId);
+        students.forEach(async (student) => {
+            await studentRepository.save(student);
+        })
+
+        const roundExams = await worksheetService.extractRoundExams(worksheet, courseId);
+        console.log(roundExams[0]);
+
+        const testers = [37, 46, 43, 40, 43, 40, 38, 24];
+        testers.forEach((value, round) => {
+            expect(roundExams[round].length).toBe(testers[round]);
+        })
+
+        await studentRepository.deleteByCourseId(courseId);
+    });
+})
+
+
+
+// 성적 칸에 띄어쓰기 한번하고 해보기
