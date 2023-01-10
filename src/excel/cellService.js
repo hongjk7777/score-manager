@@ -109,14 +109,12 @@ export default class CellService {
             }
         }
 
-        return -1;
+        return 0;
     }
 
     isScore(cell) {
-        if(cell.value) {
+        if(cell.value && (typeof cell.value === 'number')) {
             const score = cell.value;
-            
-            //TODO: 그냥 비어있을 때도 저 에러 뜨는지 확인해 봐야 함 그냥 비어 있을수도 있음
             if(isNaN(score)) {
                 throw new SyntaxError(ExcelErrorMsg.INCORRECT_EXAM_SCORE);
             }   
