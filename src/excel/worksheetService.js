@@ -2,17 +2,16 @@ import { Workbook } from "exceljs";
 import StudentRepository from "../db/student/studentRepository";
 import Exam from "../model/exam";
 import ExamScore from "../model/examScore";
+import Student from "../model/student";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import CellService from "./cellService";
-import ExamService from "./examService";
 
 //TODO: cell에서 하는 작업음 cellService로 분리하는 게 더 나을 듯?
 export default class WorksheetService {    
-    static indexRow = 2;
-    static commonRoundRow = 1;
+    indexRow = 2;
+    commonRoundRow = 1;
 
     #cellService = new CellService();
-    #examService = new ExamService();
     #studentRepository = new StudentRepository();
 
 
@@ -134,25 +133,30 @@ export default class WorksheetService {
     }
 
     //REFACTOR: 함수가 너무 길어서 이해하기 힘듬
-    extractRoundExams(worksheet, classId) {
-        const roundIndexRows = this.#getRoundIndexRow(worksheet);
+    async extractRoundExams(worksheet, courseId) {
+        const indexRow = this.#getIndexRow(worksheet);
         const commonRoundRow = this.#getCommonRoundRow(worksheet);
         let roundExams = new Array();
-        let curRound = 1;
-        let curCommonRound = 1;
+        let curRound = 0;
+        let curCommonRound = 0;
+        
 
-        roundIndexRows.eachCell((cell, col) => {
-            if(this.#cellService.isRoundCell(cell)) {
+        for (let colNum = 1; colNum <= indexRow._cells.length; colNum++) {
+            const cell = indexRow.getCell(colNum);
+            // const cell = indexRow._cells[colNum];
+
+            if(this.#cellService.isRoundIndexCell(cell)) {
+
                 const round = this.#cellService.getRound(cell, curRound);
-                const commonRound = this.#cellService.getCommonRound(commonRoundRow.getCell(col), curCommonRound);
-                const examScores = this.#getExamScores(worksheet, col, classId);
+                const commonRound = this.#getCommonRound(commonRoundRow, curCommonRound, colNum);
+                const examScores = await this.#getExamScores(worksheet, colNum, courseId);
                 let exams = new Array();
 
                 //REFACTOR: 여기 커먼라운드를 모르는ㄴ게 조을 거 같은데 total_exam_id를 따로 받ㄴ는게 좋을듯
                 //ranking은 현재 쓰지 않지만 이전 버젼에 사용해 현재는 undefined를 통해 기본값을 사용
                 examScores.forEach(examScore => {
-                    exams.push(new Exam(round, commonRound, examScores.scores, 
-                                        undefined, examScores.student.id, classId));
+                    exams.push(new Exam(round, commonRound, examScore.scores, 
+                                        undefined, examScore.student.id, courseId));
                 });
 
                 roundExams.push(exams);
@@ -162,12 +166,12 @@ export default class WorksheetService {
                     curCommonRound++;
                 }
             }
-        }); 
+        }
         
         return roundExams;
     }
 
-    #getRoundIndexRow(worksheet) {
+    #getIndexRow(worksheet) {
         //TODO: 현재는 3번째 줄을 받아오는데 좀 더 범용성 있계?
         return worksheet.getRow(this.indexRow);
     }
@@ -175,23 +179,34 @@ export default class WorksheetService {
     #getCommonRoundRow(worksheet) {
         return worksheet.getRow(this.commonRoundRow);
     }
+
+    #getCommonRound(commonRoundRow, curCommonRound, colNum) {
+        //엑셀 양식에 따라 공통회차를 적는 위치가 달라서 두 개를 다 체크한다.
+        const oldCommonRound = this.#cellService.getCommonRound(commonRoundRow.getCell(colNum + 3), curCommonRound);
+        const newCommonRound = this.#cellService.getCommonRound(commonRoundRow.getCell(colNum + 4), curCommonRound);
+
+        return Math.max(oldCommonRound, newCommonRound);
+    }
     
-    #getExamScores(worksheet, col, classId) {
+    async #getExamScores(worksheet, col, classId) {
         //한 행씩 아래로 내려가면서 이름 있는지 확인하고 -> 하나의 객체 만들어서 저장
         //끝나고 나서 합계 구하기
         const firstScoreCol = worksheet.getColumn(col);
         let examScores = new Array();
 
-        firstScoreCol.eachCell((cell, row) => {
+        for (let rowNum = 1; rowNum <= firstScoreCol.values.length; rowNum++) {
+            const cell = worksheet.getRow(rowNum).getCell(col);
+            
             if(this.#cellService.isScore(cell)) {
-                const scoreCells = this.#getScoreCells(worksheet, row, col);
+                
+                const scoreCells = this.#getScoreCells(worksheet, rowNum, col);
                 const scores = this.#cellService.getScores(scoreCells);
 
-                const student = this.#getStudent(worksheet, row, classId);
+                const student = await this.#findStudent(worksheet, rowNum, classId);
 
                 examScores.push(new ExamScore(scores, student));
             }
-        });
+        }
 
         return examScores;
     }
