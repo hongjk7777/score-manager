@@ -3,6 +3,7 @@ import StudentRepository from "../db/student/studentRepository";
 import Exam from "../model/exam";
 import ExamScore from "../model/examScore";
 import Student from "../model/student";
+import StudentDept from "../model/studentDept";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import CellService from "./cellService";
 
@@ -47,7 +48,7 @@ export default class WorksheetService {
 
         studentRows.forEach((row) => {
             const name = this.#getName(row, nameCol);
-            const phoneNum = this.#cellService.getPhoneNum(row, phoneNumCol);
+            const phoneNum = this.#getPhoneNum(row, phoneNumCol);
 
             students.push(new Student(name, phoneNum, classId));
         })
@@ -130,6 +131,12 @@ export default class WorksheetService {
         }
 
         throw new SyntaxError(ExcelErrorMsg.INCORRECT_STUDENT_NAME_INDEX);
+    }
+
+    #getPhoneNum(row, phoneNumCol) {
+        const cell = row.getCell(phoneNumCol);
+
+        return this.#cellService.getPhoneNum(cell);
     }
 
     //REFACTOR: 함수가 너무 길어서 이해하기 힘듬
