@@ -55,4 +55,14 @@ export default class StudentRepository {
 
         return students;
     }
+
+    async updateDepts(studentDept) {
+        const query = `UPDATE students SET seoul_dept = '${studentDept.seoulDept}', 
+                        yonsei_dept = '${studentDept.yonseiDept}' 
+                        WHERE id = ${studentDept.studentId} && common_round = ${studentDept.commonRound}`;
+        
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;           
+    }
 }

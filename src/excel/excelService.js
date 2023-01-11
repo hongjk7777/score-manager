@@ -7,8 +7,6 @@ import TotalExam from "../model/totalExam";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 
-
-
 export default class ExcelService {
     #examRepository = new ExamRepository();
     #totalExamRepository = new TotalExamRepository();
@@ -16,7 +14,7 @@ export default class ExcelService {
     #worksheetService = new WorksheetService();
 
 
-    async putExcelValToDB(file, courseId) {
+    async putExcelDatasToDB(file, courseId) {
         this.#initExcelDirectory(file);
     
         const excel = await this.#getExcel(file);
@@ -149,6 +147,23 @@ export default class ExcelService {
     #saveRoundExamData(roundExam) {
         roundExam.forEach(exam => {
             this.#examRepository.save(exam);    
+        });
+    }
+
+    async putDeptDatasToDB(file, courseId) {
+        const excel = await this.#getExcel(file);
+        const worksheet = excel.worksheets[0];
+
+        const roundDeptDatas = await this.#worksheetService.extractRoundDeptDatas(worksheet, courseId);
+        
+        roundDeptDatas.forEach(roundDeptData => {
+            this.#updateRoundDept(roundDeptData);
+        });
+    }
+
+    #updateRoundDept(roundDeptData) {
+        roundDeptData.forEach(studentDept => {
+            this.#studentRepository.updateDepts(studentDept);
         });
     }
 }
