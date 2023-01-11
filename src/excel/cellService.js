@@ -3,7 +3,7 @@ import ExcelErrorMsg from "../validator/excelErrorMsg";
 export default class CellService {
 
     isRoundIndexCell(cell) {
-        if(cell.value) {
+        if(cell.value && (typeof cell.value === 'string')) {
             return cell.value.includes('회') && cell.value.includes('(1)'); 
         }
 
@@ -11,7 +11,7 @@ export default class CellService {
     }
 
     isNameIndexCell(cell) {
-        if(cell.value) {
+        if(cell.value && (typeof cell.value === 'string')) {
             return cell.value.includes('이름'); 
         }
 
@@ -19,7 +19,7 @@ export default class CellService {
     }
 
     isPhoneNumIndexCell(cell) {
-        if(cell.value) {
+        if(cell.value && (typeof cell.value === 'string')) {
             return cell.value.includes('학부모') || cell.value.includes('전번'); 
         }
 
@@ -27,7 +27,7 @@ export default class CellService {
     }
 
     isStudentNumIndexCell(cell) {
-        if(cell.value) {
+        if(cell.value && (typeof cell.value === 'string')) {
             return cell.value.includes('순번'); 
         }
 
@@ -47,9 +47,13 @@ export default class CellService {
     }
 
     getPhoneNum(cell) {
+        let value = cell.value;
 
-        if(cell.value) {
-            return this.#parseOnlyNumber(cell.value);
+        if(value) {
+            if(typeof value === 'number') {
+                value = '0' + value;
+            }
+            return this.#parseOnlyNumber(value);
         }
 
         return '';
@@ -177,5 +181,52 @@ export default class CellService {
         }
 
         return scoreRule;
+    }
+
+    isDeptRoundCell(cell, curCommonRound) {
+        if(cell.value) {
+            let round = 0;
+            if(typeof cell.value === 'number') {
+                return cell.value === curCommonRound + 1;
+            } else if(typeof cell.value === 'string') {
+                round = this.#parseIntWithoutStr(cell.value);
+
+                return !isNaN(round) && (round === curCommonRound + 1);
+            }
+        }
+
+        return false;
+    }
+
+    getDeptCommonRound(cell, curCommonRound) {
+        if(cell.value) {
+            let commonRound = 0;
+
+            if(typeof cell.value === 'string') {
+                commonRound = this.#parseIntWithoutStr(cell.value);
+            } else if(typeof cell.value === 'number') {
+                commonRound = cell.value;
+            }
+
+            if(commonRound != curCommonRound + 1) {
+                throw new SyntaxError(ExcelErrorMsg.INCORRECT_DEPT_ROUND);
+            }
+
+            return commonRound;
+        }
+
+        throw new SyntaxError(ExcelErrorMsg.INCORRECT_DEPT_ROUND);
+    }
+
+    getStudentDept(cell) {
+        const value = cell.value;
+
+        if (value && (typeof value === 'string')) {
+            if(value.includes('과') || value.includes('부')) {
+                return value;
+            }
+        }
+
+        return null;
     }
 }

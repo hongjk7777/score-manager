@@ -245,4 +245,57 @@ export default class WorksheetService {
 
         return scoreRule;
     }
+
+    async extractRoundDeptDatas(worksheet, courseId) {
+        const indexRow = this.#getIndexRow(worksheet);
+        let roundDeptDatas = new Array();
+        let curCommonRound = 0;
+        
+
+        for (let colNum = 1; colNum <= indexRow._cells.length; colNum++) {
+            const cell = indexRow.getCell(colNum);
+            // const cell = indexRow._cells[colNum];
+
+            if(this.#cellService.isDeptRoundCell(cell, curCommonRound)) {
+
+                const commonRound = this.#cellService.getDeptCommonRound(cell, curCommonRound);
+                const studentDepts = await this.#getStudentDepts(worksheet, colNum, courseId, commonRound);
+                let roundDeptData = new Array();
+
+                studentDepts.forEach(studentDept => {
+                    roundDeptData.push(studentDept);
+                });
+
+                roundDeptDatas.push(roundDeptData);
+                
+                curCommonRound++;
+            }
+        }
+        
+        return roundDeptDatas;
+    }
+
+    async #getStudentDepts(worksheet, col, classId, commonRound) {
+        //한 행씩 아래로 내려가면서 이름 있는지 확인하고 -> 하나의 객체 만들어서 저장
+        //끝나고 나서 합계 구하기
+        let studentDepts = new Array();
+
+        const seoulDeptCol = worksheet.getColumn(col);
+
+        for (let rowNum = 1; rowNum <= seoulDeptCol.values.length; rowNum++) {
+            const seoulDeptCell = worksheet.getRow(rowNum).getCell(col);
+            const yonseiDeptCell = worksheet.getRow(rowNum).getCell(col + 1);
+
+            const seoulDept = this.#cellService.getStudentDept(seoulDeptCell);
+            const yonseiDept = this.#cellService.getStudentDept(yonseiDeptCell);
+
+            const student = await this.#findStudent(worksheet, rowNum, classId);
+
+            if (seoulDept || yonseiDept) {
+                studentDepts.push(new StudentDept(student.id, seoulDept, yonseiDept, commonRound))
+            }
+        }
+
+        return studentDepts;
+    }
 }
