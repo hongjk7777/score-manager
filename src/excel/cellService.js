@@ -198,7 +198,7 @@ export default class CellService {
         return false;
     }
 
-    getDeptCommonRound(cell, curCommonRound) {
+    getDeptCommonRound(cell, prevCommonRound) {
         if(cell.value) {
             let commonRound = 0;
 
@@ -208,7 +208,7 @@ export default class CellService {
                 commonRound = cell.value;
             }
 
-            if(commonRound != curCommonRound + 1) {
+            if(commonRound != prevCommonRound + 1) {
                 throw new SyntaxError(ExcelErrorMsg.INCORRECT_DEPT_ROUND);
             }
 

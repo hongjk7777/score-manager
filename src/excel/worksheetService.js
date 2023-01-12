@@ -157,13 +157,14 @@ export default class WorksheetService {
                 const round = this.#cellService.getRound(cell, curRound);
                 const commonRound = this.#getCommonRound(commonRoundRow, curCommonRound, colNum);
                 const examScores = await this.#getExamScores(worksheet, colNum, courseId);
+                
                 let exams = new Array();
 
                 //REFACTOR: 여기 커먼라운드를 모르는ㄴ게 조을 거 같은데 total_exam_id를 따로 받ㄴ는게 좋을듯
                 //ranking은 현재 쓰지 않지만 이전 버젼에 사용해 현재는 undefined를 통해 기본값을 사용
                 examScores.forEach(examScore => {
                     exams.push(new Exam(round, commonRound, examScore.scores, 
-                                        undefined, examScore.student.id, courseId));
+                                        undefined, examScore.studentId, courseId));
                 });
 
                 roundExams.push(exams);
@@ -203,15 +204,15 @@ export default class WorksheetService {
 
         for (let rowNum = 1; rowNum <= firstScoreCol.values.length; rowNum++) {
             const cell = worksheet.getRow(rowNum).getCell(col);
-            
             if(this.#cellService.isScore(cell)) {
                 
                 const scoreCells = this.#getScoreCells(worksheet, rowNum, col);
                 const scores = this.#cellService.getScores(scoreCells);
 
                 const student = await this.#findStudent(worksheet, rowNum, classId);
+                const studentId = student.id;
 
-                examScores.push(new ExamScore(scores, student));
+                examScores.push(new ExamScore(scores, studentId));
             }
         }
 
@@ -226,18 +227,30 @@ export default class WorksheetService {
         return [firstScoreCell, secondScoreCell, thirdScoreCell];
     }
 
-    async #findStudent(worksheet, rowNum, classId) {
+    async #findStudent(worksheet, rowNum, courseId) {
         const indexRow = this.#getIndexRow(worksheet);
+        const nameCol = this.#getNameCol(indexRow);
+        const name = this.#getName(worksheet.getRow(rowNum), nameCol);
+        
         const phoneNumCol = this.#getPhoneNumCol(indexRow);
-        const phoneNumCell = worksheet.getRow(rowNum).getCell(phoneNumCol);
-        const phoneNum = this.#cellService.getPhoneNum(phoneNumCell);
-        const student = await this.#studentRepository.findOneByPhoneNum(phoneNum);
+        const phoneNum = this.#getPhoneNum(worksheet.getRow(rowNum), phoneNumCol)
+        const student = await this.#findOneByStudentInfo(name, phoneNum, courseId);
 
         if(student === null) {
             throw new SyntaxError(ExcelErrorMsg.NO_EXISTENT_STUDENT);
         }
 
         //TODO: 여기 뒤에 2개 안 넣어도 되려나
+        return student;
+    }
+
+    async #findOneByStudentInfo(name, phoneNum, courseId) {
+        let student = await this.#studentRepository.findOneByPhoneNumAndCourseId(phoneNum, courseId);
+        
+        if(student === null || (student.name != name)) {
+            student = await this.#studentRepository.findOneByNameAndCourseId(name, courseId);
+        }
+
         return student;
     }
 
@@ -282,7 +295,7 @@ export default class WorksheetService {
         return roundDeptDatas;
     }
 
-    async #getStudentDepts(worksheet, col, classId, commonRound) {
+    async #getStudentDepts(worksheet, col, courseId, commonRound) {
         //한 행씩 아래로 내려가면서 이름 있는지 확인하고 -> 하나의 객체 만들어서 저장
         //끝나고 나서 합계 구하기
         let studentDepts = new Array();
@@ -296,10 +309,17 @@ export default class WorksheetService {
             const seoulDept = this.#cellService.getStudentDept(seoulDeptCell);
             const yonseiDept = this.#cellService.getStudentDept(yonseiDeptCell);
 
-            const student = await this.#findStudent(worksheet, rowNum, classId);
+            let student;
+            try {
+                student = await this.#findStudent(worksheet, rowNum, courseId);
+            } catch (error) {
+                console.log(error.message);
+            }
 
-            if (seoulDept || yonseiDept) {
-                studentDepts.push(new StudentDept(student.id, seoulDept, yonseiDept, commonRound))
+            if(student) {
+                if (seoulDept || yonseiDept) {
+                    studentDepts.push(new StudentDept(student.id, seoulDept, yonseiDept, commonRound))
+                }
             }
         }
 
