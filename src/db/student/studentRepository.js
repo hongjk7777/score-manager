@@ -24,8 +24,24 @@ export default class StudentRepository {
     }
 
     //TODO: 이거 테케
-    async findOneByPhoneNum(phoneNum) {
-        const query = `SELECT * FROM students WHERE phone_num = '${phoneNum}'`;
+    async findOneByPhoneNumAndCourseId(phoneNum, courseId) {
+        const query = `SELECT * FROM students WHERE phone_num = '${phoneNum}' AND
+                     class_id = ${courseId}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return null;
+        }
+
+        const student = rows[0];
+
+        return new Student(student.name, student.phone_num, student.class_id, student.id);
+    }
+
+    async findOneByNameAndCourseId(name, courseId) {
+        const query = `SELECT * FROM students WHERE name = '${name}' AND
+                     class_id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -54,15 +70,5 @@ export default class StudentRepository {
         });
 
         return students;
-    }
-
-    async updateDepts(studentDept) {
-        const query = `UPDATE students SET seoul_dept = '${studentDept.seoulDept}', 
-                        yonsei_dept = '${studentDept.yonseiDept}' 
-                        WHERE id = ${studentDept.studentId} && common_round = ${studentDept.commonRound}`;
-        
-        const [result] = await asyncDB.execute(query);
-
-        return result.warningStatus === 0;           
     }
 }

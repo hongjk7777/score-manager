@@ -36,14 +36,25 @@ export default class ExamRepository {
         let exams = new Array();
 
         rows.forEach(row => {
-            const scores = new Array(row.first_score, row.second_sore, row.third_score);
+            const scores = new Array(row.first_score, row.second_score, row.third_score);
 
             exams.push(new Exam(row.round, row.common_round, scores,
-                        row.ranking, row.student_id, row.class_id));
+                        row.ranking, row.student_id, row.class_id,
+                        row.seoul_dept, row.yonsei_dept));
         });
 
         console.log('examLength: ' + exams.length);
 
         return exams;
+    }
+
+    async updateDepts(studentDept) {
+        const query = `UPDATE exams SET seoul_dept = '${studentDept.seoulDept}', 
+                        yonsei_dept = '${studentDept.yonseiDept}' 
+                        WHERE student_id = ${studentDept.studentId} AND common_round = ${studentDept.commonRound}`;
+        
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;           
     }
 }

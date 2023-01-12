@@ -6,9 +6,11 @@ export default class Exam {
     ranking;
     studentId;
     classId;
+    seoulDept;
+    yonseiDept;
 
     constructor(round, commonRound, scores, ranking = 0, 
-                studentId, classId) {
+                studentId, classId, seoulDept, yonseiDept) {
         this.round = round;
         this.commonRound = commonRound;
         this.scores = scores;
@@ -16,6 +18,8 @@ export default class Exam {
         this.ranking = ranking;
         this.studentId = studentId;
         this.classId = classId;
+        this.seoulDept = seoulDept;
+        this.yonseiDept = yonseiDept;
     }
 
     #getScoreSum(scores) {

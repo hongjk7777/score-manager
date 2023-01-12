@@ -156,15 +156,15 @@ export default class ExcelService {
 
         const roundDeptDatas = await this.#worksheetService.extractRoundDeptDatas(worksheet, courseId);
         
-        roundDeptDatas.forEach(roundDeptData => {
-            this.#updateRoundDept(roundDeptData);
-        });
+        for(const roundDeptData of roundDeptDatas) {
+            await this.#updateRoundDept(roundDeptData);
+        }
     }
 
-    #updateRoundDept(roundDeptData) {
-        roundDeptData.forEach(studentDept => {
-            this.#studentRepository.updateDepts(studentDept);
-        });
+    async #updateRoundDept(roundDeptData) {
+        for(const studentDept of roundDeptData) {
+            await this.#examRepository.updateDepts(studentDept);
+        }
     }
 }
 
