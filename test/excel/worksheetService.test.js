@@ -6,6 +6,7 @@ import WorksheetService from "../../src/excel/worksheetService";
 
 const workbook = new ExcelJS.Workbook();
 const path = 'test/testResource/testExcel.xlsx';
+const deptPath = 'test/testResource/testDeptExcel.xlsx';
 
 const worksheetService = new WorksheetService();
 const studentRepository = new StudentRepository();
@@ -16,7 +17,6 @@ let excel;
 
 beforeAll(async () => {
     excel = await workbook.xlsx.readFile(path);
-
     courseId = await createClass();
 })
 
@@ -93,6 +93,7 @@ describe('extractStudents 테스트', () => {
     test('띄어쓰기 없는 경우 정상 테스트', async () => {
         const personalWorksheetName = '개인별';
         const worksheet = worksheetService.findWorksheetByName(personalWorksheetName, excel);
+
         const students = worksheetService.extractStudents(worksheet, courseId);
 
         const testStudentLength = 66;
@@ -102,24 +103,46 @@ describe('extractStudents 테스트', () => {
 })
 
 describe('extractRoundExams 테스트', () => {
-    test('띄어쓰기 없는 경우 정상 테스트', async () => {
+    test('정상 테스트', async () => {
         const personalWorksheetName = '개인별';
         const worksheet = worksheetService.findWorksheetByName(personalWorksheetName, excel);
 
         const students = worksheetService.extractStudents(worksheet, courseId);
-        students.forEach(async (student) => {
-            await studentRepository.save(student);
+            students.forEach(async (student) => {
+                await studentRepository.save(student);
         })
 
         const roundExams = await worksheetService.extractRoundExams(worksheet, courseId);
-        console.log(roundExams[0]);
 
         const testers = [37, 46, 43, 40, 43, 40, 38, 24];
         testers.forEach((value, round) => {
             expect(roundExams[round].length).toBe(testers[round]);
         })
+    });
+})
 
-        await studentRepository.deleteByCourseId(courseId);
+describe('extractRoundDeptDatas 테스트', () => {
+    test('정상 테스트', async () => {
+        const deptExcel = await workbook.xlsx.readFile(deptPath);
+        const worksheet = deptExcel.worksheets[0];
+
+        const students = worksheetService.extractStudents(worksheet, courseId);
+        
+        for(const student of students) {
+            await studentRepository.save(student);
+        }
+        
+        expect(students.length).toBe(36)
+
+        const roundDeptDatas = await worksheetService.extractRoundDeptDatas(worksheet, courseId);
+
+        console.log(roundDeptDatas);
+        const testers = [23, 23, 0, 0, 0];
+
+        roundDeptDatas.forEach((value, index) => {
+            expect(value.length).toBe(testers[index]);
+        });
+
     });
 })
 
