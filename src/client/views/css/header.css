@@ -17,3 +17,7 @@ footer {
     position: relative;
     transform: translateY(-100%);
 }
+
+.logo-title {
+    font-size: 3em;
+}
