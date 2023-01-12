@@ -1,16 +1,25 @@
-import { async } from "regenerator-runtime";
+import ExcelJS from "exceljs";
 import CourseRepository from "../../src/db/class/courseRepository";
+import ExamRepository from "../../src/db/exam/examRepository";
+import StudentRepository from "../../src/db/student/studentRepository";
 import ExcelService from "../../src/excel/excelService";
+import WorksheetService from "../../src/excel/worksheetService";
 
 const excelService = new ExcelService();
+const worksheetService = new WorksheetService();
 const courseRepository = new CourseRepository();
+const examRepository = new ExamRepository();
+const studentRepository = new StudentRepository();
 const testClassName = 'excelTest';
 let courseId;
 
-const file = { 
+const examFile = { 
     'path' : 'test/testResource/testExcel.xlsx'
 };
 
+const deptFile = { 
+    'path' : 'test/testResource/testDeptExcel2.xlsx'
+};
 
 beforeAll(async () => {
     courseId = await createClass();
@@ -37,8 +46,31 @@ async function deleteClass() {
     expect(findCourse).toBe(null);
 }
 
-describe('putExcelValToDB 테스트', () => {
+describe('putExcelDatasToDB 테스트', () => {
     test('정상 테스트', async () => {
-        await excelService.putExcelValToDB(file, courseId);
+        await excelService.putExcelDatasToDB(examFile, courseId);
+        
+        const students = await studentRepository.findByCourseId(courseId);
+        expect(students.length).toBe(66);
+
+        const exams = await examRepository.findByClassId(courseId);
+        expect(exams.length).toBe(579);
+    }) 
+})
+
+describe('putExcelDatasToDB 테스트', () => {
+    test('정상 테스트', async () => {
+        await excelService.putDeptDatasToDB(deptFile, courseId);
+
+        const exams = await examRepository.findByClassId(courseId);
+
+        let count = 0;
+        exams.forEach((exam) => {
+            if(exam.seoulDept || exam.yonseiDept) {
+                count++;
+            }
+        });
+
+        expect(count).toBe(17);
     }) 
 })

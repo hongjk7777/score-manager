@@ -210,7 +210,7 @@ describe('getCommonRound 테스트', () => {
         const curRound = 0;
         const testCell = {};
         
-        expect(cellService.getCommonRound(testCell, curRound - 1)).toBe(-1);
+        expect(cellService.getCommonRound(testCell, curRound - 1)).toBe(0);
     })
 
     test('띄어쓰기 있을 경우 정상 테스트', () => {
@@ -261,41 +261,34 @@ describe('isScore 테스트', () => {
         expect(cellService.isScore(testCell)).toBe(true);
     })
 
-    test('한 자릿수 문자열 정상 테스트', () => {
+    test('한 자릿수 문자열 실패 테스트', () => {
         const testCell = {'value' : `1`};
         
-        expect(cellService.isScore(testCell)).toBe(true);
+        expect(cellService.isScore(testCell)).toBe(false);
     })
 
-    test('두 자릿수 문자열 정상 테스트', () => {
+    test('두 자릿수 문자열 실패 테스트', () => {
         const testCell = {'value' : `12`};
         
-        expect(cellService.isScore(testCell)).toBe(true);
+        expect(cellService.isScore(testCell)).toBe(false);
     })
 
-    test('세 자릿수 문자열 정상 테스트', () => {
+    test('세 자릿수 문자열 실패 테스트', () => {
         const testCell = {'value' : `123`};
         
-        expect(cellService.isScore(testCell)).toBe(true);
+        expect(cellService.isScore(testCell)).toBe(false);
     })
 
-    test('띄어쓰기 있을 경우 정상 테스트', () => {
+    test('띄어쓰기 있을 경우 실패 테스트', () => {
         const testCell = {'value' : `  123  `};
         
-        expect(cellService.isScore(testCell)).toBe(true);
+        expect(cellService.isScore(testCell)).toBe(false);
     })
 
     test('비어있을 경우 정상 테스트', () => {
         const testCell = {'value' : ``}
         
         expect(cellService.isScore(testCell)).toBe(false);
-    })
-
-    test('점수 칸이 숫자가 아닌 값이 있을 경우 비정상 테스트', () => {
-        const testCell = {'value' : `공통 12회`}
-
-        expect(() => cellService.isScore(testCell))
-                        .toThrow(new SyntaxError(ExcelErrorMsg.INCORRECT_EXAM_SCORE));
     })
 })
 
@@ -372,5 +365,116 @@ describe('getScoreRule 테스트', () => {
         const testCell = {};
 
         expect(cellService.getScoreRule(testCell)).toBe('$\n');
+    })
+})
+
+describe('isDeptRoundCell 테스트', () => {
+    test('한 자릿수 정수일 경우 정상 테스트', () => {
+        const testCell = {'value': 1}
+        const prevCommonRound = 0;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(true);
+    })
+
+    test('두 자릿수 정수일 경우 정상 테스트', () => {
+        const testCell = {'value': 12}
+        const prevCommonRound = 11;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(true);
+    })
+
+    test('한 자릿수 문자열일 경우 정상 테스트', () => {
+        const testCell = {'value': '1'}
+        const prevCommonRound = 0;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(true);
+    })
+
+    test('두 자릿수 문자열일 경우 정상 테스트', () => {
+        const testCell = {'value': '12'}
+        const prevCommonRound = 11;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(true);
+    })
+
+    test('다른 문자열과 섞여 있을 경우 정상 테스트', () => {
+        const testCell = {'value': '$$$13'}
+        const prevCommonRound = 12;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(true);
+    })
+
+    test('숫자가 들어있지 않을 경우 실패 테스트', () => {
+        const testCell = {'value': '$$$'}
+        const prevCommonRound = 0;
+
+        expect(cellService.isDeptRoundCell(testCell, prevCommonRound)).toBe(false);
+    })
+})
+
+describe('getDeptCommonRound 테스트', () => {
+    test('한 자릿수 정수일 경우 정상 테스트', () => {
+        const testCell = {'value': 1}
+        const prevCommonRound = 0;
+
+        expect(cellService.getDeptCommonRound(testCell, prevCommonRound)).toBe(1);
+    })
+
+    test('두 자릿수 정수일 경우 정상 테스트', () => {
+        const testCell = {'value': 12}
+        const prevCommonRound = 11;
+
+        expect(cellService.getDeptCommonRound(testCell, prevCommonRound)).toBe(12);
+    })
+
+    test('한 자릿수 문자열일 경우 정상 테스트', () => {
+        const testCell = {'value': '1'}
+        const prevCommonRound = 0;
+
+        expect(cellService.getDeptCommonRound(testCell, prevCommonRound)).toBe(1);
+    })
+
+    test('두 자릿수 문자열일 경우 정상 테스트', () => {
+        const testCell = {'value': '12'}
+        const prevCommonRound = 11;
+
+        expect(cellService.getDeptCommonRound(testCell, prevCommonRound)).toBe(12);
+    })
+
+    test('다른 문자열과 섞여 있을 경우 정상 테스트', () => {
+        const testCell = {'value': '$$$13'}
+        const prevCommonRound = 12;
+
+        expect(cellService.getDeptCommonRound(testCell, prevCommonRound)).toBe(13);
+    })
+
+    test('숫자가 들어있지 않을 경우 실패 테스트', () => {
+        const testCell = {'value': '$$$'}
+        const prevCommonRound = 0;
+
+        expect(() => cellService.getDeptCommonRound(testCell, prevCommonRound))
+                .toThrow(new SyntaxError(ExcelErrorMsg.INCORRECT_DEPT_ROUND));
+    })
+
+    test('비어 있을 경우 실패 테스트', () => {
+        const testCell = {}
+        const prevCommonRound = 0;
+
+        expect(() => cellService.getDeptCommonRound(testCell, prevCommonRound))
+                .toThrow(new SyntaxError(ExcelErrorMsg.INCORRECT_DEPT_ROUND));
+    })
+})
+
+describe('getStudentDept 테스트', () => {
+    test('문자열 정상 테스트', () => {
+        const testCell = {'value': '화학과'}
+
+        expect(cellService.getStudentDept(testCell)).toBe(testCell.value);
+    })
+
+    test('비어있을 경우 테스트', () => {
+        const testCell = {}
+
+        expect(cellService.getStudentDept(testCell)).toBe(null);
     })
 })
