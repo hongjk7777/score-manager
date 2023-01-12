@@ -26,7 +26,7 @@ describe('repo 통합 테스트', () => {
 
         await studentRepository.save(student)
 
-        const testStudents = await studentRepository.findByClassId(testCourse.id);
+        const testStudents = await studentRepository.findByCourseId(testCourse.id);
         expect(testStudents.length).toBe(1);
 
         testStudent = testStudents[0];
@@ -51,7 +51,7 @@ describe('repo 통합 테스트', () => {
         //테스트 student 삭제
         await studentRepository.deleteByCourseId(testCourse.id);
 
-        const findStudents = await studentRepository.findByClassId(testCourse.id);
+        const findStudents = await studentRepository.findByCourseId(testCourse.id);
         expect(findStudents.length).toBe(0);
 
         //테스트 class 삭제
