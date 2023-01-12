@@ -11,8 +11,8 @@ export default class StudentRepository {
         return result.warningStatus === 0;
     }
 
-    async findByClassId(classId) {
-        const query = `SELECT * FROM students WHERE class_id = ${classId}`;
+    async findByCourseId(courseId) {
+        const query = `SELECT * FROM students WHERE class_id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);
 
