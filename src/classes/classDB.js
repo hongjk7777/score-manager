@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../db/dbConfig";
+import db from "../domain/db/dbConfig";
 
 const isAuthenticated = function (req, res, next) {
     if(req.isAuthenticated()) {

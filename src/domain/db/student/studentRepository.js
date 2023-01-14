@@ -1,4 +1,4 @@
-import Student from "../../model/student";
+import Student from "../../entity/student";
 import { asyncDB } from "../dbConfig";
 
 export default class StudentRepository {

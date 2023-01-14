@@ -1,10 +1,11 @@
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import crypto from "crypto";
-import db from "../db/dbConfig";
+import db from "../domain/db/dbConfig";
 import AuthRepository from "./authRepository";
 import AuthService from "./authService";
 import AuthDTO from "../dto/authDTO";
+import StudentRepository from "../domain/db/student/studentRepository";
 
 /* Configure password authentication strategy.
  *

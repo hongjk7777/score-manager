@@ -13,10 +13,10 @@ block append student-list
         //- .d-flex.flex-row-reverse
         //-     button#class-add-btn.btn.btn-primary.me-5(type="button") 학생 추가
         ul.mt-4
-            each student in studentList
+            each student, studentCount in studentList
                 li#student.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom
                     .col-9.col-lg-9.d-inline-block
-                        #student-name.mb-1 #{student.name}
+                        #student-name.mb-1 #{studentCount + 1}. #{student.name}
 
 block append exam-list 
     .container
@@ -31,7 +31,7 @@ block append exam-list
 
 block append enter-score 
     .container
-        .row 
+        .row
             .col-12
                 form(action=`/classList/${id}/add-score` method="post" enctype="multipart/form-data" accept=".xlsx") 
                     label(for="excel-file") 성적 파일 

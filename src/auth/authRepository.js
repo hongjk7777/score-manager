@@ -1,6 +1,6 @@
 import { Container, Service } from "typedi";
-import { asyncDB } from "../db/dbConfig";
-import User from "../model/user";
+import { asyncDB } from "../domain/db/dbConfig";
+import User from "../domain/entity/user";
 
 export default class AuthRepository {
 

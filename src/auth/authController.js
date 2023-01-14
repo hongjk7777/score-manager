@@ -54,7 +54,7 @@ router.post('/login/password', passport.authenticate('local', {
         }
     });
 }, function(err, req, res, next) {
-  // console.log(err);
+  console.log(err);
     if (err.status !== 401) { return next(err); }
     res.format({
         'text/html': function() {

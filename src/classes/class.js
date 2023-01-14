@@ -1,16 +1,17 @@
 import express from "express";
 import { isAuthenticated } from "../auth/authMiddleware.js";
-import {getStudentInfosByPNum, getStudentInfoByPNum} from "../db/dbQuery.js";
-import {getStudentNameByPNum} from '../db/student/dbStudentQuery.js'
-import { getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
-import { getExamChartDataById } from "../db/exam/dbExamQuery";
+import {getStudentInfosByPNum, getStudentInfoByPNum} from "../domain/db/dbQuery.js";
+import {getStudentNameByPNum} from '../domain/db/student/dbStudentQuery.js'
+import { getProblemInfoByRound, getScoreRule } from "../domain/db/totalExam/dbTotalExamQuery.js";
+import { getExamChartDataById } from "../domain/db/exam/dbExamQuery";
 
 const router = express.Router();
 
 router.get("/", isAuthenticated, function(req, res) {
+    //username 가져오기, 시험 리스트 가져오기
     getStudentNameByPNum(req.user.username).then(userInfo => {
         getStudentInfosByPNum(req.user.username).then(examList => {
-            res.render("class/exam-list", {examList : examList, userInfo : userInfo, user: req.user});
+            res.render("class/exam-list", {examList : examList, userInfo : userInfo});
         });    
     }); 
 });

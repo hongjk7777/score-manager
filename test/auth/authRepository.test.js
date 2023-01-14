@@ -1,5 +1,5 @@
 import AuthRepository from "../../src/auth/authRepository"
-import User from "../../src/model/user";
+import User from "../../src/domain/entity/user";
 
 const authRepository = new AuthRepository();
 

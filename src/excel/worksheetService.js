@@ -1,9 +1,9 @@
 import { Workbook } from "exceljs";
-import StudentRepository from "../db/student/studentRepository";
-import Exam from "../model/exam";
-import ExamScore from "../model/examScore";
-import Student from "../model/student";
-import StudentDept from "../model/studentDept";
+import StudentRepository from "../domain/db/student/studentRepository";
+import Exam from "../domain/entity/exam";
+import ExamScore from "../domain/entity/examScore";
+import Student from "../domain/entity/student";
+import StudentDept from "../domain/entity/studentDept";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import CellService from "./cellService";
 

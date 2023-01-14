@@ -1,17 +1,20 @@
 import express from "express";
 import {isAdminAuthenticated} from "../auth/authMiddleware.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
-import db from "../db/dbConfig";
-import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum, getSeoulDeptInfo, getYonseiDeptInfo} from "../db/dbQuery.js";
-import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../db/class/dbClassQuery.js";
-import { getStudentPNumByName, getStudentNameByPNum } from '../db/student/dbStudentQuery';
-import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../db/exam/dbExamQuery.js";
-import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../db/totalExam/dbTotalExamQuery.js";
-import { getSeoulDeptList, getYonseiDeptList } from '../db/student/dbStudentDeptQuery.js'
+import db from "../domain/db/dbConfig";
+import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum, getSeoulDeptInfo, getYonseiDeptInfo} from "../domain/db/dbQuery.js";
+import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../domain/db/class/dbClassQuery.js";
+import { getStudentPNumByName, getStudentNameByPNum } from '../domain/db/student/dbStudentQuery';
+import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../domain/db/exam/dbExamQuery.js";
+import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../domain/db/totalExam/dbTotalExamQuery.js";
+import { getSeoulDeptList, getYonseiDeptList } from '../domain/db/student/dbStudentDeptQuery.js'
 import { makeCommonTestExcel } from "../excel/out/exportExcel";
 
+import wrap from 'express-async-wrap'
 import multer from "multer";
 import AuthService from "../auth/authService.js";
+import TotalExamService from "../domain/service/totalExamService.js";
+import CourseService from "../domain/service/courseService.js";
 // import fs from "fs";
 
 const router = express.Router();
