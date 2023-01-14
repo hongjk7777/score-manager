@@ -20,15 +20,23 @@ import StudentRepository from "../domain/db/student/studentRepository";
  */
 
 const authRepository = new AuthRepository();
+const studentRepository = new StudentRepository();
 
 passport.use(new LocalStrategy(async function verify(username, password, cb) {
     const user = await authRepository.findOneByUsername(username);
+    const student = await studentRepository.findOneByPhoneNum(username);
 
     if (user === null) {
         return cb(null, false, { message: '해당하는 유저가 없습니다.' });
     }
 
     if(checkPassword(user, password)) {
+        //일반인일 경우
+        if(student) {
+            return cb(null, new AuthDTO(user.getUsername(), student.name));
+        }
+
+        //관리자일 경우
         return cb(null, new AuthDTO(user.getUsername()));
     }
 
@@ -54,9 +62,9 @@ passport.use(new LocalStrategy(async function verify(username, password, cb) {
  * fetch todo records and render the user element in the navigation bar, that
  * information is stored in the session.
  */
-passport.serializeUser(function(user, cb) {
+passport.serializeUser(function(authDto, cb) {
     process.nextTick(function() {
-        cb(null, { id: user.id, username: user.username });
+        cb(null, { username: authDto.username, studentName: authDto.studentName });
     });
     // console.log(user);
 });
@@ -73,9 +81,6 @@ function checkPassword(user, password) {
     const hexPassword = crypto.pbkdf2Sync( password, user.getSalt(), 310000, 32, 'sha256').toString("hex");
     //이전 버전에서는 'hex'로 저장하지 않아서 예전 버전 비밀번호 호환용이다
     const inputPassword = crypto.pbkdf2Sync( password, user.getSalt(), 310000, 32, 'sha256').toString();
-
-    console.log(user.getHashedPassword());
-    console.log(hexPassword);
 
     return (user.getHashedPassword().toString() === hexPassword) || (user.getHashedPassword().toString() === inputPassword);
 }

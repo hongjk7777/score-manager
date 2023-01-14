@@ -1,7 +1,9 @@
 export default class AuthDTO {
-    username
+    username;
+    studentName;
 
-    constructor (username) {
+    constructor (username, studentName) {
         this.username = username;
+        this.studentName = studentName;
     }
 }
