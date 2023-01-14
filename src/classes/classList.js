@@ -24,72 +24,6 @@ const authService = new AuthService();
 //set path to save input excels
 const upload = multer({dest: 'excels/'});
 
-const MONDAY = 0;
-const TUESDAY = 1;
-const WEDNESDAY = 2;
-const THURSDAY = 3;
-const FRIDAY = 4;
-const SATURDAY = 5;
-const SUNDAY = 6;
-
-function getDayStr(str) {
-    let retDay = [];
-    
-    const days = str.split(',');
-    days.forEach(day => {
-        retDay.push(getDay(parseInt(day)));
-    });
-
-    return retDay.toString();
-}
-
-function getDay(str) {
-
-    switch (str) {
-        case MONDAY:
-            return "월";
-        case TUESDAY:
-            return "화";
-        case WEDNESDAY:
-            return "수";
-        case THURSDAY:
-            return "목";
-        case FRIDAY:
-            return "금";
-        case SATURDAY:
-            return "토";
-        case SUNDAY:
-            return "일";
-    }
-}
-
-function trnasferJsonToDayStr(json) {
-    let dayStr = [];
-    if(json.monday) {
-        dayStr.push(MONDAY);
-    }
-    if(json.tuesday) {
-        dayStr.push(TUESDAY);
-    }
-    if(json.wednesday) {
-        dayStr.push(WEDNESDAY);
-    }
-    if(json.thursday) {
-        dayStr.push(THURSDAY);
-    }
-    if(json.friday) {
-        dayStr.push(FRIDAY);
-    }
-    if(json.saturday) {
-        dayStr.push(SATURDAY);
-    }
-    if(json.sunday) {
-        dayStr.push(SUNDAY);
-    }
-
-    return dayStr;
-}
-
 //추후에 classdb로 db.query는 분리해야함
 router.get("/", isAdminAuthenticated, function(req, res) {
     getCommonExamCount().then(count => {
@@ -125,8 +59,7 @@ router.get("/add", isAdminAuthenticated, function(req, res) {
 
 router.post("/add-class", isAdminAuthenticated, function(req, res) {
     //TODO: 아래를 req바디를 나누고 db에 보내느게 좋을듯
-    const dayStr = trnasferJsonToDayStr(req.body);
-    addClassToDB(req.body.classname, dayStr);
+    addClassToDB(req.body.classname);
     res.redirect("/classList");
 });
 
