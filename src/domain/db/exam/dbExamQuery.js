@@ -1,7 +1,7 @@
 import db from "../dbConfig.js";
 import { getCommonExamRound } from '../totalExam/dbTotalExamQuery.js';
 import { resolve } from "path";
-import AuthService from "../../auth/authService.js";
+import AuthService from "../../../auth/authService.js";
 
 const authService = new AuthService();
 

@@ -1,9 +1,7 @@
 import { resolve } from "path";
 import db from "../dbConfig.js";
 
-function addClassToDB(className, dayStr) {
     db.query("USE classdb");
-    db.query(`INSERT INTO classes(name, class_day) VALUES('${className}', '${dayStr}')`);
 }
 
 function getClassId(className) {

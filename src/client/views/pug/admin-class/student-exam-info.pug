@@ -83,13 +83,13 @@ block content
                     if(studentInfo.seoulDept)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 서울대 지원학과 순위
-                                    select#seoul-dept-select(class="form-select" aria-label=".form-select-sm") 
-                                        each seoulDept in seoulDeptList
-                                            if(seoulDept == studentInfo.seoulDept)
-                                                option.my-dept(value=`${seoulDept}` selected) #{seoulDept} (지원)
-                                            else 
-                                                option(value=`${seoulDept}`) #{seoulDept}
+                                th(colspan="6") 서울대 #{studentInfo.seoulDept} 순위
+                                    //- select#seoul-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                    //-     each seoulDept in seoulDeptList
+                                    //-         if(seoulDept == studentInfo.seoulDept)
+                                    //-             option.my-dept(value=`${seoulDept}` selected) #{seoulDept} (지원)
+                                    //-         else 
+                                    //-             option(value=`${seoulDept}`) #{seoulDept}
 
                         tbody.table-border-bottom-0
                             tr
@@ -99,13 +99,13 @@ block content
                     if(studentInfo.yonseiDept)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 연세대 지원학과 순위
-                                    select#yonsei-dept-select(class="form-select" aria-label=".form-select-sm") 
-                                            each yonseiDept in yonseiDeptList
-                                                if(yonseiDept == studentInfo.yonseiDept)
-                                                    option.my-dept(value=`${yonseiDept}` selected) #{yonseiDept} (지원)
-                                                else
-                                                    option(value=`${yonseiDept}`) #{yonseiDept}
+                                th(colspan="6") 연세대 #{studentInfo.yonseiDept} 순위
+                                    //- select#yonsei-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                    //-         each yonseiDept in yonseiDeptList
+                                    //-             if(yonseiDept == studentInfo.yonseiDept)
+                                    //-                 option.my-dept(value=`${yonseiDept}` selected) #{yonseiDept} (지원)
+                                    //-             else
+                                    //-                 option(value=`${yonseiDept}`) #{yonseiDept}
                                     
                         tbody.table-border-bottom-0
                             tr

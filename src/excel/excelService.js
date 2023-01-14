@@ -1,9 +1,9 @@
 import ExcelJS from "exceljs";
 import fs from "fs"
-import ExamRepository from "../db/exam/examRepository";
-import StudentRepository from "../db/student/studentRepository";
-import TotalExamRepository from "../db/totalExam/totalExamRepository";
-import TotalExam from "../model/totalExam";
+import ExamRepository from "../domain/db/exam/examRepository";
+import StudentRepository from "../domain/db/student/studentRepository";
+import TotalExamRepository from "../domain/db/totalExam/totalExamRepository";
+import TotalExam from "../domain/entity/totalExam";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 

@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
-import CourseRepository from "../../src/db/class/courseRepository";
-import ExamRepository from "../../src/db/exam/examRepository";
-import StudentRepository from "../../src/db/student/studentRepository";
+import CourseRepository from "../../src/domain/db/class/courseRepository";
+import ExamRepository from "../../src/domain/db/exam/examRepository";
+import StudentRepository from "../../src/domain/db/student/studentRepository";
 import ExcelService from "../../src/excel/excelService";
 import WorksheetService from "../../src/excel/worksheetService";
 

@@ -1,4 +1,4 @@
-import TotalExam from "../../model/totalExam";
+import TotalExam from "../../entity/totalExam";
 import { asyncDB } from "../dbConfig";
 
 export default class TotalExamRepository {
@@ -27,6 +27,20 @@ export default class TotalExamRepository {
         return this.#convertToTotalExams(rows);
     }
 
+    async findCommonExamCount() {
+        const query = `SELECT MAX(common_round) as count FROM total_exams;`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return 0;
+        }
+
+        return rows[0].count;
+    }
+
+
+ 
     async deleteByClassId(classId) {
         const query = `DELETE FROM total_exams WHERE class_id = ${classId}`;
 

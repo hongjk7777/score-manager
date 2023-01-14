@@ -1,12 +1,12 @@
 import ExcelJS from "exceljs";
 import fs from "fs"
 import { log } from "firebase-functions/logger";
-import { getCommonExamRound} from "../db/totalExam/dbTotalExamQuery.js";
-import { deleteClassDB } from "../db/class/dbClassQuery";
-import { addSeoulDeptToDB, addYonseiDeptToDB } from "../db/student/dbStudentDeptQuery.js";
-import { putTotalExamToDB } from '../db/totalExam/dbTotalExamQuery.js'
-import { addStudentToDB, removeSamePNumStudent, getStudentIdByName } from '../db/student/dbStudentQuery'
-import { putScoreToDB } from '../db/exam/dbExamQuery'
+import { getCommonExamRound} from "../domain/db/totalExam/dbTotalExamQuery.js";
+import { deleteClassDB } from "../domain/db/class/dbClassQuery";
+import { addSeoulDeptToDB, addYonseiDeptToDB } from "../domain/db/student/dbStudentDeptQuery.js";
+import { putTotalExamToDB } from '../domain/db/totalExam/dbTotalExamQuery.js'
+import { addStudentToDB, removeSamePNumStudent, getStudentIdByName } from '../domain/db/student/dbStudentQuery'
+import { putScoreToDB } from '../domain/db/exam/dbExamQuery'
 import { resolve } from "path";
 import WorksheetService from "./worksheetService.js";
 

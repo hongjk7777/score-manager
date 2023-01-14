@@ -1,6 +1,6 @@
 import xlsx from "xlsx";
 import Excel from "exceljs";
-import { getCommontTestExcel } from "../../db/out/export";
+import { getCommontTestExcel } from "../../domain/db/out/export";
 import {removeExcelsDirectory} from '../excel'
 
 const FILE_PATH = "src/excel/output/";

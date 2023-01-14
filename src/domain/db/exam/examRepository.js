@@ -1,4 +1,4 @@
-import Exam from "../../model/exam";
+import Exam from "../../entity/exam";
 import { asyncDB } from "../dbConfig";
 
 export default class ExamRepository {

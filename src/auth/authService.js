@@ -1,7 +1,7 @@
 import { Service, Inject, Container } from "typedi"
 import AuthRepository from "./authRepository";
 import crypto from "crypto";
-import User from "../model/user";
+import User from "../domain/entity/user";
 import { getInitPassword } from "./initPw.js";
 
 @Service()

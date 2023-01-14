@@ -1,7 +1,7 @@
-import CourseRepository from "../../src/db/class/courseRepository";
-import ExamRepository from "../../src/db/exam/examRepository";
-import StudentRepository from "../../src/db/student/studentRepository";
-import Exam from "../../src/model/exam";
+import CourseRepository from "../../src/domain/db/class/courseRepository";
+import ExamRepository from "../../src/domain/db/exam/examRepository";
+import StudentRepository from "../../src/domain/db/student/studentRepository";
+import Exam from "../../src/domain/entity/exam";
 import { createTempStudent } from "./studentRepository.test";
 
 const courseRepository = new CourseRepository();

@@ -13,7 +13,7 @@ import settingsRouter from "./settings/profile.js";
 import favicon from "serve-favicon";
 import path from "path";
 import config from "./config.json";
-import { getCommontTestExcel } from "./db/out/export";
+import { getCommontTestExcel } from "./domain/db/out/export";
 
 
 
@@ -59,8 +59,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //set up view engine and file dir
-// app.engine('html', engines.mustache);
-// app.set("view engine", "html);
 app.set("view engine", "pug");
 app.set("views", __dirname + "/client/views/pug");
 
@@ -95,9 +93,3 @@ app.use("/classList", adminRouter);
 app.use("/settings", settingsRouter);
 
 export default app;
-// getCommontTestExcel(2);
-
-
-// app.use(passport.authenticate('session'));
-// const api = functions.https.onRequest(app);
-// module.exports(api);

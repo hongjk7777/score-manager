@@ -1,7 +1,7 @@
 import db from "./dbConfig.js";
-import { getStudentList, getStudentInfosById, getClassIdByStudent, getStudentIdByPNum } from "../db/student/dbStudentQuery";
-import { getExamList } from "../db/exam/dbExamQuery.js";
-import { getSeoulDeptInfo, getYonseiDeptInfo } from "../db/student/dbStudentDeptQuery";
+import { getStudentList, getStudentInfosById, getClassIdByStudent, getStudentIdByPNum } from "./student/dbStudentQuery";
+import { getExamList } from "./exam/dbExamQuery.js";
+import { getSeoulDeptInfo, getYonseiDeptInfo } from "./student/dbStudentDeptQuery";
 import { getMaxRound } from "./totalExam/dbTotalExamQuery";
 
 async function getStudentAndExamInfos(classId) {
