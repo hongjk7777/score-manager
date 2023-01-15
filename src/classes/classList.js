@@ -49,9 +49,6 @@ router.get("/", isAdminAuthenticated, function(req, res) {
     });
 });
 
-router.get("/class", isAdminAuthenticated, function(req, res) {
-    getClassId(req.query.className).then(classId => res.redirect(`/classList/${classId}`));
-})
 
 router.get("/add", isAdminAuthenticated, function(req, res) {
     res.render("classList/add-class", {user: req.user});
