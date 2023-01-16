@@ -14,6 +14,7 @@ import wrap from 'express-async-wrap'
 import multer from "multer";
 import AuthService from "../auth/authService.js";
 import TotalExamService from "../domain/service/totalExamService.js";
+import ExcelService from "../excel/excelService.js";
 import CourseService from "../domain/service/courseService.js";
 // import fs from "fs";
 
@@ -60,19 +61,19 @@ router.post("/add-class", isAdminAuthenticated, function(req, res) {
     res.redirect("/classList");
 });
 
-router.get("/export-excel", isAdminAuthenticated, function(req, res) {
-    makeCommonTestExcel(req.query.commonRound, res);
-    // res.setHeader(
-    //     'Content-Type',
-    //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    // );
+router.get("/export-excel", isAdminAuthenticated, wrap(async function(req, res) {
+    await excelService.exportCommonTestExcel(req.query.commonRound);
 
-    // res.setHeader(
-    // 'Content-Disposition',
-    // `attachment; filename=${fileName}.xlsx`,
-    // );
-    // res.redirect("/classList");
-});
+    const FILE_PATH = "src/excel/output/";
+    const FILE_NAME = "testExcel.xlsx";
+
+    res.setHeader(
+        'Content-Disposition',
+        `attachment; filename= ${FILE_NAME}`,
+    );
+
+    res.sendFile('testExcel.xlsx', {root: FILE_PATH});
+}));
 
 //TODO: 이 아래는 클래스를 따로 빼야함
 

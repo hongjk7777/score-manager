@@ -39,7 +39,19 @@ export default class TotalExamRepository {
         return rows[0].count;
     }
 
+    async findScoreRule(commonRound) {
+        const query = `SELECT score_rule FROM total_exams WHERE common_round = ${commonRound};`;
 
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return '';
+        }
+
+        const scoreRule = rows[0].score_rule;
+
+        return scoreRule.replaceAll('$', '');
+    }
  
     async deleteByClassId(classId) {
         const query = `DELETE FROM total_exams WHERE class_id = ${classId}`;
