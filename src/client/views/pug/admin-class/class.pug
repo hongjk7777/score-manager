@@ -16,7 +16,8 @@ block append student-list
             each student, studentCount in studentList
                 li#student.col-11.d-flex.flex-justify-between.width-full.py-4.border-bottom
                     .col-9.col-lg-9.d-inline-block
-                        #student-name.mb-1 #{studentCount + 1}. #{student.name}
+                        span #{studentCount + 1}. 
+                        span#student-name.mb-1 #{student.name}
 
 block append exam-list 
     .container
