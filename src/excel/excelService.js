@@ -1,18 +1,25 @@
 import ExcelJS from "exceljs";
+import xlsx from "xlsx";
 import fs from "fs"
 import ExamRepository from "../domain/db/exam/examRepository";
 import StudentRepository from "../domain/db/student/studentRepository";
 import TotalExamRepository from "../domain/db/totalExam/totalExamRepository";
 import TotalExam from "../domain/entity/totalExam";
+import ExamService from "../domain/service/examService";
+import TotalExamService from "../domain/service/totalExamService";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 
+const FILE_PATH = "src/excel/output/";
+const FILE_NAME = "testExcel.xlsx";
+
 export default class ExcelService {
+    #worksheetService = new WorksheetService();
+    #examService = new ExamService();
+    #totalExamService = new TotalExamService();
     #examRepository = new ExamRepository();
     #totalExamRepository = new TotalExamRepository();
     #studentRepository = new StudentRepository();
-    #worksheetService = new WorksheetService();
-
 
     async putExcelDatasToDB(file, courseId) {
         this.#initExcelDirectory(file);
@@ -165,6 +172,38 @@ export default class ExcelService {
         for(const studentDept of roundDeptData) {
             await this.#examRepository.updateDepts(studentDept);
         }
+    }
+
+    async exportCommonTestExcel(commonRound) {
+        this.#removeExcelsDirectory(FILE_PATH, '');
+
+        const workbook = xlsx.utils.book_new(); 
+
+        await this.#createScoreDataSheet(workbook, commonRound);
+        await this.#createScoreRuleDataSheet(workbook, commonRound);
+        await this.#createRankingDataSheet(workbook, commonRound);
+
+        await xlsx.writeFile( workbook, FILE_PATH + FILE_NAME ); 
+        
+        //아래는 컨트롤러에 넣기
+    }
+
+    async #createScoreDataSheet(workbook, commonRound) {
+        const scoreDatas = await this.#examService.getScoreDatas(commonRound);
+        const scoreDistSheet = xlsx.utils.json_to_sheet(scoreDatas);
+        xlsx.utils.book_append_sheet(workbook, scoreDistSheet, "성적분포");
+    }
+
+    async #createScoreRuleDataSheet(workbook, commonRound) {
+        const scoreRuleDatas = await this.#totalExamService.getScoreRuleData(commonRound);
+        const scoreRuleSheet = xlsx.utils.aoa_to_sheet(scoreRuleDatas);
+        xlsx.utils.book_append_sheet(workbook, scoreRuleSheet, "채점기준");
+    }
+
+    async #createRankingDataSheet(workbook, commonRound) {
+        const rankingDatas = await this.#examService.getRankingDatas(commonRound);
+        const originalSheet = xlsx.utils.json_to_sheet(rankingDatas);
+        xlsx.utils.book_append_sheet(workbook, originalSheet, "원본");
     }
 }
 

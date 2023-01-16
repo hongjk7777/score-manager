@@ -1,3 +1,4 @@
+import ExamDAO from "../../dao/examDAO";
 import Exam from "../../entity/exam";
 import { asyncDB } from "../dbConfig";
 
@@ -24,14 +25,6 @@ export default class ExamRepository {
         return this.#convertToExams(rows);
     }
 
-    async deleteByClassId(classId) {
-        const query = `DELETE FROM exams WHERE class_id = ${classId}`;
-        
-        const [result] = await asyncDB.execute(query);
-
-        return result.warningStatus === 0;
-    }
-
     #convertToExams(rows) {
         let exams = new Array();
 
@@ -43,9 +36,51 @@ export default class ExamRepository {
                         row.seoul_dept, row.yonsei_dept));
         });
 
-        console.log('examLength: ' + exams.length);
+        return exams;
+    }
+    
+    async findAllScoreSum(commonRound) {
+        const query = `SELECT score_sum FROM exams WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;
+        
+        const [rows] = await asyncDB.execute(query);
+
+        if (rows.length === 0) {
+            return new Array();
+        }
+
+        return rows;
+    }
+
+    async findCommonExamRanking(commonRound) {
+        const query = `SELECT first_score, second_score, third_score, score_sum, seoul_dept, 
+                        yonsei_dept, students.name AS student_name, phone_num, classes.name AS class_name
+                        FROM exams INNER JOIN students ON exams.student_id = students.id INNER JOIN classes 
+                        ON students.class_id = classes.id WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        return this.#convertToExamDAOs(rows);
+    }
+
+    #convertToExamDAOs(rows) {
+        let exams = new Array();
+
+        rows.forEach((row, index) => {
+            const scores = new Array(row.first_score, row.second_score, row.third_score);
+
+            exams.push(new ExamDAO(index + 1, scores, row.ranking, row.student_name, 
+                row.class_name, row.seoul_dept, row.yonsei_dept, row.phone_num));
+        });
 
         return exams;
+    }
+
+    async deleteByClassId(classId) {
+        const query = `DELETE FROM exams WHERE class_id = ${classId}`;
+        
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;
     }
 
     async updateDepts(studentDept) {
