@@ -47,7 +47,7 @@ describe('repo 통합 테스트', () => {
         // examRepository.deleteByClassId();
     })
 
-    afterEach(async () => {
+    afterAll(async () => {
         //테스트 student 삭제
         await studentRepository.deleteByCourseId(testCourse.id);
 
@@ -58,6 +58,24 @@ describe('repo 통합 테스트', () => {
         expect(await courseRepository.deleteById(testCourse.id)).toBe(true);
     })
 }) 
+
+describe('findAllScoreSum 테스트', () => {
+    test('정상 테스트', async () => {
+        const commonRound = 2;
+        const results = await examRepository.findAllScoreSum(commonRound);
+
+        expect(results.length).toBe(315);
+    })
+})
+
+describe('findCommonExamRanking 테스트', () => {
+    test('정상 테스트', async () => {
+        const commonRound = 2;
+        const results = await examRepository.findCommonExamRanking(commonRound);
+
+        expect(results.length).toBe(315);
+    })
+})
 
 
 function createTempExam() {

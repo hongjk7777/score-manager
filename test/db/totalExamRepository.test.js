@@ -42,6 +42,25 @@ describe('repo 통합 테스트', () => {
     })
 }) 
 
+describe('findCommonExamCount 테스트', () => {
+    test('정상 테스트', async () => {
+        const commonExamCount = await totalExamRepository.findCommonExamCount();
+
+        const realExamCount = 4;
+
+        expect(commonExamCount).toBe(realExamCount);
+    }) 
+})
+
+describe('findScoreRule 테스트', () => {
+    test('정상 테스트', async () => {
+        const commonRound = 2;
+        const scoreRule = await totalExamRepository.findScoreRule(commonRound);
+        
+        console.log(scoreRule);
+    }) 
+})
+
 
 function createTempTotalExam() {
     const problemScores = new Array(1,1,1);
