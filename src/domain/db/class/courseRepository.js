@@ -1,3 +1,4 @@
+import ExcelErrorMsg from "../../../validator/excelErrorMsg";
 import Course from "../../entity/course";
 import { asyncDB } from "../dbConfig";
 
@@ -22,6 +23,17 @@ export default class CourseRepository {
         return new Course(rows[0].id, rows[0].name);
     }
 
+    async findById(classId) {
+        const query = `SELECT * FROM classes WHERE id = ${classId}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if (rows.length === 0) {
+            throw new ReferenceError(ExcelErrorMsg.NO_EXISTENT_CLASS);
+        }
+
+        return new Course(rows[0].id, rows[0].name);
+    }
     async deleteById(classId) {
         const query = `DELETE FROM classes WHERE id = ${classId}`;
 

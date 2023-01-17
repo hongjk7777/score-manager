@@ -10,4 +10,10 @@ export default class CourseService {
     async saveClass(className) {
         await this.#courseRepository.save(className);
     }
+
+    async getCourseName(classId) {
+        const course = await this.#courseRepository.findById(classId);
+
+        return course.name;
+    }
 }

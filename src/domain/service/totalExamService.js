@@ -21,4 +21,10 @@ export default class TotalExamService {
 
         return scoreRuleData;
     }
+
+    async getClassExamList(courseId) {
+        const examList = await this.#totalExamRepository.findByClassId(courseId);
+        
+        return examList;
+    }
 }
