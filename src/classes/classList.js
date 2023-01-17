@@ -63,13 +63,17 @@ router.get("/export-excel", isAdminAuthenticated, wrap(async function(req, res) 
 
 //TODO: 이 아래는 클래스를 따로 빼야함
 
-router.get("/:id", isAdminAuthenticated, function(req, res) {
-    getClassNameById(req.params.id).then(className => {
-        getStudentAndExamInfos(req.params.id).then(infos => res.render("admin-class/class",
-        {id: req.params.id, studentList: infos.studentList, examList: infos.examList, user: req.user, className: className}));
-    });
-    
-});
+router.get("/:id", isAdminAuthenticated, wrap(async function(req, res) {
+    const courseId = req.params.id;
+    const className = await courseService.getCourseName(courseId);
+    const studentList = await studentService.getClassStudentList(courseId);
+    const examList = await totalExamService.getClassExamList(courseId);
+
+    console.log(studentList);
+
+    res.render("admin-class/class", {id: req.params.id, studentList: studentList, 
+            examList: examList, user: req.user, className: className});
+}));
 
 //TODO: 완료가 되면 redirect가 되어야 함 현재 db 넣는 게 async await 처리가 안 되어있음
 router.post("/:id/add-score", isAdminAuthenticated, upload.single('excel'), function(req, res) {
