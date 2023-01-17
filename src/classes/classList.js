@@ -40,11 +40,12 @@ router.get("/add", isAdminAuthenticated, function(req, res) {
     res.render("classList/add-class", {user: req.user});
 });
 
-router.post("/add-class", isAdminAuthenticated, function(req, res) {
+router.post("/add-class", isAdminAuthenticated, wrap(async function(req, res) {
     //TODO: 아래를 req바디를 나누고 db에 보내느게 좋을듯
-    addClassToDB(req.body.classname);
+    await courseService.saveClass(req.body.classname);
+    
     res.redirect("/classList");
-});
+}));
 
 router.get("/export-excel", isAdminAuthenticated, wrap(async function(req, res) {
     await excelService.exportCommonTestExcel(req.query.commonRound);
