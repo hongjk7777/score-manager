@@ -7,7 +7,7 @@ export default class CourseRepository {
 
         const [results] = await asyncDB.execute(query);
 
-        return results.warningStatus === 0;
+        return results.insertId;;
     }
 
     async findByName(name) {

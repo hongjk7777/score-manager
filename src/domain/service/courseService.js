@@ -7,4 +7,7 @@ export default class CourseService {
         return await this.#courseRepository.findAllClass();
     }
 
+    async saveClass(className) {
+        await this.#courseRepository.save(className);
+    }
 }
