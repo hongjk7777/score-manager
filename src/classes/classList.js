@@ -21,35 +21,20 @@ import CourseService from "../domain/service/courseService.js";
 const router = express.Router();
 
 const authService = new AuthService();
+const totalExamService = new TotalExamService();
+const courseService = new CourseService();
 
 //set path to save input excels
 const upload = multer({dest: 'excels/'});
 
 //추후에 classdb로 db.query는 분리해야함
-router.get("/", isAdminAuthenticated, function(req, res) {
-    getCommonExamCount().then(count => {
-        let classArray = [];
-        db.query("USE classdb");
-        db.query("SELECT * FROM classes WHERE id > 30", function(err, classes){
-            if(err) {
-                console.log("failed to find classes from db");
-            }
-            console.log(classes);
-            classes.forEach(aClass => {
-                let newClass = [];
-                newClass.id = aClass.id;
-                newClass.name = aClass.name;
-                newClass.classDay = getDayStr(aClass.class_day);
-                classArray.push(newClass);
-            });
-    
-            // console.log(classArray);
-            //TODO: 고치기
-            res.render("classList/classes", {classes : classArray, user: req.user, commonExamCount : count});
-        });
-    });
-});
+router.get("/", isAdminAuthenticated, wrap(async function(req, res) {
+    const commonExamCount = await totalExamService.countCommonExam();
+    const classes = await courseService.getAllClass();
 
+    console.log(req.user);
+    res.render("classList/classes", {classes : classes, user: req.user, commonExamCount : commonExamCount});
+}));
 
 router.get("/add", isAdminAuthenticated, function(req, res) {
     res.render("classList/add-class", {user: req.user});
