@@ -38,6 +38,30 @@ export default class ExamRepository {
 
         return exams;
     }
+
+    async findByRoundAndClassId(round, courseId) {
+        const query = `SELECT * FROM exams WHERE round = ${round} AND class_id = ${courseId}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return new Array();
+        }
+
+        return this.#convertToExams(rows);
+    }
+
+    async findExamRoundCount(classId) {
+        const query = `SELECT MAX(round) as count FROM exams WHERE class_id = ${classId};`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return 0;
+        }
+
+        return rows[0].count;
+    }
     
     async findAllScoreSum(commonRound) {
         const query = `SELECT score_sum FROM exams WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;

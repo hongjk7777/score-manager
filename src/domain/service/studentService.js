@@ -9,5 +9,9 @@ export default class StudentService {
         return studentList;
     }
 
+    async getStudent(studentId) {
+        const student = await this.#studentRepository.findById(studentId);
 
+        return student;
+    }
 }
