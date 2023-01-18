@@ -8,10 +8,10 @@ nav.navbar.navbar-light.bg-light.border-bottom.shadow-sm
             //- a#signup-btn.btn.btn-outline-primary.ms-3(href='/signup') 회원가입
         else 
             if (user)
-                if(user.username === 'admin')
+                if(user.username === 'admin' || user.username === 'test')
                     #user-menu.dropdown
                         button#dropdownMenuButton.btn.btn-secondary.btn-sm.dropdown-toggle(type='button' data-bs-toggle='dropdown' aria-expanded='false')
-                            img(src="https://identicon-api.herokuapp.com/hongjk7777/25?format=png" alt="avatar image")
+                            svg(width='40' height='30' data-jdenticon-value='user127')
                         .dropdown-menu.dropdown-menu-end(aria-labelledby='dropdownMenuButton')
                             li
                                 a.dropdown-item(href='/classList') 내 클래스
@@ -24,7 +24,7 @@ nav.navbar.navbar-light.bg-light.border-bottom.shadow-sm
                 else 
                     #user-menu.dropdown
                         button#dropdownMenuButton.btn.btn-secondary.btn-sm.dropdown-toggle(type='button' data-bs-toggle='dropdown' aria-expanded='false')
-                            img(src="https://identicon-api.herokuapp.com/hongjk7777/25?format=png" alt="avatar image")
+                            svg(width='40' height='30' data-jdenticon-value='user127')
                         .dropdown-menu.dropdown-menu-end(aria-labelledby='dropdownMenuButton')
                             li
                                 a.dropdown-item(href='/class') 시험 성적
@@ -38,7 +38,8 @@ nav.navbar.navbar-light.bg-light.border-bottom.shadow-sm
             else 
                 #user-menu.dropdown
                     button#dropdownMenuButton.btn.btn-secondary.dropdown-toggle(type='button' data-bs-toggle='dropdown' aria-expanded='false')
-                        img(src="https://identicon-api.herokuapp.com/hongjk7777/25?format=png" alt="avatar image")
+                        svg(width='40' height='30' data-jdenticon-value='user127')
+
                     .dropdown-menu.dropdown-menu-end(aria-labelledby='dropdownMenuButton')
                         li
                             a.dropdown-item(href='/settings') 비밀번호 변경
