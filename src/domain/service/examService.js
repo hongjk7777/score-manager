@@ -1,13 +1,17 @@
 import ExportExamDTO from "../../dto/exportExamDTO";
 import ExamRepository from "../db/exam/examRepository";
+import TotalExamService from "./totalExamService";
+import _ from 'lodash'
+import DeptInfoDTO from "../../dto/deptInfoDTO";
 
 export default class ExamService {
     #examRepository = new ExamRepository();
+    #totalExamService = new TotalExamService();
 
     async getScoreDatas(commonRound) {
         const scoreSumDatas = await this.#examRepository.findAllScoreSum(commonRound);
         //함수형 프로그래밍이 더 조은가?
-        this.#addRanking(scoreSumDatas);
+        this.#addExtractRanking(scoreSumDatas);
         this.#addDistribution(scoreSumDatas);
 
         const scoreDatas = this.#changeToScoreDatas(scoreSumDatas);
@@ -15,7 +19,7 @@ export default class ExamService {
         return scoreDatas;
     }
 
-    #addRanking(datas) {
+    #addExtractRanking(datas) {
         let sameCount = 0;
         let lastScore = -1;
 
@@ -66,7 +70,7 @@ export default class ExamService {
 
     async getRankingDatas(commonRound) {
         const commonRanking = await this.#examRepository.findCommonExamRanking(commonRound);
-        this.#addRanking(commonRanking);
+        this.#addExtractRanking(commonRanking);
 
         const exportExamDTOs = this.#changeToExportExamDTO(commonRanking);
         const rankingDatas = this.#changeToRankingDatas(exportExamDTOs);
@@ -207,6 +211,19 @@ export default class ExamService {
         return copyExam;
     }
 
+    #getChartData(scores) {
+        const chartData = new Array(10).fill(0);
+
+        scores.forEach(score => {
+            if(score != 0) {
+                chartData[Math.ceil(score / 5) - 1]++;
+            } else {
+                chartData[0]++;
+            }
+        })
+
+        return chartData;
+    }
 
     #isCommonExam(commonRound) {
         return commonRound > 0;
@@ -224,3 +241,40 @@ export default class ExamService {
 
         return studentExam;
     }
+
+    async getSeoulDeptInfo(commonRound, studentId, seoulDept) {
+        let exams = await this.#examRepository.findByCommonRoundAndSeoulDept(commonRound, seoulDept);
+
+        exams = this.#sortExam(exams);
+        exams = this.#addRanking(exams);
+
+        let seoulDeptInfo = this.#selectStudentExam(exams, studentId);
+        
+        if(seoulDeptInfo) {
+            seoulDeptInfo = this.#addScoreInfo(seoulDeptInfo, exams)
+
+            return new DeptInfoDTO(seoulDeptInfo.ranking, seoulDeptInfo.totalTester, seoulDeptInfo.average,
+                seoulDeptInfo.topScore, seoulDeptInfo.chartData);
+        }
+
+        return null;
+    }
+
+    async getYonseiDeptInfo(commonRound, studentId, yonseiDept) {
+        let exams = await this.#examRepository.findByCommonRoundAndYonseiDept(commonRound, yonseiDept);
+
+        exams = this.#sortExam(exams);
+        exams = this.#addRanking(exams);
+
+        let yonseiDeptInfo = this.#selectStudentExam(exams, studentId);
+        
+        if(yonseiDeptInfo) {
+            yonseiDeptInfo = this.#addScoreInfo(yonseiDeptInfo, exams)
+
+            return new DeptInfoDTO(yonseiDeptInfo.ranking, yonseiDeptInfo.totalTester, yonseiDeptInfo.average,
+                yonseiDeptInfo.topScore, yonseiDeptInfo.chartData);
+        }
+        
+        return null;
+    }
+}

@@ -86,6 +86,18 @@ export default class ExamRepository {
         return this.#convertToExamDAOs(rows);
     }
 
+    async findByCommonRound(commonRound) {
+        const query = `SELECT * FROM exams WHERE common_round = ${commonRound}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return new Array();
+        }
+
+        return this.#convertToExams(rows);
+    }
+
     #convertToExamDAOs(rows) {
         let exams = new Array();
 
@@ -115,5 +127,31 @@ export default class ExamRepository {
         const [result] = await asyncDB.execute(query);
 
         return result.warningStatus === 0;           
+    }
+
+    //TODO: 공백이 잘 못 들어가면 어카지?
+    async findByCommonRoundAndSeoulDept(commonRound, seoulDept) {
+        const query = `SELECT * FROM exams WHERE common_round = ${commonRound} AND seoul_dept = '${seoulDept}'`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return new Array();
+        }
+
+        return this.#convertToExams(rows);
+    }
+
+    //TODO: 공백이 잘 못 들어가면 어카지?
+    async findByCommonRoundAndYonseiDept(commonRound, yonseiDept) {
+        const query = `SELECT * FROM exams WHERE common_round = ${commonRound} AND yonsei_dept = '${yonseiDept}'`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return new Array();
+        }
+
+        return this.#convertToExams(rows);
     }
 }
