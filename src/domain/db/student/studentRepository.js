@@ -26,7 +26,7 @@ export default class StudentRepository {
     }
 
     async findByCourseId(courseId) {
-        const query = `SELECT * FROM students WHERE class_id = ${courseId}`;
+        const query = `SELECT * FROM students WHERE class_id = ${courseId} ORDER BY name`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -35,6 +35,20 @@ export default class StudentRepository {
         }
 
         return this.#convertToStudents(rows);
+    }
+    
+    async findOneByPhoneNum(phoneNum) {
+        const query = `SELECT * FROM students WHERE phone_num = '${phoneNum}'`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return null;
+        }
+
+        const student = rows[0];
+
+        return new Student(student.name, student.phone_num, student.class_id, student.id);
     }
 
     //TODO: 이거 테케

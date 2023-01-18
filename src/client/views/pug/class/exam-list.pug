@@ -26,7 +26,7 @@ block content
                             tr
                                 if(exam)
                                     //- 공통시험이 아닐경우
-                                    if(exam.commonRound === 0)
+                                    if(exam.commonRound <= 0)
                                         td
                                             i.fab.fa-angular.fa-lg.text-danger.me-3
                                             strong <span id="exam-round"> #{exam.round}</span>회차

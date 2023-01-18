@@ -34,6 +34,19 @@ export default class CourseRepository {
 
         return new Course(rows[0].id, rows[0].name);
     }
+
+    async findAllClass() {
+        const query = `SELECT * FROM classes WHERE id > 10`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if (rows.length === 0) {
+            return new Array();
+        }
+
+        return rows;
+    }
+
     async deleteById(classId) {
         const query = `DELETE FROM classes WHERE id = ${classId}`;
 
