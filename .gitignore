@@ -10,4 +10,5 @@ excels/
 src/config.json
 test/testResource/testExcel.xlsx
 src/auth/initPw.js
+src/domain/db/dbConfig.js
 
