@@ -1,3 +1,4 @@
+import ExcelErrorMsg from "../../../validator/excelErrorMsg";
 import TotalExam from "../../entity/totalExam";
 import { asyncDB } from "../dbConfig";
 
@@ -25,6 +26,18 @@ export default class TotalExamRepository {
         }
 
         return this.#convertToTotalExams(rows);
+    }
+
+    async findByRoundAndClassId(round, classId) {
+        const query = `SELECT * FROM total_exams WHERE class_id = ${classId} AND round = ${round}`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            throw new ReferenceError(ExcelErrorMsg.NO_EXISTENT_EXAM);
+        }
+
+        return this.#convertToTotalExam(rows[0]);
     }
 
     async findCommonExamCount() {
@@ -65,12 +78,20 @@ export default class TotalExamRepository {
         let totalExams = new Array();
 
         rows.forEach(row => {
-            const problemScores = new Array(row.first_problem_score, row.second_problem_score, row.third_problem_score);
+            const totalExam = this.#convertToTotalExam(row);
 
-            totalExams.push(new TotalExam(row.round, row.common_round, row.score_rule, row.class_id, row.total_tester, 
-                                        row.average, row.stadard_deviation, row.max_score, problemScores));
+            totalExams.push(totalExam);
         });
 
         return totalExams;
     }
+
+    #convertToTotalExam(row) {
+        const problemScores = new Array(row.first_problem_score, row.second_problem_score, row.third_problem_score);
+      
+        const totalExam = new TotalExam(row.round, row.common_round, row.score_rule, row.class_id, row.total_tester, 
+            row.average, row.standard_deviation, row.max_score, problemScores)
+
+        return totalExam;
+    }    
 }

@@ -17,7 +17,6 @@ export default class TotalExamService {
             //Array of array 형태로 되어있어야 엑셀에 잘 들어감
             scoreRuleData.push([scoreRule]);
         });
-        
 
         return scoreRuleData;
     }
@@ -26,5 +25,11 @@ export default class TotalExamService {
         const examList = await this.#totalExamRepository.findByClassId(courseId);
         
         return examList;
+    }
+
+    async getCommonRound(round, courseId) {
+        const examInfo = await this.#totalExamRepository.findByRoundAndClassId(round, courseId);
+
+        return examInfo.commonRound;
     }
 }

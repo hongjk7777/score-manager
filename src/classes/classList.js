@@ -2,7 +2,7 @@ import express from "express";
 import {isAdminAuthenticated} from "../auth/authMiddleware.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 import db from "../domain/db/dbConfig";
-import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum, getSeoulDeptInfo, getYonseiDeptInfo} from "../domain/db/dbQuery.js";
+import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../domain/db/dbQuery.js";
 import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../domain/db/class/dbClassQuery.js";
 import { getStudentPNumByName, getStudentNameByPNum } from '../domain/db/student/dbStudentQuery';
 import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../domain/db/exam/dbExamQuery.js";
@@ -16,6 +16,8 @@ import AuthService from "../auth/authService.js";
 import TotalExamService from "../domain/service/totalExamService.js";
 import ExcelService from "../excel/excelService.js";
 import CourseService from "../domain/service/courseService.js";
+import StudentService from "../domain/service/studentService.js";
+import ExamService from "../domain/service/examService.js";
 // import fs from "fs";
 
 const router = express.Router();
@@ -23,6 +25,9 @@ const router = express.Router();
 const authService = new AuthService();
 const totalExamService = new TotalExamService();
 const courseService = new CourseService();
+const excelService = new ExcelService();
+const examService = new ExamService();
+const studentService = new StudentService();
 
 //set path to save input excels
 const upload = multer({dest: 'excels/'});
@@ -94,17 +99,49 @@ router.get("/:id/student", isAdminAuthenticated, wrap(async function(req, res) {
     res.render("admin-class/student-info", {examInfos : studentExams, student : student, user: req.user});
 }));
 
+router.get("/:id/student/exam", isAdminAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudent(req.query.id);
+    const round = req.query.round;
+
+    //TODO: 나중에 totalExam, exam 하나씩 받아오는게 더 보기 좋을 듯?
+    const studentExam = await examService.getStudentExam(student.id, round, student.classId);
+    const seoulDeptInfo = await getSeoulDeptInfo(studentExam.commonRound, student.id, studentExam.seoulDept);
+    const yonseiDeptInfo = await getYonseiDeptInfo(studentExam.commonRound, student.id, studentExam.yonseiDept);
+    
+    //TODO: 대학별 학부 리스트도 넘겨줘야 함
+    res.render("admin-class/student-exam-info", {student : student, studentExam : studentExam, 
+                                        seoulDeptInfo: seoulDeptInfo, yonseiDeptInfo : yonseiDeptInfo});
+    // res.render("admin-class/student-exam-info", { 
+    //     studentExam : studentExam, 
+    //     seoulDeptList: seoulDeptList, yonseiDeptList: yonseiDeptList, studentId : student.id});
+}));
+
+async function getSeoulDeptInfo(commonRound, studentId, seoulDept) {
+    if(isCommonRound(commonRound)) {
+        return await examService.getSeoulDeptInfo(commonRound, studentId, seoulDept);
+    } 
+
+    return null;
+}
+
+async function getYonseiDeptInfo(commonRound, studentId, yonseiDept) {
+    if(isCommonRound(commonRound)) {
+        return await examService.getYonseiDeptInfo(commonRound, studentId, yonseiDept);
+    } 
+
+    return null;
+}
+
+function isCommonRound(commonRound) {
+    return commonRound > 0;
+}
+
 router.get("/:id/student/exam/seoul-dept", function(req, res) {
-    // console.log(req.query.round + req.query.name);
-    getSeoulDeptInfo(req.params.id, req.query.round, req.query.name).then(seoulDeptInfo => {
-        res.send(seoulDeptInfo.seoulChartData);
-    });
+    
 });
 
 router.get("/:id/student/exam/yonsei-dept", function(req, res) {
-    getYonseiDeptInfo(req.params.id, req.query.round, req.query.name).then(yonseiDeptInfo => {
-        res.json(yonseiDeptInfo.yonseiChartData);
-    });
+    
 });
 
 router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, res) {

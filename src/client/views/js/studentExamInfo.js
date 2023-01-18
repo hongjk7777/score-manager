@@ -3,28 +3,7 @@ const scoreRuleBtn = document.querySelector("#score-rule-btn");
 const problemInfoBtn = document.querySelector("#problem-info-btn");
 const seoulDeptSelect = document.querySelector("#seoul-dept-select")
 const yonseiDeptSelect = document.querySelector("#yonsei-dept-select")
-
-students.forEach(student => {
-    const initName = '***';
-    const name = student.querySelector("#student-name").innerHTML.trim();
-    if(!(name === initName)) {
-        // writeMyScore(student);
-    }
-});
-
-function writeMyScore(student) {
-    const firstScore = student.querySelector("#first-score").innerHTML;
-    const secondScore = student.querySelector("#second-score").innerHTML;
-    const thirdScore = student.querySelector("#third-score").innerHTML;
-    const scoreSum = student.querySelector("#score-sum").innerHTML;
-    const ranking = student.querySelector("#ranking").innerHTML;
-
-    document.querySelector("#my-first-score").innerHTML = firstScore;
-    document.querySelector("#my-second-score").innerHTML = secondScore;
-    document.querySelector("#my-third-score").innerHTML = thirdScore;
-    document.querySelector("#my-score-sum").innerHTML = scoreSum;
-    document.querySelector("#my-ranking").innerHTML = ranking;
-}
+const studentId = document.querySelector("#student-id").innerHTML;
 
 const examRound = document.querySelector("#exam-round").innerHTML;
 
@@ -36,7 +15,7 @@ scoreRuleBtn.addEventListener("click", e => {
 problemInfoBtn.addEventListener("click", e => {
     const studentName = document.querySelector("#username").innerHTML;
     const curUrl = window.location.href.split('?')[0];
-    location.href=`${curUrl}/problem-info?round=${examRound}&name=${studentName}`;
+    location.href=`${curUrl}/problem-info?round=${examRound}&name=${studentName}&id=${studentId}`;
 });
 
 function makeChart() {
@@ -80,7 +59,7 @@ function makeChart() {
     });
 
     const maxVal = getMaxVal(chartData);
-    console.log(maxVal);
+    
     if(maxVal < 5){
         chart.options.scales.yAxes[0].ticks.max = 5;
         chart.options.scales.yAxes[0].ticks.stepSize = 1;
@@ -233,7 +212,7 @@ function getChartColor() {
 
 const curUrl = window.location.href.split('?')[0];
 
-function handelSeoulDeptChange(e) {
+function handleSeoulDeptChange(e) {
     const deptName = e.target.value;
 
     axios({
@@ -247,7 +226,7 @@ function handelSeoulDeptChange(e) {
     });
 }
 
-function handelYonseiDeptChange(e) {
+function handleYonseiDeptChange(e) {
     const deptName = e.target.value;
     axios({
         url: `${curUrl}/yonsei-dept?round=${examRound}&name=${deptName}`, 
@@ -291,13 +270,13 @@ function changeChartColor(examChart) {
     examChart.update(); 
 }
 
-if(seoulDeptSelect){
-    seoulDeptSelect.addEventListener("change", handelSeoulDeptChange);
-}
+// if(seoulDeptSelect){
+//     seoulDeptSelect.addEventListener("change", handleSeoulDeptChange);
+// }
 
-if(yonseiDeptSelect){
-    yonseiDeptSelect.addEventListener("change", handelYonseiDeptChange);
-}
+// if(yonseiDeptSelect){
+//     yonseiDeptSelect.addEventListener("change", handleYonseiDeptChange);
+// }
 
 makeChart();
 makeSeoulChart();
