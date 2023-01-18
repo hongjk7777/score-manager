@@ -79,7 +79,7 @@ async function getExamInfosById(round, classId, user) {
     // console.log(id);
     // const totalExamInfo = await getTotalExamInfoById(id);
     const commonRound = await getCommonExamRound(round, classId);
-    if(commonRound === 0) {
+    if(commonRound <= 0) {
         return new Promise(resolve => {
             db.query(`USE classdb`);
             db.query(`SELECT exams.first_score, exams.second_score, exams.third_score, students.school, 
@@ -190,13 +190,13 @@ async function getExamInfosById(round, classId, user) {
 
 async function getExamChartDataById(round, classId, user) {
     const commonRound = await getCommonExamRound(round, classId);
-    if(commonRound === 0) {
+    if(commonRound <= 0) {
         return new Promise(resolve => {
             db.query(`USE classdb`);
             db.query(`SELECT exams.score_sum FROM exams WHERE round = ${round} 
                     AND exams.class_id = ${classId}`, function (err, studentScores) {
                 let chartData = new Array(10).fill(0);
-    
+
                 if(err) {
                     console.log("Failed to load exam datas");
                     console.log(err);

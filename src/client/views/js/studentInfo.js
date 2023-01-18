@@ -1,4 +1,5 @@
 const username = document.querySelector('#username').innerHTML;
+const studentId = document.querySelector('#student-id').innerHTML;
 const examRounds = document.querySelectorAll("#exam-round");
 const infoBtns = document.querySelectorAll("#info-btn");
 
@@ -14,6 +15,6 @@ for (let i = 0; i < examRounds.length; i++) {
     const round = parseInt(examRounds[i].innerHTML);
 
     infoBtn.addEventListener("click", e => {
-        location.href=`${curUrl}/exam?round=${round}&name=${username}`;
+        location.href=`${curUrl}/exam?round=${round}&name=${username}&id=${studentId}`;
     })   
 }

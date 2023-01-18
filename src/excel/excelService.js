@@ -9,6 +9,7 @@ import ExamService from "../domain/service/examService";
 import TotalExamService from "../domain/service/totalExamService";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
+import CourseService from "../domain/service/courseService";
 
 const FILE_PATH = "src/excel/output/";
 const FILE_NAME = "testExcel.xlsx";
@@ -20,12 +21,13 @@ export default class ExcelService {
     #examRepository = new ExamRepository();
     #totalExamRepository = new TotalExamRepository();
     #studentRepository = new StudentRepository();
+    #courseService = new CourseService();
 
     async putExcelDatasToDB(file, courseId) {
         this.#initExcelDirectory(file);
     
         const excel = await this.#getExcel(file);
-        const success = await this.deleteClassPrevDB(courseId);
+        const success = await this.#courseService.deleteClassPrevDB(courseId);
 
         if(success) {
             const personalSheetName = '개인';
@@ -89,16 +91,6 @@ export default class ExcelService {
         return excel;
     }
 
-    async deleteClassPrevDB(classId) {
-        let success = false;
-
-        success = await this.#examRepository.deleteByClassId(classId);
-        success = await this.#studentRepository.deleteByCourseId(classId);
-        success = await this.#totalExamRepository.deleteByClassId(classId);
-
-        return success;
-    }
-
     #saveRoundExams(excel, roundExams, classId) {
         roundExams.forEach((roundExam, round) => {
             this.#saveRoundExamInfo(excel, roundExam, round + 1, classId);
@@ -124,7 +116,7 @@ export default class ExcelService {
             return roundExam[0].commonRound;
         }
 
-        return -1;
+        return 0;
     }
 
     #parseProblemScore(scoreRule) {

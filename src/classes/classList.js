@@ -115,19 +115,17 @@ router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, r
     });
 });
 
-router.get("/:id/student/exam/problem-info", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
-        getStudentNameByPNum(pNum).then(userInfo => {
-            getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
-                console.log(studentInfo);
-                getProblemInfoByRound(req.query.round, req.params.id).then(problemInfo => {
-                    res.render("class/problem-info", {username : userInfo.username , round : req.query.round, 
-                        studentInfo: studentInfo, problemInfo: problemInfo, userInfo : userInfo, user: req.user});
-                });
-            });
+router.get("/:id/student/exam/problem-info", isAdminAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudent(req.query.id);
+    const pNum = student.phoneNum;
+
+    getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
+        getProblemInfoByRound(req.query.round, req.params.id).then(problemInfo => {
+            res.render("class/problem-info", {username : student.name , round : req.query.round, 
+                studentInfo: studentInfo, problemInfo: problemInfo, user: req.user});
         });
     });
-});
+}));
 
 router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
     getCommonExamRound(req.query.round, req.params.id).then(commonRound => {
@@ -137,20 +135,20 @@ router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
 });
 
 //TODO: 여기도 async await 라우터에서 데코레이터 패턴으로 처리해줘야 할ㄷ듯
-router.get("/:id/init-pw", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
-        // console.log(pNum);
-        authService.initPassword(pNum).then(() => {
-            res.redirect(`/classList/${req.params.id}`);
-        });
-    });
-});
+router.get("/:id/init-pw", isAdminAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudent(req.query.id);
+    const pNum = student.phoneNum;
+    
+    authService.initPassword(pNum);
 
-router.get("/:id/delete", isAdminAuthenticated, function(req, res) {
-    deleteClassFromDB(req.params.id).then( ()=> {
-        res.redirect("/classList");
-    });
-});
+    res.redirect(`/classList/${req.params.id}`);
+}));
+
+router.get("/:id/delete", isAdminAuthenticated, wrap(async function(req, res) {
+    await courseService.deleteClass(req.params.id);
+    
+    res.redirect("/classList");
+}));
 
 
 
