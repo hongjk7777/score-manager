@@ -118,4 +118,109 @@ export default class ExamService {
 
         return rankingData;
     }
-}
+
+    async getStudentExams(studentId, courseId) {
+        const roundCount = await this.#getExamRoundCount(courseId);
+        const examInfos = new Array();
+
+        for (let round = 1; round <= roundCount; round++) {
+            const examInfo = await this.getStudentExam(studentId, round, courseId);
+            
+            examInfos.push(examInfo);   
+        }
+        
+
+        return examInfos;
+    }
+
+    async #getExamRoundCount(courseId) {
+        return await this.#examRepository.findExamRoundCount(courseId);
+    }
+
+    async getStudentExam(studentId, round, courseId) {
+        let exams;
+
+        const commonRound = await this.#totalExamService.getCommonRound(round, courseId);
+
+        if(this.#isCommonExam(commonRound)) {
+            exams = await this.#examRepository.findByCommonRound(commonRound);
+        } else {
+            exams = await this.#examRepository.findByRoundAndClassId(round, courseId);
+        }
+
+        exams = this.#sortExam(exams);
+        exams = this.#addRanking(exams);
+
+        let studentExam = this.#selectStudentExam(exams, studentId);
+        
+        if(studentExam) {
+            studentExam = this.#addScoreInfo(studentExam, exams);
+        }
+
+        return studentExam;
+    }
+
+    #sortExam(exams) {
+        const copyExams = _.cloneDeep(exams);
+
+        copyExams.sort(function(a, b)  {
+            if(a.scoreSum > b.scoreSum) return -1;
+            if(a.scoreSum === b.scoreSum) return 0;
+            if(a.scoreSum < b.scoreSum) return 1;
+        });
+
+        return copyExams;
+    }
+
+    #addRanking(exams) {
+        const copyExams = _.cloneDeep(exams);
+
+        let sameCount = 0;
+        let lastScore = -1;
+
+        copyExams.forEach((exam, index) => {
+            if(exam.scoreSum === lastScore) {
+                sameCount++;
+            }  else {
+                sameCount = 0;
+            }
+
+            exam.ranking = index + 1 - sameCount;
+
+            lastScore = exam.scoreSum;
+        });
+
+        return copyExams;
+    }
+
+    #addScoreInfo(studentExam, exams) {
+        const copyExam = _.cloneDeep(studentExam);
+        
+        copyExam.topScore = Math.max.apply(null, exams.map(exam => exam.scoreSum));
+        copyExam.totalTester = exams.length;
+        copyExam.percent = ((copyExam.ranking / copyExam.totalTester) * 100).toFixed(0);
+        copyExam.average = (exams.reduce((sum, curVal) => sum + curVal.scoreSum, 0) / exams.length).toFixed(2);
+        copyExam.standardDev = (Math.sqrt(exams.map(exam => Math.pow(exam.scoreSum - copyExam.average, 2))
+            .reduce((a, b) => a + b) / copyExam.totalTester)).toFixed(2);
+        copyExam.chartData = this.#getChartData(exams.map(exam => exam.scoreSum));
+
+        return copyExam;
+    }
+
+
+    #isCommonExam(commonRound) {
+        return commonRound > 0;
+    }
+
+    #selectStudentExam(exams, studentId) {
+        let studentExam = null;
+
+
+        exams.forEach((exam) => {
+            if (exam.studentId === studentId) {
+                studentExam = exam;
+            }
+        });
+
+        return studentExam;
+    }

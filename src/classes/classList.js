@@ -87,36 +87,12 @@ router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), funct
     putDeptValToDB(file, req.params.id).then(res.redirect(`/classList/${req.params.id}`));
 });
 
-router.get("/:id/student", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
-        getStudentNameByPNum(pNum).then(userInfo => {
-            getStudentInfosByPNum(pNum).then(examList => {
-                console.log(examList);
-                res.render("admin-class/student-info", {examList : examList, userInfo : userInfo, user: req.user});
-                // res.render("class/exam-list", {examList : examList, userInfo : userInfo, user: req.user});
-            });    
-        });
-    })
-});
+router.get("/:id/student", isAdminAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudent(req.query.id);
+    const studentExams = await examService.getStudentExams(student.id, req.params.id);
 
-router.get("/:id/student/exam", isAdminAuthenticated, function(req, res) {
-    getStudentPNumByName(req.query.name, req.params.id).then(pNum => {
-        getStudentNameByPNum(pNum).then(userInfo => {
-            getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
-                getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
-                    // console.log(studentInfo);
-                    getSeoulDeptList(req.query.round, userInfo.classId).then(seoulDeptList => {
-                        getYonseiDeptList(req.query.round, userInfo.classId).then(yonseiDeptList => {
-                            res.render("admin-class/student-exam-info", {username : userInfo.username , round : req.query.round, 
-                                chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user,
-                                seoulDeptList: seoulDeptList, yonseiDeptList: yonseiDeptList});       
-                        });
-                    });
-                });
-            });
-        });
-    });
-});
+    res.render("admin-class/student-info", {examInfos : studentExams, student : student, user: req.user});
+}));
 
 router.get("/:id/student/exam/seoul-dept", function(req, res) {
     // console.log(req.query.round + req.query.name);
