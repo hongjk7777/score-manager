@@ -28,8 +28,8 @@ export default class TotalExamRepository {
         return this.#convertToTotalExams(rows);
     }
 
-    async findByRoundAndClassId(round, classId) {
-        const query = `SELECT * FROM total_exams WHERE class_id = ${classId} AND round = ${round}`;
+    async findByRoundAndCourseId(round, courseId) {
+        const query = `SELECT * FROM total_exams WHERE class_id = ${courseId} AND round = ${round}`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -52,8 +52,22 @@ export default class TotalExamRepository {
         return rows[0].count;
     }
 
-    async findScoreRule(commonRound) {
+    async findCommonScoreRule(commonRound) {
         const query = `SELECT score_rule FROM total_exams WHERE common_round = ${commonRound};`;
+
+        const [rows] = await asyncDB.execute(query);
+
+        if(rows.length === 0) {
+            return '';
+        }
+
+        const scoreRule = rows[0].score_rule;
+
+        return scoreRule.replaceAll('$', '');
+    }
+
+    async findScoreRule(round, classId) {
+        const query = `SELECT score_rule FROM total_exams WHERE round = ${round} AND class_id = ${classId};`;
 
         const [rows] = await asyncDB.execute(query);
 

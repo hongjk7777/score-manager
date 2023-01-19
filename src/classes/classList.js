@@ -144,13 +144,11 @@ router.get("/:id/student/exam/yonsei-dept", function(req, res) {
     
 });
 
-router.get("/:id/student/exam/score-rule", isAdminAuthenticated, function(req, res) {
-    getScoreRule(req.query.round, req.params.id).then(scoreRule => {
-        // console.log(req.params.id);
-        const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
-        res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user, round: req.query.round});
-    });
-});
+router.get("/:id/student/exam/score-rule", isAdminAuthenticated, wrap(async function(req, res) {
+    const scoreRules = await totalExamService.getScoreRules(req.query.round, req.params.id);
+
+    res.render("class/score-rule", {scoreRuleArr : scoreRules, user: req.user, round: req.query.round});
+}));
 
 router.get("/:id/student/exam/problem-info", isAdminAuthenticated, wrap(async function(req, res) {
     const student = await studentService.getStudent(req.query.id);

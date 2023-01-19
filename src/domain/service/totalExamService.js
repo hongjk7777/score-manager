@@ -21,6 +21,12 @@ export default class TotalExamService {
         return scoreRuleData;
     }
 
+    async getScoreRules(round, classId) {
+        const scoreRule = await this.#totalExamRepository.findScoreRule(round, classId);
+
+        return scoreRule.split(/\r\n|\r|\n/);
+    }
+
     async getClassExamList(courseId) {
         const examList = await this.#totalExamRepository.findByClassId(courseId);
         
