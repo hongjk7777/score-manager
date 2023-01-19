@@ -1,53 +1,54 @@
 import express from "express";
 import { isAuthenticated } from "../auth/authMiddleware.js";
-import {getStudentInfosByPNum, getStudentInfoByPNum} from "../domain/db/dbQuery.js";
-import {getStudentNameByPNum} from '../domain/db/student/dbStudentQuery.js'
-import { getProblemInfoByRound, getScoreRule } from "../domain/db/totalExam/dbTotalExamQuery.js";
-import { getExamChartDataById } from "../domain/db/exam/dbExamQuery";
+
+import wrap from 'express-async-wrap'
+import StudentService from "../domain/service/studentService.js";
+import ExamService from "../domain/service/examService.js";
+import TotalExamService from "../domain/service/totalExamService.js";
 
 const router = express.Router();
 
-router.get("/", isAuthenticated, function(req, res) {
+const studentService = new StudentService();
+const examService = new ExamService();
+const totalExamService = new TotalExamService();
+
+router.get("/", isAuthenticated, wrap(async function(req, res) {
     //username 가져오기, 시험 리스트 가져오기
-    getStudentNameByPNum(req.user.username).then(userInfo => {
-        getStudentInfosByPNum(req.user.username).then(examList => {
-            res.render("class/exam-list", {examList : examList, userInfo : userInfo});
-        });    
-    }); 
-});
+    const student = await studentService.getStudentByPhoneNNum(req.user.username);
+    const studentExams = await examService.getStudentExams(student.id, student.classId);
 
-router.get("/exam", isAuthenticated, function(req, res) {
-    getStudentNameByPNum(req.user.username).then(userInfo => {
-        getStudentInfoByPNum(req.user.username, req.query.round).then(studentInfo => {
-            getExamChartDataById(req.query.round, userInfo.classId, userInfo).then(chartData => {
-                res.render("class/exam-info", {username : userInfo.username , round : req.query.round, 
-                    chartData : chartData, studentInfo: studentInfo, userInfo : userInfo, user: req.user});
-            });
-        });
-        
-    });
-});
+    res.render("class/exam-list", {studentName : req.user.studentName, studentExams: studentExams});
+}));
 
-router.get("/score-rule", isAuthenticated, function(req, res) {
-    getStudentNameByPNum(req.user.username).then(userInfo => {
-        getScoreRule(req.query.round, userInfo.classId).then(scoreRule => {
-            // console.log(scoreRule);
-            const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
-            res.render("class/score-rule", {scoreRuleArr : scoreRuleArr, user: req.user, round: req.query.round});
-        });
-    });
-});
+router.get("/exam", isAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudentByPhoneNNum(req.user.username);
+    const studentExam = await examService.getStudentExam(student.id, req.query.round, student.classId);
+    const seoulDeptInfo = await examService.getSeoulDeptInfo(studentExam.commonRound, student.id, studentExam.seoulDept);
+    const yonseiDeptInfo = await examService.getYonseiDeptInfo(studentExam.commonRound, student.id, studentExam.yonseiDept);
 
-router.get("/exam/problem-info", isAuthenticated, function(req, res) {
-    getStudentNameByPNum(req.user.username).then(userInfo => {
-        getStudentInfoByPNum(req.user?.username, req.query.round).then(studentInfo => {
-            getProblemInfoByRound(req.query.round, userInfo.classId).then(problemInfo => {
-                res.render("class/problem-info", {studentInfo: studentInfo, problemInfo: problemInfo});
-            });
-        });
-    });
+    res.render("class/exam-info", {username: student.name, studentExam: studentExam,
+                                    seoulDeptInfo: seoulDeptInfo, yonseiDeptInfo: yonseiDeptInfo});
+
+}));
+
+router.get("/score-rule", isAuthenticated, wrap(async function(req, res) {
+    const round = req.query.round;
+    const student = await studentService.getStudentByPhoneNNum(req.user.username);
+    const scoreRules = await totalExamService.getScoreRules(round, student.classId);
     
-});
+    res.render("class/score-rule", {scoreRuleArr : scoreRules, round: round});
+}));
+
+router.get("/exam/problem-info", isAuthenticated, wrap(async function(req, res) {
+    const student = await studentService.getStudentByPhoneNNum(req.user.username);
+    const courseId = student.classId;
+    const round = req.query.round;
+    
+    const studentExam = await examService.getStudentExam(student.id, round, courseId);
+    const problemScores = await totalExamService.getProblemScores(round, courseId);
+
+    res.render("class/problem-info", {studentExam: studentExam, problemScores: problemScores});
+}));
 
 
 export default router;

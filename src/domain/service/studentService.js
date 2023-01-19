@@ -9,8 +9,14 @@ export default class StudentService {
         return studentList;
     }
 
-    async getStudent(studentId) {
+    async getStudentById(studentId) {
         const student = await this.#studentRepository.findById(studentId);
+
+        return student;
+    }
+
+    async getStudentByPhoneNNum(phoneNum) {
+        const student = await this.#studentRepository.findOneByPhoneNum(phoneNum);
 
         return student;
     }

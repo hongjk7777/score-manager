@@ -71,7 +71,7 @@ block content
                                 button#score-rule-btn.btn.btn-sm.btn-outline-secondary 채점기준
                                 
                                 
-                    if(studentExam.seoulDept)
+                    if(seoulDeptInfo)
                         thead.fs-6
                             tr.table-active
                                 th(colspan="6") 서울대 #{studentExam.seoulDept} 순위
@@ -87,7 +87,7 @@ block content
                                 if(seoulDeptInfo)
                                     th(colspan="6") #{seoulDeptInfo.ranking}/#{seoulDeptInfo.tester}
                                 
-                    if(studentExam.yonseiDept)
+                    if(yonseiDeptInfo)
                         thead.fs-6
                             tr.table-active
                                 th(colspan="6") 연세대 #{studentExam.yonseiDept} 순위

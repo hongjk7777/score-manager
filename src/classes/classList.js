@@ -83,14 +83,14 @@ router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), funct
 });
 
 router.get("/:id/student", isAdminAuthenticated, wrap(async function(req, res) {
-    const student = await studentService.getStudent(req.query.id);
+    const student = await studentService.getStudentById(req.query.id);
     const studentExams = await examService.getStudentExams(student.id, req.params.id);
 
     res.render("admin-class/student-info", {examInfos : studentExams, student : student, user: req.user});
 }));
 
 router.get("/:id/student/exam", isAdminAuthenticated, wrap(async function(req, res) {
-    const student = await studentService.getStudent(req.query.id);
+    const student = await studentService.getStudentById(req.query.id);
     const round = req.query.round;
 
     //TODO: 나중에 totalExam, exam 하나씩 받아오는게 더 보기 좋을 듯?
@@ -140,7 +140,7 @@ router.get("/:id/student/exam/score-rule", isAdminAuthenticated, wrap(async func
 router.get("/:id/student/exam/problem-info", isAdminAuthenticated, wrap(async function(req, res) {
     const courseId = req.params.id;
     const round = req.query.round;
-    const student = await studentService.getStudent(req.query.id);
+    const student = await studentService.getStudentById(req.query.id);
 
     //TODO: 나중에 totalExam, exam 하나씩 받아오는게 더 보기 좋을 듯?
     const studentExam = await examService.getStudentExam(student.id, round, courseId);
@@ -161,7 +161,7 @@ router.get("/:id/exam", isAdminAuthenticated, wrap(async function(req, res) {
 
 //TODO: 여기도 async await 라우터에서 데코레이터 패턴으로 처리해줘야 할ㄷ듯
 router.get("/:id/init-pw", isAdminAuthenticated, wrap(async function(req, res) {
-    const student = await studentService.getStudent(req.query.id);
+    const student = await studentService.getStudentById(req.query.id);
     const pNum = student.phoneNum;
     
     authService.initPassword(pNum);
