@@ -310,7 +310,7 @@ export default class ExamService {
         const that = this;
 
         const promises = copyExams.map((exam) => {
-            return that.#studentService.getStudent(exam.studentId);
+            return that.#studentService.getStudentById(exam.studentId);
         });
         
         await Promise.all(promises).then(students => {
