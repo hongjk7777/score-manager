@@ -187,7 +187,7 @@ export default class ExcelService {
     }
 
     async #createScoreRuleDataSheet(workbook, commonRound) {
-        const scoreRuleDatas = await this.#totalExamService.getScoreRuleData(commonRound);
+        const scoreRuleDatas = await this.#totalExamService.getCommonScoreRule(commonRound);
         const scoreRuleSheet = xlsx.utils.aoa_to_sheet(scoreRuleDatas);
         xlsx.utils.book_append_sheet(workbook, scoreRuleSheet, "채점기준");
     }
