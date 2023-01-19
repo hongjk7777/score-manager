@@ -142,18 +142,7 @@ export default class ExamService {
     }
 
     async getStudentExam(studentId, round, courseId) {
-        let exams;
-
-        const commonRound = await this.#totalExamService.getCommonRound(round, courseId);
-
-        if(this.#isCommonExam(commonRound)) {
-            exams = await this.#examRepository.findByCommonRound(commonRound);
-        } else {
-            exams = await this.#examRepository.findByRoundAndClassId(round, courseId);
-        }
-
-        exams = this.#sortExam(exams);
-        exams = this.#addRanking(exams);
+        const exams = await this.getSortedExams(round, courseId);
 
         let studentExam = this.#selectStudentExam(exams, studentId);
         
@@ -162,6 +151,23 @@ export default class ExamService {
         }
 
         return studentExam;
+    }
+
+    async getSortedExams(round, courseId) {
+        let exams;
+
+        const commonRound = await this.#totalExamService.getCommonRound(round, courseId);
+
+        if (this.#isCommonExam(commonRound)) {
+            exams = await this.#examRepository.findByCommonRound(commonRound);
+        } else {
+            exams = await this.#examRepository.findByRoundAndCourseId(round, courseId);
+        }
+
+        exams = this.#sortExam(exams);
+        exams = this.#addRanking(exams);
+
+        return exams;
     }
 
     #sortExam(exams) {

@@ -39,7 +39,7 @@ export default class ExamRepository {
         return exams;
     }
 
-    async findByRoundAndClassId(round, courseId) {
+    async findByRoundAndCourseId(round, courseId) {
         const query = `SELECT * FROM exams WHERE round = ${round} AND class_id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);

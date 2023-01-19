@@ -74,8 +74,6 @@ router.get("/:id", isAdminAuthenticated, wrap(async function(req, res) {
     const studentList = await studentService.getClassStudentList(courseId);
     const examList = await totalExamService.getClassExamList(courseId);
 
-    console.log(studentList);
-
     res.render("admin-class/class", {id: req.params.id, studentList: studentList, 
             examList: examList, user: req.user, className: className});
 }));
@@ -111,9 +109,6 @@ router.get("/:id/student/exam", isAdminAuthenticated, wrap(async function(req, r
     //TODO: 대학별 학부 리스트도 넘겨줘야 함
     res.render("admin-class/student-exam-info", {student : student, studentExam : studentExam, 
                                         seoulDeptInfo: seoulDeptInfo, yonseiDeptInfo : yonseiDeptInfo});
-    // res.render("admin-class/student-exam-info", { 
-    //     studentExam : studentExam, 
-    //     seoulDeptList: seoulDeptList, yonseiDeptList: yonseiDeptList, studentId : student.id});
 }));
 
 async function getSeoulDeptInfo(commonRound, studentId, seoulDept) {
@@ -151,15 +146,15 @@ router.get("/:id/student/exam/score-rule", isAdminAuthenticated, wrap(async func
 }));
 
 router.get("/:id/student/exam/problem-info", isAdminAuthenticated, wrap(async function(req, res) {
+    const courseId = req.params.id;
+    const round = req.query.round;
     const student = await studentService.getStudent(req.query.id);
-    const pNum = student.phoneNum;
 
-    getStudentInfoByPNum(pNum, req.query.round).then(studentInfo => {
-        getProblemInfoByRound(req.query.round, req.params.id).then(problemInfo => {
-            res.render("class/problem-info", {username : student.name , round : req.query.round, 
-                studentInfo: studentInfo, problemInfo: problemInfo, user: req.user});
-        });
-    });
+    //TODO: 나중에 totalExam, exam 하나씩 받아오는게 더 보기 좋을 듯?
+    const studentExam = await examService.getStudentExam(student.id, round, courseId);
+    const problemScores = await totalExamService.getProblemScores(round, courseId);
+
+    res.render("class/problem-info", {studentExam: studentExam, problemScores: problemScores});
 }));
 
 router.get("/:id/exam", isAdminAuthenticated, function(req, res) {

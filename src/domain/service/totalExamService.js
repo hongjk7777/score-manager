@@ -3,6 +3,13 @@ import TotalExamRepository from "../db/totalExam/totalExamRepository";
 export default class TotalExamService {
     #totalExamRepository = new TotalExamRepository();
 
+
+    async getProblemScores(round, classId) {
+        const totalExam = await this.getTotalExam(round, classId);
+
+        return totalExam.problemScores;
+    }
+
     async countCommonExam() {
         return await this.#totalExamRepository.findCommonExamCount();
     }
