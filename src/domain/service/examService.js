@@ -3,10 +3,12 @@ import ExamRepository from "../db/exam/examRepository";
 import TotalExamService from "./totalExamService";
 import _ from 'lodash'
 import DeptInfoDTO from "../../dto/deptInfoDTO";
+import StudentService from "./studentService";
 
 export default class ExamService {
     #examRepository = new ExamRepository();
     #totalExamService = new TotalExamService();
+    #studentService = new StudentService();
 
     async getScoreDatas(commonRound) {
         const scoreSumDatas = await this.#examRepository.findAllScoreSum(commonRound);
@@ -209,12 +211,23 @@ export default class ExamService {
         copyExam.topScore = Math.max.apply(null, exams.map(exam => exam.scoreSum));
         copyExam.totalTester = exams.length;
         copyExam.percent = ((copyExam.ranking / copyExam.totalTester) * 100).toFixed(0);
+        copyExam.problemsAverage = this.#calcProblemsAverage(exams);
         copyExam.average = (exams.reduce((sum, curVal) => sum + curVal.scoreSum, 0) / exams.length).toFixed(2);
         copyExam.standardDev = (Math.sqrt(exams.map(exam => Math.pow(exam.scoreSum - copyExam.average, 2))
             .reduce((a, b) => a + b) / copyExam.totalTester)).toFixed(2);
         copyExam.chartData = this.#getChartData(exams.map(exam => exam.scoreSum));
 
         return copyExam;
+    }
+
+    #calcProblemsAverage(exams) {
+        const problemsAverage = new Array(3);
+
+        for (let i = 0; i < problemsAverage.length; i++) {
+            problemsAverage[i] = (exams.reduce((sum, curExam) => sum + curExam.scores[i], 0) / exams.length).toFixed(2);
+        }
+
+        return problemsAverage;
     }
 
     #getChartData(scores) {
@@ -282,5 +295,31 @@ export default class ExamService {
         }
         
         return null;
+    }
+
+    async getExamRankingList(round, courseId) {
+        let exams = await this.getSortedExams(round, courseId);
+
+        exams = this.#addStudentName(exams);
+
+        return exams;
+    }
+
+    async #addStudentName(exams) {
+        let copyExams = _.cloneDeep(exams);
+        const that = this;
+
+        const promises = copyExams.map((exam) => {
+            return that.#studentService.getStudent(exam.studentId);
+        });
+        
+        await Promise.all(promises).then(students => {
+            copyExams.forEach((exam, index) => {
+                exam.studentName = students[index].name;
+            })
+        });
+
+        
+        return copyExams;
     }
 }
