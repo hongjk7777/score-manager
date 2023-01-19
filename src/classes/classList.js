@@ -1,14 +1,6 @@
 import express from "express";
 import {isAdminAuthenticated} from "../auth/authMiddleware.js";
 import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
-import db from "../domain/db/dbConfig";
-import {getStudentAndExamInfos, getStudentInfosByPNum, getStudentInfoByPNum} from "../domain/db/dbQuery.js";
-import { getClassId, getClassNameById, addClassToDB, deleteClassFromDB } from "../domain/db/class/dbClassQuery.js";
-import { getStudentPNumByName, getStudentNameByPNum } from '../domain/db/student/dbStudentQuery';
-import { getExamInfosById, getExamChartDataById, getCommonExamCount } from "../domain/db/exam/dbExamQuery.js";
-import { getCommonExamRound, getProblemInfoByRound, getScoreRule } from "../domain/db/totalExam/dbTotalExamQuery.js";
-import { getSeoulDeptList, getYonseiDeptList } from '../domain/db/student/dbStudentDeptQuery.js'
-import { makeCommonTestExcel } from "../excel/out/exportExcel";
 
 import wrap from 'express-async-wrap'
 import multer from "multer";
@@ -157,12 +149,15 @@ router.get("/:id/student/exam/problem-info", isAdminAuthenticated, wrap(async fu
     res.render("class/problem-info", {studentExam: studentExam, problemScores: problemScores});
 }));
 
-router.get("/:id/exam", isAdminAuthenticated, function(req, res) {
-    getCommonExamRound(req.query.round, req.params.id).then(commonRound => {
-        getExamInfosById(req.query.round, req.params.id, req.user).then(studentList => res.render("admin-class/exam", 
-        {studentList : studentList, round : req.query.round, commonRound : commonRound, user: req.user}));
-    });
-});
+router.get("/:id/exam", isAdminAuthenticated, wrap(async function(req, res) {
+    const round = req.query.round;
+    const courseId = req.params.id;
+
+    const commonRound = await totalExamService.getCommonRound(round, courseId);
+    const rankingList = await examService.getExamRankingList(round, courseId);
+
+    res.render("admin-class/exam", {round: round, commonRound: commonRound, rankingList: rankingList});
+}));
 
 //TODO: 여기도 async await 라우터에서 데코레이터 패턴으로 처리해줘야 할ㄷ듯
 router.get("/:id/init-pw", isAdminAuthenticated, wrap(async function(req, res) {

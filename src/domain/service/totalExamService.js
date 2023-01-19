@@ -3,6 +3,11 @@ import TotalExamRepository from "../db/totalExam/totalExamRepository";
 export default class TotalExamService {
     #totalExamRepository = new TotalExamRepository();
 
+    async getTotalExam(round, courseId) {
+        const totalExam = await this.#totalExamRepository.findByRoundAndCourseId(round, courseId);
+
+        return totalExam;
+    }
 
     async getProblemScores(round, classId) {
         const totalExam = await this.getTotalExam(round, classId);
@@ -14,8 +19,8 @@ export default class TotalExamService {
         return await this.#totalExamRepository.findCommonExamCount();
     }
 
-    async getScoreRuleData(commonRound) {
-        let scoreRule = await this.#totalExamRepository.findScoreRule(commonRound);
+    async getCommonScoreRule(commonRound) {
+        const scoreRule = await this.#totalExamRepository.findCommonScoreRule(commonRound);
 
         const scoreRuleArr = scoreRule.split(/\r\n|\r|\n/);
         const scoreRuleData = new Array();
@@ -41,7 +46,7 @@ export default class TotalExamService {
     }
 
     async getCommonRound(round, courseId) {
-        const examInfo = await this.#totalExamRepository.findByRoundAndClassId(round, courseId);
+        const examInfo = await this.#totalExamRepository.findByRoundAndCourseId(round, courseId);
 
         return examInfo.commonRound;
     }
