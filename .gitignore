@@ -8,7 +8,7 @@ excels/
 
 
 src/config.json
-test/testResource/testExcel.xlsx
+*.xlsx
 src/auth/initPw.js
 src/domain/db/dbConfig.js
 
