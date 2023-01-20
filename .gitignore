@@ -1,13 +1,14 @@
-/node_modules
-/src/public/db/mysql.js
-/build
-/src/db/dbConfig.js
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-build/server.js
+node_modules
+src/public/db/mysql.js
+build
+excels/
+
+**/*.zip
+**/*.DS_STORE
+
+
 src/config.json
-test/testResource/testExcel.xlsx
+*.xlsx
 src/auth/initPw.js
-package-lock.json
+src/domain/db/dbConfig.js
+

@@ -18,13 +18,16 @@ function deleteClass() {
 function addStudentLink() {
     const studentNameList = document.querySelectorAll("#student-name");
     const studentList = document.querySelectorAll("#student");
+    const studentIds = document.querySelectorAll("#student-id");
 
     for (let i = 0; i < studentList.length; i++) {
         const studentName = studentNameList[i].innerHTML;
         const student = studentList[i];
-    
+        const studentId = studentIds[i].innerHTML;
+        console.log(studentId);
+        
         student.addEventListener("click", (e) => {
-            location.href=`${curUrl}/student?name=${studentName}`
+            location.href=`${curUrl}/student?name=${studentName}&id=${studentId}`
         });
     }
 }
@@ -46,13 +49,15 @@ function addExamLink() {
 function addInitPwBtn() {
     const studentList = document.querySelectorAll("#init-pw-student");
     const initPwBtns = document.querySelectorAll("#init-pw-btn");
+    const studentIds = document.querySelectorAll("#student-id");
     
     for (let i = 0; i < studentList.length; i++) {
         const studentName = studentList[i].innerHTML;
         const initPwBtn =initPwBtns[i];
+        const studentId = studentIds[i].innerHTML;
         
         initPwBtn.addEventListener("click", (e) => {
-            location.href=`${curUrl}/init-pw?name=${studentName}`;
+            location.href=`${curUrl}/init-pw?name=${studentName}&id=${studentId}`;
         });
     }
 }

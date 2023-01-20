@@ -13,14 +13,14 @@ block content
         #score-card.container
             .row.justify-content-center
             .card.mt-4.mx-3.overflow-auto
-                if(studentInfo.commonRound > 0)
-                    h5.card-header.text-center <span id="username">#{username}</span>님의
-                        |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
-                        |공통 #{studentInfo.commonRound}회차 시험  
+                if(studentExam.commonRound > 0)
+                    h5.card-header.text-center <span id="username">#{student.name}</span>님의
+                        |<span id='exam-round' class='hidden'>#{studentExam.round}</span>
+                        |공통 #{studentExam.commonRound}회차 시험  
                 else 
-                    h5.card-header.text-center <span id="username">#{username}</span>님의 <br>
-                        |<span id='exam-round'>#{studentInfo.round}</span>회차 시험  
-            
+                    h5.card-header.text-center <span id="username">#{student.name}</span>님의 <br>
+                        |<span id='exam-round'>#{studentExam.round}</span>회차 시험  
+                span#student-id.hidden #{student.id}
                 table.table.text-center
                     thead.fs-6
                         tr.table-active
@@ -33,8 +33,8 @@ block content
                     tbody.table-border-bottom-0
                         tr
                             //- 공통시험일 경우     
-                            td(colspan="2") #{studentInfo.firstScore}/#{studentInfo.secondScore}/#{studentInfo.thirdScore}
-                            td#score-sum(colspan="2") #{studentInfo.scoreSum}
+                            td(colspan="2") #{studentExam.scores[0]}/#{studentExam.scores[1]}/#{studentExam.scores[2]}
+                            td#score-sum(colspan="2") #{studentExam.scoreSum}
                             td.pb-0.pt-1(colspan="2") 
                                 button#problem-info-btn.btn.btn-sm.btn-outline-secondary 자세히
                             //- td 
@@ -50,15 +50,10 @@ block content
 
                     tbody.table-border-bottom-0
                         tr
-                            if(studentInfo.commonRound > 0)
-                                td(colspan="2") #{studentInfo.commonAverage}
-                                td(colspan="2") #{studentInfo.commonStandardDev}
+                            td(colspan="2") #{studentExam.average}
+                            td(colspan="2") #{studentExam.standardDev}
                                 
-                            else 
-                                td(colspan="2") #{studentInfo.average}
-                                td(colspan="2") #{studentInfo.standardDeviation}
-                                
-                            td(colspan="2") #{studentInfo.maxScore}
+                            td(colspan="2") #{studentExam.topScore}
                             //- td 
                                 //- button#score-rule-btn.btn.btn-outline-secondary 채점기준
 
@@ -70,70 +65,66 @@ block content
                             th(colspan="2") 채점기준
                     tbody.table-border-bottom-0
                         tr
-                            if(studentInfo.commonRound > 0)
-                                td(colspan="2") #{studentInfo.commonRanking}/#{studentInfo.commonTester}
-                                td(colspan="2") #{studentInfo.commonPercent}%
-                            else 
-                                td(colspan="2") #{studentInfo.ranking}/#{studentInfo.totalTester} 
-                                td(colspan="2") #{studentInfo.percent}%
+                            td(colspan="2") #{studentExam.ranking}/#{studentExam.totalTester} 
+                            td(colspan="2") #{studentExam.percent}%
                             td.pb-0.pt-1(colspan="2") 
                                 button#score-rule-btn.btn.btn-sm.btn-outline-secondary 채점기준
                                 
                                 
-                    if(studentInfo.seoulDept)
+                    if(seoulDeptInfo)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 서울대 지원학과 순위
-                                    select#seoul-dept-select(class="form-select" aria-label=".form-select-sm") 
-                                        each seoulDept in seoulDeptList
-                                            if(seoulDept == studentInfo.seoulDept)
-                                                option.my-dept(value=`${seoulDept}` selected) #{seoulDept} (지원)
-                                            else 
-                                                option(value=`${seoulDept}`) #{seoulDept}
+                                th(colspan="6") 서울대 #{studentExam.seoulDept} 순위
+                                    //- select#seoul-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                    //-     each seoulDept in seoulDeptList
+                                    //-         if(seoulDept == studentExam.seoulDept)
+                                    //-             option.my-dept(value=`${seoulDept}` selected) #{seoulDept} (지원)
+                                    //-         else 
+                                    //-             option(value=`${seoulDept}`) #{seoulDept}
 
                         tbody.table-border-bottom-0
                             tr
-                                if(studentInfo.seoulDeptRanking)
-                                    th(colspan="6") #{studentInfo.seoulDeptRanking}/#{studentInfo.seoulDeptTester}
+                                if(seoulDeptInfo)
+                                    th(colspan="6") #{seoulDeptInfo.ranking}/#{seoulDeptInfo.tester}
                                 
-                    if(studentInfo.yonseiDept)
+                    if(yonseiDeptInfo)
                         thead.fs-6
                             tr.table-active
-                                th(colspan="6") 연세대 지원학과 순위
-                                    select#yonsei-dept-select(class="form-select" aria-label=".form-select-sm") 
-                                            each yonseiDept in yonseiDeptList
-                                                if(yonseiDept == studentInfo.yonseiDept)
-                                                    option.my-dept(value=`${yonseiDept}` selected) #{yonseiDept} (지원)
-                                                else
-                                                    option(value=`${yonseiDept}`) #{yonseiDept}
+                                th(colspan="6") 연세대 #{studentExam.yonseiDept} 순위
+                                    //- select#yonsei-dept-select(class="form-select" aria-label=".form-select-sm") 
+                                    //-         each yonseiDept in yonseiDeptList
+                                    //-             if(yonseiDept == studentExam.yonseiDept)
+                                    //-                 option.my-dept(value=`${yonseiDept}` selected) #{yonseiDept} (지원)
+                                    //-             else
+                                    //-                 option(value=`${yonseiDept}`) #{yonseiDept}
                                     
                         tbody.table-border-bottom-0
                             tr
-                                if(studentInfo.yonseiDeptRanking) 
-                                    th(colspan="6") #{studentInfo.yonseiDeptRanking}/#{studentInfo.yonseiDeptTester}                 
+                                if(yonseiDeptInfo) 
+                                    th(colspan="6") #{yonseiDeptInfo.ranking}/#{yonseiDeptInfo.tester}
                                         
                     
 
                 //- canvas#exam-chart(data-chart=chartData) 
-                if(studentInfo.yonseiDept || studentInfo.seoulDeptRanking)
+                if(yonseiDeptInfo || seoulDeptInfo)
                     #carouselExampleControls.carousel.carousel-dark.slide(data-bs-ride='carousel')
                         .carousel-inner
                             .carousel-item.active
                                 .text-center.fs-4 전체 성적 
-                                .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.commonAverage}
-                                canvas#exam-chart.d-block.w-100(data-chart=chartData) 
+                                .text-end.fs-6.text-muted.me-3 최고점: #{studentExam.topScore} 평균: #{studentExam.average}
+                                canvas#exam-chart.d-block.w-100(data-chart=studentExam.chartData) 
                             
-                            if(studentInfo.seoulDeptRanking)
+                            if(seoulDeptInfo)
                                 .carousel-item
-                                    #seoul-dept-name.fs-4.text-center 서울대 #{studentInfo.seoulDept} 성적
-                                    .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.seoulDeptMaxScore} 평균: #{studentInfo.seoulDeptAverage}
-                                    canvas#seoul-exam-chart.d-block.w-100(data-chart=studentInfo.seoulChartData) 
+                                    #seoul-dept-name.fs-4.text-center 서울대 #{studentExam.seoulDept} 성적
+                                    .text-end.fs-6.text-muted.me-3 최고점: #{seoulDeptInfo.topScore} 평균: #{seoulDeptInfo.average}
+                                    canvas#seoul-exam-chart.d-block.w-100(data-chart=seoulDeptInfo.chartData) 
 
-                            if(studentInfo.yonseiDeptRanking) 
+                            if(yonseiDeptInfo) 
                                 .carousel-item
-                                    #yonsei-dept-name.fs-4.text-center 연세대 #{studentInfo.yonseiDept} 성적 
-                                    .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.yonseiDeptMaxScore} 평균: #{studentInfo.yonseiDeptAverage}
-                                    canvas#yonsei-exam-chart.d-block.w-100(data-chart=studentInfo.yonseiChartData) 
+                                    #yonsei-dept-name.fs-4.text-center 연세대 #{studentExam.yonseiDept} 성적 
+                                    .text-end.fs-6.text-muted.me-3 최고점: #{yonseiDeptInfo.topScore} 평균: #{yonseiDeptInfo.average}
+                                    canvas#yonsei-exam-chart.d-block.w-100(data-chart=yonseiDeptInfo.chartData) 
 
                         button.carousel-control-prev(type='button' data-bs-target='#carouselExampleControls' data-bs-slide='prev')
                             span.carousel-control-prev-icon(aria-hidden='true')
@@ -144,12 +135,9 @@ block content
                 
                 else 
                     .text-center.fs-4 전체 성적 
-                    if(studentInfo.commonRound > 0)
-                        .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.commonAverage}
-                    else 
-                        .text-end.fs-6.text-muted.me-3 최고점: #{studentInfo.maxScore} 평균: #{studentInfo.average}
+                    .text-end.fs-6.text-muted.me-3 최고점: #{studentExam.topScore} 평균: #{studentExam.average}
 
-                    canvas#exam-chart(data-chart=chartData) 
+                    canvas#exam-chart(data-chart=studentExam.chartData) 
 
 
 

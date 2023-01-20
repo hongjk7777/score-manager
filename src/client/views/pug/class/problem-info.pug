@@ -13,13 +13,13 @@ block content
         #score-card.container
             .row.justify-content-center
             .card.mt-4.mx-3.overflow-auto
-                if(studentInfo.commonRound > 0)
+                if(studentExam.commonRound > 0)
                     h5.card-header.text-center 
-                        |<span id='exam-round' class='hidden'>#{studentInfo.round}</span>
-                        |공통 #{studentInfo.commonRound}회차 시험 정보
+                        |<span id='exam-round' class='hidden'>#{studentExam.round}</span>
+                        |공통 #{studentExam.commonRound}회차 시험 정보
                 else 
                     h5.card-header
-                        |<span id='exam-round'>#{studentInfo.round}회차 시험 정보</span>  
+                        |<span id='exam-round'>#{studentExam.round}회차 시험 정보</span>  
             
                 table.table.text-center
                     thead.fs-6
@@ -35,23 +35,23 @@ block content
                         tr
                             //- 공통시험일 경우     
                             th(scope="row") 1번
-                            td #{studentInfo.firstScore}
-                            td #{studentInfo.firstProblemScore}
-                            td #{problemInfo.firstScoreAverage}
+                            td #{studentExam.scores[0]}
+                            td #{problemScores[0]}
+                            td #{studentExam.problemsAverage[0]}
 
                         tr
                             //- 공통시험일 경우     
                             th(scope="row") 2번
-                            td #{studentInfo.secondScore}
-                            td #{studentInfo.secondProblemScore}
-                            td #{problemInfo.secondScoreAverage}
+                            td #{studentExam.scores[1]}
+                            td #{problemScores[1]}
+                            td #{studentExam.problemsAverage[1]}
 
                         tr
                             //- 공통시험일 경우     
                             th(scope="row") 3번
-                            td #{studentInfo.thirdScore}
-                            td #{studentInfo.thirdProblemScore}
-                            td #{problemInfo.thirdScoreAverage}
+                            td #{studentExam.scores[2]}
+                            td #{problemScores[2]}
+                            td #{studentExam.problemsAverage[2]}
                                 
                             //- td 
                                 //- button#score-rule-btn.btn.btn-outline-secondary 채점기준
