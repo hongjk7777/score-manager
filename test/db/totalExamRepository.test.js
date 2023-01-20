@@ -8,17 +8,18 @@ const courseRepository = new CourseRepository();
 const studentRepository = new StudentRepository();
 const totalExamRepository = new TotalExamRepository();
 
-const testClassName = 'examTestClass';
+const testCourseName = 'examTestClass';
+const testCourseId = 305;
 let testCourse;
 
 describe('repo 통합 테스트', () => {
 
     beforeAll(async () => {
         //테스트 class 생성
-        expect(await courseRepository.save(testClassName)).toBe(true);
+        await courseRepository.save(testCourseName);
 
-        testCourse = await courseRepository.findByName(testClassName);
-        expect(testCourse.name).toBe(testClassName);
+        testCourse = await courseRepository.findByName(testCourseName);
+        expect(testCourse.name).toBe(testCourseName);
     })
 
     test('정상 테스트', async () => {
@@ -42,6 +43,14 @@ describe('repo 통합 테스트', () => {
     })
 }) 
 
+describe('findByClassId 테스트', () => {
+    test('정상 테스트', async () => {
+        const examList = await totalExamRepository.findByClassId(testCourseId);
+        
+        console.log(examList);
+    }) 
+})
+
 describe('findCommonExamCount 테스트', () => {
     test('정상 테스트', async () => {
         const commonExamCount = await totalExamRepository.findCommonExamCount();
@@ -55,7 +64,7 @@ describe('findCommonExamCount 테스트', () => {
 describe('findScoreRule 테스트', () => {
     test('정상 테스트', async () => {
         const commonRound = 2;
-        const scoreRule = await totalExamRepository.findScoreRule(commonRound);
+        const scoreRule = await totalExamRepository.findCommonScoreRule(commonRound);
         
         console.log(scoreRule);
     }) 
