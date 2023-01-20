@@ -1,6 +1,5 @@
 import express from "express";
 import {isAdminAuthenticated} from "../auth/authMiddleware.js";
-import {putExcelValToDB, putDeptValToDB} from "../excel/excel.js";
 
 import wrap from 'express-async-wrap'
 import multer from "multer";
@@ -75,16 +74,21 @@ export default (app) => {
     }));
 
     //TODO: 완료가 되면 redirect가 되어야 함 현재 db 넣는 게 async await 처리가 안 되어있음
-    router.post("/:id/add-score", isAdminAuthenticated, upload.single('excel'), function(req, res) {
+    router.post("/:id/add-score", isAdminAuthenticated, upload.single('excel'), wrap(async function(req, res) {
         const file = req.file;
-        putExcelValToDB(file, req.params.id);
-        res.redirect(`/classList/${req.params.id}`);
-    });
+        const courseId = req.params.id;
 
-    router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), function(req, res) {
+        await excelService.putExcelDatasToDB(file, courseId)
+        res.redirect(`/classList/${courseId}`);
+    }));
+
+    router.post("/:id/add-dept", isAdminAuthenticated, upload.single('excel'), wrap(async function(req, res) {
         const file = req.file;
-        putDeptValToDB(file, req.params.id).then(res.redirect(`/classList/${req.params.id}`));
-    });
+        const courseId = req.params.id;
+        
+        await excelService.putDeptDatasToDB(file, courseId);
+        res.redirect(`/classList/${req.params.id}`);
+    }));
 
     router.get("/:id/student", isAdminAuthenticated, wrap(async function(req, res) {
         const student = await studentService.getStudentById(req.query.id);
