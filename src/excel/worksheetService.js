@@ -84,7 +84,7 @@ export default class WorksheetService {
         });
 
         if(phoneNumCol === -1) {
-            throw SyntaxError(ExcelErrorMsg.NO_STUDENT_NAME_COL);
+            throw SyntaxError(ExcelErrorMsg.NO_PHONE_NUM_COL);
         }
 
         return phoneNumCol;
