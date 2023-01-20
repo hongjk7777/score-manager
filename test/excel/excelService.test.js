@@ -2,11 +2,12 @@ import ExcelJS from "exceljs";
 import CourseRepository from "../../src/domain/db/class/courseRepository";
 import ExamRepository from "../../src/domain/db/exam/examRepository";
 import StudentRepository from "../../src/domain/db/student/studentRepository";
+import CourseService from "../../src/domain/service/courseService";
 import ExcelService from "../../src/excel/excelService";
 import WorksheetService from "../../src/excel/worksheetService";
 
 const excelService = new ExcelService();
-const worksheetService = new WorksheetService();
+const courseService = new CourseService();
 const courseRepository = new CourseRepository();
 const examRepository = new ExamRepository();
 const studentRepository = new StudentRepository();
@@ -26,7 +27,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-    await excelService.deleteClassPrevDB(courseId);
+    await courseService.deleteClassPrevDB(courseId);
     await deleteClass();
 })
 
