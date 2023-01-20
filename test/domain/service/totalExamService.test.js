@@ -15,7 +15,7 @@ describe('countCommonExam 테스트', () => {
 describe('getScoreRuleData 테스트', () => {
     test('정상 테스트', async () => {
         const commonRound = 2;
-        const scoreRule = await totalService.getScoreRuleData(commonRound);
+        const scoreRule = await totalService.getCommonScoreRule(commonRound);
 
         const scoreRuleLength = 93;
         expect(scoreRule.length).toBe(scoreRuleLength);
