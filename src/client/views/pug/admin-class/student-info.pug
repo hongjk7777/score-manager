@@ -32,20 +32,16 @@ block content
                                         td
                                             i.fab.fa-angular.fa-lg.text-danger.me-3
                                             strong <span id= "exam-round"> #{examInfo.round}</span>회차
-                                        //- td #{exam.firstScore}/#{exam.secondScore}/#{exam.thirdScore}
-                                        td #{examInfo.scoreSum}
-                                        //- td #{exam.average}/#{exam.standardDeviation}
-                                        td #{examInfo.ranking}/#{examInfo.totalTester} 
-                                        //- td #{exam.percent}%
+                                    
+
                                     //- 공통시험일 경우
                                     else 
                                         td
                                             i.fab.fa-angular.fa-lg.text-danger.me-3
                                             strong <span id= "exam-round"> #{examInfo.round}</span>회차(공통 #{examInfo.commonRound}회차)
-                                        //- td #{exam.firstScore}/#{exam.secondScore}/#{exam.thirdScore}
-                                        td #{examInfo.scoreSum}
-                                        //- td #{exam.commonAverage}/#{exam.commonStandardDev}
-                                        td #{examInfo.commonRanking}/#{examInfo.commonTester}
+
+                                    td #{examInfo.scoreSum}
+                                    td #{examInfo.ranking}/#{examInfo.totalTester} 
                                         //- td #{exam.commonPercent}%
                                 
                                 else 
@@ -60,45 +56,7 @@ block content
                                     //- td
                                 if(examInfo != null)
                                     td 
-                                        button#info-btn.btn.btn-sm.btn-secondary 자세히        
-  
-
-    //- .row
-    //-     .container.mt-4
-    //-         h4.text-center #{userInfo.username}님 시험 결과
-    //-         if(examList.length === 0)
-    //-             h6.text-center.mt-5 응시한 시험이 없습니다.
-    //-         -var round = 0;
-    //-         ul.mt-4.mx-5
-    //-             each exam in examList
-    //-                 li.d-flex.flex-justify-between.width-full.py-4.border-bottom.exam-list
-    //-                     #student.col-11.col-lg-9.d-inline-block
-    //-                         -round++;
-    //-                         if(exam)
-    //-                             if(exam.commonRound > 0)
-    //-                                 #exam-round.mb-1 #{exam.round}회차 시험 (공통 #{exam.commonRound}회차 시험)
-    //-                                 | #{exam.firstScore}점/#{exam.secondScore}점/#{exam.thirdScore}점  총점: #{exam.scoreSum}<br>
-    //-                                 | 평균:#{exam.commonAverage} 표준편차:#{exam.commonStandardDev} <br> 
-    //-                                 | #{exam.commonRanking}등 응시인원 #{exam.commonTester}명 (상위#{exam.commonPercent}%)
-    //-                                 if(exam.seoulDeptRanking)
-    //-                                     div 서울대 #{exam.seoulDept}: #{exam.seoulDeptRanking}등
-    //-                                 if(exam.yonseiDeptRanking)
-    //-                                     div 연세대 #{exam.yonseiDept}: #{exam.yonseiDeptRanking}등
-    //-                                     //- div #{userInfo.dept}: #{exam.deptRanking}등
-    //-                             else 
-    //-                                 #exam-round.mb-1 #{exam.round}회차 시험 
-    //-                                 | #{exam.firstScore}점/#{exam.secondScore}점/#{exam.thirdScore}점  총점: #{exam.scoreSum}<br>
-    //-                                 | 평균:#{exam.average} 표준편차:#{exam.standardDeviation} <br> 
-    //-                                 | #{exam.ranking}등 응시인원 #{exam.totalTester}명 (상위#{exam.percent}%)
-    //-                         else 
-    //-                             .mb-1 #{round}회차 시험
-    //-                             | 미응시
-
-    //-                     if(exam != null)        
-    //-                         .col-1
-    //-                         button#info-btn.btn.btn-secondary 자세히 보기
-                        
-                        
+                                        button#info-btn.btn.btn-sm.btn-secondary 자세히             
 
 block append footer 
     script(src="/public/views/js/studentInfo.js") 
