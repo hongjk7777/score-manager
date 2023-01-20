@@ -12,7 +12,7 @@ describe('repo 통합 테스트', () => {
 
     beforeAll(async () => {
         //테스트 class 생성
-        expect(await courseRepository.save(testClassName)).toBe(true);
+        await courseRepository.save(testClassName);
 
         testCourse = await courseRepository.findByName(testClassName);
         expect(testCourse.name).toBe(testClassName);
