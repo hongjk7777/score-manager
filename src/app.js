@@ -6,14 +6,13 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import MySQLStore from "express-mysql-session";
 import compression from "compression";
-import classRouter from "./classes/class.js";
-import adminRouter from "./classes/classList.js";
-import {router as authRouter} from "./auth/authController.js";
+import classRouter from "./classes/studentController.js";
+import adminRouter from "./classes/adminController.js";
+import authRouter from "./auth/authController.js";
 import settingsRouter from "./settings/profile.js";
 import favicon from "serve-favicon";
 import path from "path";
 import config from "./config.json";
-import { getCommontTestExcel } from "./domain/db/out/export";
 
 
 
@@ -66,7 +65,6 @@ app.set("views", __dirname + "/client/views/pug");
 app.use(favicon(path.join(__dirname, 'client', '/views/img/favicon.ico')));
 
 app.use("/public", express.static(__dirname + "/client"));
-// app.use(express.static(__dirname + "/public/views"));
 
 app.get("/", (req, res) => {
   res.render("home", {authentication : req.isAuthenticated(), user: req.user});
@@ -76,20 +74,10 @@ app.use("/health", function(req, res) {
   res.send({'title': 'success'});
 });
 
-app.use("/test", async function(req, res) {
-  throw new Error('Async 사용자 정의 에러 발생');
-  res.send({'title': 'success'});
-});
-
-app.use("/test2", function(req, res) {
-  throw new Error('Async 사용자 정의 에러 발생');
-  res.send({'title': 'success'});
-});
-
 //set routers
-app.use("/", authRouter);
-app.use("/class", classRouter);
-app.use("/classList", adminRouter);
-app.use("/settings", settingsRouter);
+authRouter(app);
+classRouter(app);
+adminRouter(app);
+settingsRouter(app);
 
 export default app;
