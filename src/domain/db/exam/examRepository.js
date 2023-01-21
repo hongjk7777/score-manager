@@ -119,9 +119,17 @@ export default class ExamRepository {
         return result.warningStatus === 0;
     }
 
-    async updateDepts(studentDept) {
-        const query = `UPDATE exams SET seoul_dept = '${studentDept.seoulDept}', 
-                        yonsei_dept = '${studentDept.yonseiDept}' 
+    async updateSeoulDepts(studentDept) {
+        const query = `UPDATE exams SET seoul_dept = '${studentDept.seoulDept}'
+                        WHERE student_id = ${studentDept.studentId} AND common_round = ${studentDept.commonRound}`;
+        
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;           
+    }
+
+    async updateYonseiDepts(studentDept) {
+        const query = `UPDATE exams SET yonsei_dept = '${studentDept.yonseiDept}' 
                         WHERE student_id = ${studentDept.studentId} AND common_round = ${studentDept.commonRound}`;
         
         const [result] = await asyncDB.execute(query);

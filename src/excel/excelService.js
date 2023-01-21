@@ -162,7 +162,13 @@ export default class ExcelService {
 
     async #updateRoundDept(roundDeptData) {
         for(const studentDept of roundDeptData) {
-            await this.#examRepository.updateDepts(studentDept);
+            if(studentDept.seoulDept) {
+                await this.#examRepository.updateSeoulDepts(studentDept);
+            }
+
+            if(studentDept.yonseiDept) {
+                await this.#examRepository.updateYonseiDepts(studentDept);
+            }
         }
     }
 
