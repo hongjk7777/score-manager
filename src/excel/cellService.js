@@ -35,11 +35,13 @@ export default class CellService {
     }
 
     isStudentNumCell(cell) {
+        const cancelStudentIndex = '중단';
         if(cell.value) {
             if(typeof cell.value === 'number') {
                 return true;
             } else if(typeof cell.value === 'string') {
-                return !isNaN(cell.value);
+                const studentNum = cell.value.replaceAll(' ', '');
+                return !isNaN(studentNum) || (studentNum == cancelStudentIndex);
             }
         }
 
@@ -52,6 +54,8 @@ export default class CellService {
         if(value) {
             if(typeof value === 'number') {
                 value = '0' + value;
+            } else if (typeof value === 'string') {
+                value = value.replaceAll(' ', '');
             }
             return this.#parseOnlyNumber(value);
         }

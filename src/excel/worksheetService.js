@@ -117,7 +117,7 @@ export default class WorksheetService {
             if(this.#cellService.isStudentNumCell(studentNumCell) &&
                 this.#cellService.isStudentNameCell(studentNameCell)) {
                 studentRows.push(row);
-            }
+            } 
         })
 
         return studentRows;
@@ -233,7 +233,7 @@ export default class WorksheetService {
         const name = this.#getName(worksheet.getRow(rowNum), nameCol);
         
         const phoneNumCol = this.#getPhoneNumCol(indexRow);
-        const phoneNum = this.#getPhoneNum(worksheet.getRow(rowNum), phoneNumCol)
+        const phoneNum = this.#getPhoneNum(worksheet.getRow(rowNum), phoneNumCol);
         const student = await this.#findOneByStudentInfo(name, phoneNum, courseId);
 
         if(student === null) {
@@ -245,7 +245,11 @@ export default class WorksheetService {
     }
 
     async #findOneByStudentInfo(name, phoneNum, courseId) {
-        let student = await this.#studentRepository.findOneByPhoneNumAndCourseId(phoneNum, courseId);
+        let student = null;
+
+        if (phoneNum != '') {
+            let student = await this.#studentRepository.findOneByPhoneNumAndCourseId(phoneNum, courseId);
+        }
         
         if(student === null || (student.name != name)) {
             student = await this.#studentRepository.findOneByNameAndCourseId(name, courseId);
