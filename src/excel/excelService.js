@@ -10,6 +10,7 @@ import TotalExamService from "../domain/service/totalExamService";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 import CourseService from "../domain/service/courseService";
+import AuthService from "../auth/authService";
 
 const FILE_PATH = "src/excel/output/";
 const FILE_NAME = "testExcel.xlsx";
@@ -22,6 +23,7 @@ export default class ExcelService {
     #totalExamRepository = new TotalExamRepository();
     #studentRepository = new StudentRepository();
     #courseService = new CourseService();
+    #authService = new AuthService();
 
     async putExcelDatasToDB(file, courseId) {
         this.#initExcelDirectory(file);
@@ -104,7 +106,7 @@ export default class ExcelService {
         const scoreRule = this.#worksheetService.getScoreRule(scoreRuleWorksheet);
         const problemScores = this.#parseProblemScore(scoreRule);
         const examInfo = this.#calculateExamInfo(roundExam);
-
+        
         const totalExam = new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
                     examInfo.average, examInfo.standardDev, examInfo.maxScore, problemScores)
 
@@ -125,12 +127,17 @@ export default class ExcelService {
     }
 
     #calculateExamInfo(roundExam) {
+        if(roundExam.length === 0) {
+            //시험을 안 본 경우
+            return new ExamInfo(0, 0, 0, 0);
+        }
+
         const scores = roundExam.map(exam => exam.scoreSum);
         const totalTester = scores.length;
-        const average = (scores.reduce((partialSum, nextVal) => partialSum + nextVal) / totalTester)
+        const average = (scores.reduce((partialSum, nextVal) => partialSum + nextVal, 0) / totalTester)
                         .toFixed(2);
         const stdDev = Math.sqrt(scores.map(x => Math.pow(x - average, 2))
-                                        .reduce((partialSum, nextVal) => partialSum + nextVal)
+                                        .reduce((partialSum, nextVal) => partialSum + nextVal, 0)
                                         / totalTester);
         const maxScore = Math.max.apply(null, scores);
 
@@ -139,8 +146,13 @@ export default class ExcelService {
 
     #saveStudents(students) {
         students.forEach(student => {
-            this.#studentRepository.save(student);    
+            this.#saveStudent(student);
         });
+    }
+
+    #saveStudent(student) {
+        this.#authService.signUpByPhoneNum(student.phoneNum);
+        this.#studentRepository.save(student);
     }
 
     #saveRoundExamData(roundExam) {
