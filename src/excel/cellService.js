@@ -130,6 +130,11 @@ export default class CellService {
             return true;
         }
 
+        if(cell.value === 0) {
+            //점수가 0일 경우 false로 취급되어 따로 분리
+            return true;
+        }
+
         return false;
     }
 
