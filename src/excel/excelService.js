@@ -40,10 +40,15 @@ export default class ExcelService {
             }
 
             const students = this.#worksheetService.extractStudents(personalSheet, courseId);
-            this.#saveStudents(students);
+            let start = new Date();
+            await this.#saveStudents(students);
+            let end = new Date();
+
+            console.log(end-start);
 
             const roundExams = await this.#worksheetService.extractRoundExams(personalSheet, courseId);
-            this.#saveRoundExams(excel, roundExams, courseId);
+
+            await this.#saveRoundExams(excel, roundExams, courseId);
             //TODO: 아래 함수들 구현 요망
             const worksheet = excel.worksheets[0];
             //handleStudentDatas(worksheet, classId);
@@ -93,14 +98,18 @@ export default class ExcelService {
         return excel;
     }
 
-    #saveRoundExams(excel, roundExams, classId) {
+    async #saveRoundExams(excel, roundExams, classId) {
+        const roundPromises = new Array();
+
         roundExams.forEach((roundExam, round) => {
-            this.#saveRoundExamInfo(excel, roundExam, round + 1, classId);
-            this.#saveRoundExamData(roundExam);
+            roundPromises.push(this.#saveRoundExamInfo(excel, roundExam, round + 1, classId));
+            roundPromises.push(this.#saveRoundExamData(roundExam)); 
         });
+
+        await Promise.all(roundPromises);
     }
 
-    #saveRoundExamInfo(excel, roundExam, round, classId) {
+    async #saveRoundExamInfo(excel, roundExam, round, classId) {
         const commonRound = this.#getCommonRound(roundExam);
         const scoreRuleWorksheet = this.#worksheetService.findWorksheetByName(`테스트(${round})`, excel);
         const scoreRule = this.#worksheetService.getScoreRule(scoreRuleWorksheet);
@@ -110,7 +119,7 @@ export default class ExcelService {
         const totalExam = new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
                     examInfo.average, examInfo.standardDev, examInfo.maxScore, problemScores)
 
-        this.#totalExamRepository.save(totalExam);
+        await this.#totalExamRepository.save(totalExam);
     }
 
     #getCommonRound(roundExam) {
@@ -144,21 +153,20 @@ export default class ExcelService {
         return new ExamInfo(totalTester, average, stdDev, maxScore);
     }
 
-    #saveStudents(students) {
-        students.forEach(student => {
-            this.#saveStudent(student);
-        });
+    async #saveStudents(students) {
+        const that = this;
+
+        const signupPromises = students.map((student) => {
+            return that.#authService.signUpByPhoneNum(student.phoneNum);
+        })
+
+        await Promise.all(signupPromises);
+        
+        await this.#studentRepository.bulkSave(students);
     }
 
-    #saveStudent(student) {
-        this.#authService.signUpByPhoneNum(student.phoneNum);
-        this.#studentRepository.save(student);
-    }
-
-    #saveRoundExamData(roundExam) {
-        roundExam.forEach(exam => {
-            this.#examRepository.save(exam);    
-        });
+    async #saveRoundExamData(roundExam) {
+        await this.#examRepository.bulkSave(roundExam);
     }
 
     async putDeptDatasToDB(file, courseId) {

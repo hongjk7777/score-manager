@@ -9,20 +9,23 @@ class AuthService {
     #authRepository = new AuthRepository();
 
     async signUpByPhoneNum(phoneNum) {
-        const salt = crypto.randomBytes(16).toString("hex");
-
         const initId = phoneNum.replaceAll('-', '');
+        
+        if(initId === '') {
+            return;
+        }
+
+        if(await this.#authRepository.findOneByUsername(initId)) {
+            return;
+        }
+
+        const salt = crypto.randomBytes(16).toString("hex");
         const initPassword = getInitPassword(initId);
         const hashedPassword = this.getHashedPassword(initPassword, salt);
     
         const newUser = new User(initId, hashedPassword, salt);
 
-        if(await this.#authRepository.findOneByUsername(initId)) {
-            return;
-        }
- 
         return await this.#authRepository.save(newUser);
-
     }
 
     getHashedPassword(password, salt) {     

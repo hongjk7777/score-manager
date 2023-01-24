@@ -3,11 +3,30 @@ import Exam from "../../entity/exam";
 import { asyncDB } from "../dbConfig";
 
 export default class ExamRepository {
-    async save(course) {
+    async save(exam) {
         const query = `INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) 
-                    values('${course.round}', ${course.commonRound}, '${course.scores[0]}', '${course.scores[1]}', '${course.scores[2]}', 
-                    '${course.scoreSum}', '${course.ranking}', '${course.studentId}', '${course.classId}')`
+                    values('${exam.round}', ${exam.commonRound}, '${exam.scores[0]}', '${exam.scores[1]}', '${exam.scores[2]}', 
+                    '${exam.scoreSum}', '${exam.ranking}', '${exam.studentId}', '${exam.classId}')`;
 
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;
+    }
+
+    async bulkSave(exams) {
+        let query = `INSERT INTO exams(round, common_round, first_score, second_score, third_score, score_sum, ranking, student_id, class_id) values`;
+
+        exams.forEach((exam, index) => {
+            if(index === exams.length - 1) {
+                query += `('${exam.round}', ${exam.commonRound}, '${exam.scores[0]}', '${exam.scores[1]}', '${exam.scores[2]}', 
+                            '${exam.scoreSum}', '${exam.ranking}', '${exam.studentId}', '${exam.classId}')`;
+                return;
+            }
+
+            query += `('${exam.round}', ${exam.commonRound}, '${exam.scores[0]}', '${exam.scores[1]}', '${exam.scores[2]}', 
+            '${exam.scoreSum}', '${exam.ranking}', '${exam.studentId}', '${exam.classId}'),`;
+        })
+        
         const [result] = await asyncDB.execute(query);
 
         return result.warningStatus === 0;

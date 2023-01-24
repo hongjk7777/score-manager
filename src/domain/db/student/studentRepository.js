@@ -11,6 +11,23 @@ export default class StudentRepository {
         return result.warningStatus === 0;
     }
 
+    async bulkSave(students) {
+        let query = `INSERT INTO students(name, phone_num, class_id) values`
+
+        students.forEach((student, index) => {
+            if(index === students.length - 1) {
+                query += `('${student.name}', '${student.phoneNum}', '${student.classId}')`;
+                return;
+            }
+
+            query += `('${student.name}', '${student.phoneNum}', '${student.classId}'),`;
+        })
+
+        const [result] = await asyncDB.execute(query);
+
+        return result.warningStatus === 0;
+    }
+
     async findById(studentId) {
         const query = `SELECT * FROM students WHERE id = '${studentId}'`;
 
