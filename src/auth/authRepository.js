@@ -15,9 +15,9 @@ export default class AuthRepository {
 
     //TODO: 지금 상태로 나가면 안 될 듯? DTO라도
     async findOneByUsername(username) {
-        const query = `SELECT * FROM accounts WHERE username = '${username}'`
+        const query = `SELECT * FROM accounts WHERE username = ?`
 
-        const [rows] = await asyncDB.execute(query);
+        const [rows] = await asyncDB.execute(query, [username]);
 
         if (rows.length === 0) {
             return null;
