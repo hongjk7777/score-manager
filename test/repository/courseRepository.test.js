@@ -1,5 +1,5 @@
 import { async } from "regenerator-runtime";
-import CourseRepository from "../../src/domain/db/class/courseRepository";
+import CourseRepository from "../../src/domain/repository/courseRepository";
 import Course from "../../src/domain/entity/course";
 
 const courseRepository = new CourseRepository();

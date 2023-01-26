@@ -1,5 +1,5 @@
 import { Workbook } from "exceljs";
-import StudentRepository from "../domain/db/student/studentRepository";
+import StudentRepository from "../domain/repository/studentRepository";
 import Exam from "../domain/entity/exam";
 import ExamScore from "../domain/entity/examScore";
 import Student from "../domain/entity/student";

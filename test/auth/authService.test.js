@@ -1,7 +1,7 @@
 import crypto from "crypto";
 const { default: AuthRepository } = require("../../src/auth/authRepository");
 const { default: AuthService } = require("../../src/auth/authService");
-const { default: AuthDTO } = require("../../src/dto/authDTO");
+const { default: AuthDTO } = require("../../src/domain/dto/authDTO");
 const { getInitPassword } = require("../../src/auth/initPw");
 
 const authService = new AuthService();

@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
 import { async } from "regenerator-runtime";
-import CourseRepository from "../../src/domain/db/class/courseRepository";
-import StudentRepository from "../../src/domain/db/student/studentRepository";
+import CourseRepository from "../../src/domain/repository/courseRepository";
+import StudentRepository from "../../src/domain/repository/studentRepository";
 import WorksheetService from "../../src/excel/worksheetService";
 
 const workbook = new ExcelJS.Workbook();

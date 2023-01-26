@@ -1,5 +1,5 @@
-import CourseRepository from "../../src/domain/db/class/courseRepository";
-import StudentRepository from "../../src/domain/db/student/studentRepository";
+import CourseRepository from "../../src/domain/repository/courseRepository";
+import StudentRepository from "../../src/domain/repository/studentRepository";
 import Student from "../../src/domain/entity/student";
 
 const courseRepository = new CourseRepository();

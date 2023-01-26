@@ -1,6 +1,6 @@
-import ExcelErrorMsg from "../../../validator/excelErrorMsg";
-import TotalExam from "../../entity/totalExam";
-import { asyncDB } from "../dbConfig";
+import ExcelErrorMsg from "../../validator/excelErrorMsg";
+import TotalExam from "../entity/totalExam";
+import { asyncDB } from "./dbConfig";
 
 export default class TotalExamRepository {
     async save(totalExam) {

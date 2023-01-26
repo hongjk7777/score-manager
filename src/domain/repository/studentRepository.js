@@ -1,5 +1,5 @@
-import Student from "../../entity/student";
-import { asyncDB } from "../dbConfig";
+import Student from "../entity/student";
+import { asyncDB } from "./dbConfig";
 
 export default class StudentRepository {
     async save(student) {

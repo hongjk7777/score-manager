@@ -1,8 +1,8 @@
-import ExportExamDTO from "../../dto/exportExamDTO";
-import ExamRepository from "../db/exam/examRepository";
+import ExportExamDTO from "../dto/exportExamDTO";
+import ExamRepository from "../repository/examRepository";
 import TotalExamService from "./totalExamService";
 import _ from 'lodash'
-import DeptInfoDTO from "../../dto/deptInfoDTO";
+import DeptInfoDTO from "../dto/deptInfoDTO";
 import StudentService from "./studentService";
 
 export default class ExamService {

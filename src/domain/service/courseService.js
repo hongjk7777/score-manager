@@ -1,7 +1,7 @@
-import CourseRepository from "../db/class/courseRepository"
-import ExamRepository from "../db/exam/examRepository";
-import StudentRepository from "../db/student/studentRepository";
-import TotalExamRepository from "../db/totalExam/totalExamRepository";
+import CourseRepository from "../repository/courseRepository"
+import ExamRepository from "../repository/examRepository";
+import StudentRepository from "../repository/studentRepository";
+import TotalExamRepository from "../repository/totalExamRepository";
 
 export default class CourseService {
     #courseRepository = new CourseRepository();

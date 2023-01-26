@@ -1,6 +1,6 @@
-import ExamDAO from "../../dao/examDAO";
-import Exam from "../../entity/exam";
-import { asyncDB } from "../dbConfig";
+import ExamDAO from "../dao/examDAO";
+import Exam from "../entity/exam";
+import { asyncDB } from "./dbConfig";
 
 export default class ExamRepository {
     async save(exam) {

@@ -1,4 +1,4 @@
-import StudentRepository from "../db/student/studentRepository";
+import StudentRepository from "../repository/studentRepository";
 
 export default class StudentService {
     #studentRepository = new StudentRepository();

@@ -1,4 +1,4 @@
-import TotalExamRepository from "../db/totalExam/totalExamRepository";
+import TotalExamRepository from "../repository/totalExamRepository";
 
 export default class TotalExamService {
     #totalExamRepository = new TotalExamRepository();

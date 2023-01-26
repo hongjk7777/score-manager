@@ -1,6 +1,6 @@
-import ExcelErrorMsg from "../../../validator/excelErrorMsg";
-import Course from "../../entity/course";
-import { asyncDB } from "../dbConfig";
+import ExcelErrorMsg from "../../validator/excelErrorMsg";
+import Course from "../entity/course";
+import { asyncDB } from "./dbConfig";
 
 export default class CourseRepository {
     async save(name) {
@@ -36,7 +36,7 @@ export default class CourseRepository {
     }
 
     async findAllClass() {
-        const query = `SELECT * FROM classes WHERE id > 10`;
+        const query = `SELECT * FROM classes WHERE id > 30`;
 
         const [rows] = await asyncDB.execute(query);
 

@@ -1,6 +1,6 @@
-import CourseRepository from "../../src/domain/db/class/courseRepository";
-import ExamRepository from "../../src/domain/db/exam/examRepository";
-import StudentRepository from "../../src/domain/db/student/studentRepository";
+import CourseRepository from "../../src/domain/repository/courseRepository";
+import ExamRepository from "../../src/domain/repository/examRepository";
+import StudentRepository from "../../src/domain/repository/studentRepository";
 import Exam from "../../src/domain/entity/exam";
 import { createTempStudent } from "./studentRepository.test";
 

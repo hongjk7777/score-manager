@@ -1,4 +1,4 @@
-import CourseRepository from "../../../src/domain/db/class/courseRepository";
+import CourseRepository from "../../../src/domain/repository/courseRepository";
 import CourseService from "../../../src/domain/service/courseService";
 
 const courseService = new CourseService();
