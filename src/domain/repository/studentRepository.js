@@ -8,7 +8,7 @@ export default class StudentRepository {
 
         const [result] = await asyncDB.execute(query);
 
-        return result.warningStatus === 0;
+        return result.insertId;
     }
 
     async bulkSave(students) {
