@@ -41,31 +41,6 @@ async function deleteClass() {
     expect(findCourse).toBe(null);
 }
 
-describe('getScoreRule 테스트', () => {
-    test('정상 테스트', async () => {
-
-        const worksheetName = '테스트(1) 채점기준';
-        const scoreRuleWorksheet = excel.getWorksheet(worksheetName);
-        const scoreRule = worksheetService.getScoreRule(scoreRuleWorksheet);
-
-        scoreRuleWorksheet.getColumn(1).eachCell((cell) => {
-            if(cell.value) {
-                if(cell.value.richText){
-                    //폰트가 있는 경우
-                    cell.value.richText.forEach(obj => {
-                        expect(scoreRule.includes(obj.text)).toBe(true);
-                    });
-                    
-                } else{
-                    //폰트가 없는 경우
-                    expect(scoreRule.includes(cell.value)).toBe(true);
-                }
-            }
-        });
-
-    });
-})
-
 describe('findWorksheetByName 테스트', () => {
     test('띄어쓰기 없는 경우 정상 테스트', async () => {
         const partialWorksheetName = '테스트(1)';
@@ -118,6 +93,31 @@ describe('extractRoundExams 테스트', () => {
         testers.forEach((value, round) => {
             expect(roundExams[round].length).toBe(testers[round]);
         })
+    });
+})
+
+describe('getScoreRule 테스트', () => {
+    test('정상 테스트', async () => {
+
+        const worksheetName = '테스트(1) 채점기준';
+        const scoreRuleWorksheet = excel.getWorksheet(worksheetName);
+        const scoreRule = worksheetService.getScoreRule(scoreRuleWorksheet);
+        
+        scoreRuleWorksheet.getColumn(1).eachCell((cell) => {
+            if(cell.value) {
+                if(cell.value.richText){
+                    //폰트가 있는 경우
+                    cell.value.richText.forEach(obj => {
+                        expect(scoreRule.includes(obj.text)).toBe(true);
+                    });
+                    
+                } else{
+                    //폰트가 없는 경우
+                    expect(scoreRule.includes(cell.value)).toBe(true);
+                }
+            }
+        });
+
     });
 })
 

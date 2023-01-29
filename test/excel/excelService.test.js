@@ -62,7 +62,7 @@ describe('putExcelDatasToDB 테스트', () => {
 })
 
 describe('putDeptDatasToDB 테스트', () => {
-    test.skip('정상 테스트', async () => {
+    test('정상 테스트', async () => {
         await excelService.putDeptDatasToDB(deptFile, courseId);
 
         const exams = await examRepository.findByClassId(courseId);

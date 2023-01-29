@@ -21,7 +21,7 @@ describe('repo 통합 테스트', () => {
     test('정상 테스트', async () => {
         const student = createTempStudent(testCourse);
 
-        studentRepository.save(student)
+        await studentRepository.save(student)
 
         let findStudents = await studentRepository.findByCourseId(testCourse.id);
         expect(findStudents.length).toBe(1);
