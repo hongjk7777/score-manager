@@ -103,6 +103,42 @@ describe('isStudentNumIndexCell 테스트', () => {
     })
 })
 
+describe('getPhoneNum 테스트', () => {
+    test('정수 정상 테스트', () => {
+        const testPhoneNum = 1012345678;
+        const testCell = {'value' : testPhoneNum};
+        
+        expect(cellService.getPhoneNum(testCell)).toBe('0' + testPhoneNum);
+    })
+
+    test('띄어쓰기 없는 문자열 정상 테스트', () => {
+        const testPhoneNum = '01012345678';
+        const testCell = {'value' : testPhoneNum};
+        
+        expect(cellService.getPhoneNum(testCell)).toBe(testPhoneNum);
+    })
+
+    test('띄어쓰기 있는 문자열 정상 테스트', () => {
+        const testPhoneNum = ' 01 012345678   ';
+        const testCell = {'value' : testPhoneNum};
+        
+        expect(cellService.getPhoneNum(testCell)).toBe(testPhoneNum.replaceAll(' ', ''));
+    })
+
+    test('숫자가 아닌 문자 있을 경우 테스트', () => {
+        const testPhoneNum = '01012345678-';
+        const testCell = {'value' : testPhoneNum};
+        
+        expect(cellService.getPhoneNum(testCell)).toBe(testPhoneNum.replace('-', ''));
+    })
+
+    test('값이 없을 경우 테스트', () => {
+        const testCell = {'value' : undefined};
+        
+        expect(cellService.getPhoneNum(testCell)).toBe('');
+    })
+})
+
 describe('isStudentNumCell 테스트', () => {
     test('정수 정상 테스트', () => {
         const testCell = {'value' : 1};
