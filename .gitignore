@@ -11,4 +11,5 @@ src/config.json
 *.xlsx
 src/auth/initPw.js
 src/domain/db/dbConfig.js
+**/dbConfig.js
 
