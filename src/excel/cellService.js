@@ -104,6 +104,14 @@ export default class CellService {
         return value;
     }
 
+    #parseFloatWithoutStr(str) {
+        const regex = /[^0-9|\.]|/g;
+        const result = str.replace(regex, "");
+        const value = parseFloat(result);
+
+        return value;
+    }
+
     getCommonRound(cell, curCommonRound) {
         if(cell.value) {
             const commonRound = this.#parseIntWithoutStr(cell.value);
@@ -156,7 +164,7 @@ export default class CellService {
             if(typeof scoreCell.value === 'number') {
                 score = scoreCell.value;
             } else if(typeof scoreCell.value === 'string') {
-                score = this.#parseIntWithoutStr(scoreCell.value);
+                score = this.#parseFloatWithoutStr(scoreCell.value);
             }
             
             if(isNaN(score)) {
