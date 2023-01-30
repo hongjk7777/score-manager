@@ -10,5 +10,9 @@ excels/
 src/config.json
 *.xlsx
 src/auth/initPw.js
+<<<<<<< HEAD
 **/dbConfig.js
+=======
+src/domain/db/dbConfig.js
+>>>>>>> main
 
