@@ -104,7 +104,6 @@ export default class CellService {
         return value;
     }
 
-<<<<<<< HEAD
     #parseFloatWithoutStr(str) {
         const regex = /[^0-9|\.]|/g;
         const result = str.replace(regex, "");
@@ -113,8 +112,6 @@ export default class CellService {
         return value;
     }
 
-=======
->>>>>>> main
     getCommonRound(cell, curCommonRound) {
         if(cell.value) {
             const commonRound = this.#parseIntWithoutStr(cell.value);
