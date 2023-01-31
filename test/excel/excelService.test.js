@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import container from "../../src/container";
 import CourseRepository from "../../src/domain/repository/courseRepository";
 import ExamRepository from "../../src/domain/repository/examRepository";
 import StudentRepository from "../../src/domain/repository/studentRepository";
@@ -7,11 +8,11 @@ import ExcelService from "../../src/excel/excelService";
 import WorksheetService from "../../src/excel/worksheetService";
 import ExcelErrorMsg from "../../src/validator/excelErrorMsg";
 
-const excelService = new ExcelService();
-const courseService = new CourseService();
-const courseRepository = new CourseRepository();
-const examRepository = new ExamRepository();
-const studentRepository = new StudentRepository();
+const excelService = container.resolve('excelService');
+const courseService = container.resolve('courseService');
+const courseRepository = container.resolve('courseRepository');
+const examRepository = container.resolve('examRepository')
+const studentRepository = container.resolve('studentRepository');
 const testClassName = 'excelTest';
 let courseId;
 

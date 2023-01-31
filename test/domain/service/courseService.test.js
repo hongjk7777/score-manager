@@ -1,4 +1,5 @@
 import { async } from "regenerator-runtime";
+import container from "../../../src/container";
 import Exam from "../../../src/domain/entity/exam";
 import Student from "../../../src/domain/entity/student";
 import TotalExam from "../../../src/domain/entity/totalExam";
@@ -9,12 +10,12 @@ import TotalExamRepository from "../../../src/domain/repository/totalExamReposit
 import CourseService from "../../../src/domain/service/courseService";
 import ExcelErrorMsg from "../../../src/validator/excelErrorMsg";
 
-const courseService = new CourseService();
-const courseRepository = new CourseRepository();
+const courseService = container.resolve('courseService');
+const courseRepository = container.resolve('courseRepository');
 
-const examRepository = new ExamRepository();
-const studentRepository = new StudentRepository();
-const totalExamRepository = new TotalExamRepository();
+const examRepository = container.resolve('examRepository');
+const studentRepository = container.resolve('studentRepository');
+const totalExamRepository = container.resolve('totalExamRepository');
 
 const courseName = 'courseServiceTest';
 let courseId;

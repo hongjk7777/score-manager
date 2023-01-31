@@ -1,3 +1,5 @@
+import container from "../../container";
+import { asClass } from "awilix";
 import ExcelErrorMsg from "../../validator/excelErrorMsg";
 import Course from "../entity/course";
 import { asyncDB } from "./dbConfig";
@@ -55,3 +57,7 @@ export default class CourseRepository {
         return results.warningStatus === 0;
     }
 }
+
+container.register({
+    courseRepository: asClass(CourseRepository)
+})

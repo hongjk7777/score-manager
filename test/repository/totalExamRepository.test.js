@@ -3,10 +3,10 @@ import StudentRepository from "../../src/domain/repository/studentRepository";
 import TotalExamRepository from "../../src/domain/repository/totalExamRepository";
 import TotalExam from "../../src/domain/entity/totalExam";
 import { createTempStudent } from "./studentRepository.test";
+import container from "../../src/container";
 
-const courseRepository = new CourseRepository();
-const studentRepository = new StudentRepository();
-const totalExamRepository = new TotalExamRepository();
+const courseRepository = container.resolve('courseRepository');
+const totalExamRepository = container.resolve('totalExamRepository');
 
 const testCourseName = 'examTestClass';
 const testCourseId = 305;

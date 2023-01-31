@@ -1,3 +1,5 @@
+import container from "../../container";
+import { asClass } from "awilix";
 import ExportExamDTO from "../dto/exportExamDTO";
 import ExamRepository from "../repository/examRepository";
 import TotalExamService from "./totalExamService";
@@ -6,9 +8,9 @@ import DeptInfoDTO from "../dto/deptInfoDTO";
 import StudentService from "./studentService";
 
 export default class ExamService {
-    #examRepository = new ExamRepository();
-    #totalExamService = new TotalExamService();
-    #studentService = new StudentService();
+    #examRepository = container.resolve('examRepository');
+    #totalExamService = container.resolve('totalExamService');
+    #studentService = container.resolve('studentService');
 
     async getScoreDatas(commonRound) {
         const scoreSumDatas = await this.#examRepository.findAllScoreSum(commonRound);
@@ -323,3 +325,7 @@ export default class ExamService {
         return copyExams;
     }
 }
+
+container.register({
+    examService: asClass(ExamService)
+})

@@ -1,11 +1,12 @@
 import crypto from "crypto";
+import container from "../../src/container";
 const { default: AuthRepository } = require("../../src/auth/authRepository");
 const { default: AuthService } = require("../../src/auth/authService");
 const { default: AuthDTO } = require("../../src/domain/dto/authDTO");
 const { getInitPassword } = require("../../src/auth/initPw");
 
-const authService = new AuthService();
-const authRepository = new AuthRepository();
+const authService = container.resolve('authService');
+const authRepository = container.resolve('authRepository');
 
 describe('signUpByPhoneNum 테스트', () => {
     test('정상 테스트', async () => {

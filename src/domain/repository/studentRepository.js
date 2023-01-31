@@ -1,7 +1,10 @@
+import {asClass} from 'awilix'
+import container from '../../container';
 import Student from "../entity/student";
 import { asyncDB } from "./dbConfig";
 
 export default class StudentRepository {
+
     async save(student) {
         const query = `INSERT INTO students(name, phone_num, class_id) 
                     values('${student.name}', '${student.phoneNum}', '${student.classId}')`
@@ -117,3 +120,7 @@ export default class StudentRepository {
         return students;
     }
 }
+
+container.register({
+    studentRepository: asClass(StudentRepository)
+});

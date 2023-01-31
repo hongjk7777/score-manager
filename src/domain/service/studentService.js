@@ -1,7 +1,9 @@
+import {asClass} from 'awilix';
+import container from "../../container";
 import StudentRepository from "../repository/studentRepository";
 
 export default class StudentService {
-    #studentRepository = new StudentRepository();
+    #studentRepository = container.resolve('studentRepository');
 
     async getClassStudentList(courseId) {
         const studentList = await this.#studentRepository.findByCourseId(courseId);
@@ -21,3 +23,7 @@ export default class StudentService {
         return student;
     }
 }
+
+container.register({
+    studentService: asClass(StudentService)
+})

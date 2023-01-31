@@ -1,13 +1,15 @@
+import { asClass } from "awilix";
+import container from "../../container";
 import CourseRepository from "../repository/courseRepository"
 import ExamRepository from "../repository/examRepository";
 import StudentRepository from "../repository/studentRepository";
 import TotalExamRepository from "../repository/totalExamRepository";
 
 export default class CourseService {
-    #courseRepository = new CourseRepository();
-    #examRepository = new ExamRepository();
-    #studentRepository = new StudentRepository();
-    #totalExamRepository = new TotalExamRepository();
+    #courseRepository = container.resolve('courseRepository');
+    #examRepository = container.resolve('examRepository');
+    #studentRepository = container.resolve('studentRepository');
+    #totalExamRepository = container.resolve('totalExamRepository');
 
     async getAllClass() {
         return await this.#courseRepository.findAllClass();
@@ -38,3 +40,7 @@ export default class CourseService {
         return success;
     }
 }
+
+container.register({
+    courseService : asClass(CourseService)
+})

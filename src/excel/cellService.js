@@ -1,3 +1,5 @@
+import { asClass } from "awilix";
+import container from "../container";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 
 export default class CellService {
@@ -247,3 +249,7 @@ export default class CellService {
         return null;
     }
 }
+
+container.register({
+    cellService : asClass(CellService)
+})

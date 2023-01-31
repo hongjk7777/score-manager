@@ -1,12 +1,12 @@
-import { Service, Inject, Container } from "typedi"
 import AuthRepository from "./authRepository";
 import crypto from "crypto";
 import User from "../domain/entity/user";
 import { getInitPassword } from "./initPw.js";
+import container from "../container";
+import { asClass } from "awilix";
 
-@Service()
-class AuthService {
-    #authRepository = new AuthRepository();
+export default class AuthService {
+    #authRepository = container.resolve('authRepository');
 
     async signUpByPhoneNum(phoneNum) {
         const initId = phoneNum.replaceAll('-', '');
@@ -56,6 +56,6 @@ class AuthService {
 
 }
 
-//Container.set(AuthService, new AuthService());
-
-export default AuthService
+container.register({
+    authService : asClass(AuthService)
+})

@@ -1,7 +1,8 @@
 import AuthRepository from "../../src/auth/authRepository"
+import container from "../../src/container";
 import User from "../../src/domain/entity/user";
 
-const authRepository = new AuthRepository();
+const authRepository = container.resolve('authRepository');
 
 //TODO: 추후에 sequalize를 사용해 테스트마다 디비를 초기화 시킬 수 있도록 해서 save delete 유닛 테스트 해야 함.
 

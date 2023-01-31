@@ -9,16 +9,17 @@ import ExcelService from "../excel/excelService.js";
 import CourseService from "../domain/service/courseService.js";
 import StudentService from "../domain/service/studentService.js";
 import ExamService from "../domain/service/examService.js";
+import container from "../container.js";
 // import fs from "fs";
 
 const router = express.Router();
 
-const authService = new AuthService();
-const totalExamService = new TotalExamService();
-const courseService = new CourseService();
-const excelService = new ExcelService();
-const examService = new ExamService();
-const studentService = new StudentService();
+const authService = container.resolve('authService');
+const totalExamService = container.resolve('totalExamService');
+const courseService = container.resolve('courseService');
+const excelService = container.resolve('excelService');
+const examService = container.resolve('examService');
+const studentService = container.resolve('studentService');
 
 
 export default (app) => {

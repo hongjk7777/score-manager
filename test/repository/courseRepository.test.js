@@ -1,8 +1,7 @@
-import { async } from "regenerator-runtime";
 import CourseRepository from "../../src/domain/repository/courseRepository";
-import Course from "../../src/domain/entity/course";
+import container from "../../src/container";
 
-const courseRepository = new CourseRepository();
+const courseRepository = container.resolve('courseRepository');
 const courseName = 'testCourse';
 let courseId;
 
@@ -55,5 +54,7 @@ describe('findById 테스트', () => {
         const findClass = await courseRepository.findById(courseId);
 
         expect(findClass.name).toBe(courseName);
+
+        await courseRepository.deleteById(courseId)
     })
 })

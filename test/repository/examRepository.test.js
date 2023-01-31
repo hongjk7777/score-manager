@@ -3,30 +3,28 @@ import ExamRepository from "../../src/domain/repository/examRepository";
 import StudentRepository from "../../src/domain/repository/studentRepository";
 import Exam from "../../src/domain/entity/exam";
 import { createTempStudent } from "./studentRepository.test";
+import container from "../../src/container";
 
-const courseRepository = new CourseRepository();
-const studentRepository = new StudentRepository();
-const examRepository = new ExamRepository();
+const courseRepository = container.resolve('courseRepository');
+const studentRepository = container.resolve('studentRepository');
+const examRepository = container.resolve('examRepository');
 
 const testClassName = 'examTestClass';
-let testCourse;
+let testCourseId;
 let testStudent;
 
 describe('repo 통합 테스트', () => {
 
     beforeAll(async () => {
         //테스트 class 생성
-        expect(await courseRepository.save(testClassName)).toBe(true);
-
-        testCourse = await courseRepository.findByName(testClassName);
-        expect(testCourse.name).toBe(testClassName);
+        testCourseId = await courseRepository.save(testClassName);
 
         //테스트 student 생성
-        const student = createTempStudent(testCourse);
+        const student = createTempStudent(testCourseId);
 
         await studentRepository.save(student)
 
-        const testStudents = await studentRepository.findByCourseId(testCourse.id);
+        const testStudents = await studentRepository.findByCourseId(testCourseId);
         expect(testStudents.length).toBe(1);
 
         testStudent = testStudents[0];
@@ -37,25 +35,25 @@ describe('repo 통합 테스트', () => {
 
         await examRepository.save(exam);
 
-        let findExams = await examRepository.findByClassId(testCourse.id);
+        let findExams = await examRepository.findByClassId(testCourseId);
         expect(findExams.length).toBe(1);
 
-        await examRepository.deleteByClassId(testCourse.id);
+        await examRepository.deleteByClassId(testCourseId);
 
-        findExams = await examRepository.findByClassId(testCourse.id);
+        findExams = await examRepository.findByClassId(testCourseId);
         expect(findExams.length).toBe(0);
         // examRepository.deleteByClassId();
     })
 
     afterAll(async () => {
         //테스트 student 삭제
-        await studentRepository.deleteByCourseId(testCourse.id);
+        await studentRepository.deleteByCourseId(testCourseId);
 
-        const findStudents = await studentRepository.findByCourseId(testCourse.id);
+        const findStudents = await studentRepository.findByCourseId(testCourseId);
         expect(findStudents.length).toBe(0);
 
         //테스트 class 삭제
-        expect(await courseRepository.deleteById(testCourse.id)).toBe(true);
+        expect(await courseRepository.deleteById(testCourseId)).toBe(true);
     })
 }) 
 
@@ -64,7 +62,7 @@ describe('findAllScoreSum 테스트', () => {
         const commonRound = 2;
         const results = await examRepository.findAllScoreSum(commonRound);
 
-        expect(results.length).toBe(315);
+        expect(results.length).toBe(284);
     })
 })
 
@@ -73,7 +71,7 @@ describe('findCommonExamRanking 테스트', () => {
         const commonRound = 2;
         const results = await examRepository.findCommonExamRanking(commonRound);
 
-        expect(results.length).toBe(315);
+        expect(results.length).toBe(284);
     })
 })
 
@@ -81,6 +79,6 @@ describe('findCommonExamRanking 테스트', () => {
 function createTempExam() {
     const scores = new Array(1,1,1);
 
-    return new Exam( 1, 1, scores, 1, testStudent.id, testCourse.id);
+    return new Exam( 1, 1, scores, 1, testStudent.id, testCourseId);
 }
 

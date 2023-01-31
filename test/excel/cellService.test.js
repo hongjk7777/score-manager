@@ -1,7 +1,8 @@
+import container from "../../src/container";
 import CellService from "../../src/excel/cellService"
 import ExcelErrorMsg from "../../src/validator/excelErrorMsg";
 
-const cellService = new CellService();
+const cellService = container.resolve('cellService');
 
 describe('isRoundIndexCell 테스트', () => {
     test('한 자릿수 정상 테스트', () => {

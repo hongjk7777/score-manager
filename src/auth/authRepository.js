@@ -1,6 +1,7 @@
-import { Container, Service } from "typedi";
 import { asyncDB } from "../domain/repository/dbConfig";
 import User from "../domain/entity/user";
+import container from "../container";
+import { asClass } from "awilix";
 
 export default class AuthRepository {
 
@@ -56,4 +57,6 @@ export default class AuthRepository {
 
 }
 
-//Container.set(AuthRepository, AuthRepository);
+container.register({
+    authRepository : asClass(AuthRepository)
+})

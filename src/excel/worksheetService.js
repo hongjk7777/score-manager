@@ -6,14 +6,16 @@ import Student from "../domain/entity/student";
 import StudentDept from "../domain/entity/studentDept";
 import ExcelErrorMsg from "../validator/excelErrorMsg";
 import CellService from "./cellService";
+import container from "../container";
+import { asClass } from "awilix";
 
 //TODO: cell에서 하는 작업음 cellService로 분리하는 게 더 나을 듯?
 export default class WorksheetService {    
-    indexRow = 2;
-    commonRoundRow = 1;
+    INDEX_ROW = 2;
+    COMMON_ROUND_ROW = 1;
 
-    #cellService = new CellService();
-    #studentRepository = new StudentRepository();
+    #cellService = container.resolve('cellService');
+    #studentRepository = container.resolve('studentRepository');
 
 
     findWorksheetByName(name, excel) {
@@ -181,11 +183,11 @@ export default class WorksheetService {
 
     #getIndexRow(worksheet) {
         //TODO: 현재는 3번째 줄을 받아오는데 좀 더 범용성 있계?
-        return worksheet.getRow(this.indexRow);
+        return worksheet.getRow(this.INDEX_ROW);
     }
 
     #getCommonRoundRow(worksheet) {
-        return worksheet.getRow(this.commonRoundRow);
+        return worksheet.getRow(this.COMMON_ROUND_ROW);
     }
 
     #getCommonRound(commonRoundRow, curCommonRound, colNum) {
@@ -330,3 +332,7 @@ export default class WorksheetService {
         return studentDepts;
     }
 }
+
+container.register({
+    worksheetService : asClass(WorksheetService)
+})

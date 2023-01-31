@@ -11,19 +11,21 @@ import ExcelErrorMsg from "../validator/excelErrorMsg";
 import WorksheetService from "./worksheetService";
 import CourseService from "../domain/service/courseService";
 import AuthService from "../auth/authService";
+import container from "../container";
+import { asClass } from "awilix";
 
 const FILE_PATH = "src/excel/output/";
 const FILE_NAME = "testExcel.xlsx";
 
 export default class ExcelService {
-    #worksheetService = new WorksheetService();
-    #examService = new ExamService();
-    #totalExamService = new TotalExamService();
-    #examRepository = new ExamRepository();
-    #totalExamRepository = new TotalExamRepository();
-    #studentRepository = new StudentRepository();
-    #courseService = new CourseService();
-    #authService = new AuthService();
+    #worksheetService = container.resolve('worksheetService');
+    #examService = container.resolve('examService');
+    #totalExamService = container.resolve('totalExamService');
+    #examRepository = container.resolve('examRepository');
+    #totalExamRepository = container.resolve('totalExamRepository');
+    #studentRepository = container.resolve('studentRepository');
+    #courseService = container.resolve('courseService');
+    #authService = container.resolve('authService');
 
     async putExcelDatasToDB(file, courseId) {
         this.#initExcelDirectory(file);
@@ -238,3 +240,7 @@ class ExamInfo {
         this.maxScore = maxScore;
     }
 }
+
+container.register({
+    excelService : asClass(ExcelService)
+})

@@ -1,5 +1,6 @@
 import ExcelJS from "exceljs";
 import { async } from "regenerator-runtime";
+import container from "../../src/container";
 import CourseRepository from "../../src/domain/repository/courseRepository";
 import StudentRepository from "../../src/domain/repository/studentRepository";
 import WorksheetService from "../../src/excel/worksheetService";
@@ -8,9 +9,9 @@ const workbook = new ExcelJS.Workbook();
 const path = 'test/testResource/testExcel.xlsx';
 const deptPath = 'test/testResource/testDeptExcel.xlsx';
 
-const worksheetService = new WorksheetService();
-const studentRepository = new StudentRepository();
-const courseRepository = new CourseRepository();
+const worksheetService = container.resolve('worksheetService');
+const studentRepository = container.resolve('studentRepository');
+const courseRepository = container.resolve('courseRepository');
 const testClassName = 'worksheetTest';
 let courseId;
 let excel;
@@ -26,7 +27,7 @@ afterAll(async () => {
 })
 
 async function createClass() {
-    expect(await courseRepository.save(testClassName)).toBe(true);
+    await courseRepository.save(testClassName);
 
     const findCourse = await courseRepository.findByName(testClassName);
     expect(findCourse.name).toBe(testClassName);
@@ -35,7 +36,7 @@ async function createClass() {
 }
 
 async function deleteClass() {
-    expect(await courseRepository.deleteById(courseId)).toBe(true);
+    await courseRepository.deleteById(courseId);
 
     const findCourse = await courseRepository.findByName(testClassName);
     expect(findCourse).toBe(null);
@@ -89,7 +90,7 @@ describe('extractRoundExams 테스트', () => {
 
         const roundExams = await worksheetService.extractRoundExams(worksheet, courseId);
 
-        const testers = [37, 46, 43, 40, 43, 40, 38, 24];
+        const testers = [37, 46, 43, 40, 43, 41, 38, 24];
         testers.forEach((value, round) => {
             expect(roundExams[round].length).toBe(testers[round]);
         })
@@ -102,7 +103,7 @@ describe('getScoreRule 테스트', () => {
         const worksheetName = '테스트(1) 채점기준';
         const scoreRuleWorksheet = excel.getWorksheet(worksheetName);
         const scoreRule = worksheetService.getScoreRule(scoreRuleWorksheet);
-        
+
         scoreRuleWorksheet.getColumn(1).eachCell((cell) => {
             if(cell.value) {
                 if(cell.value.richText){

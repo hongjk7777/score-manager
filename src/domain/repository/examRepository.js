@@ -1,3 +1,5 @@
+import container from "../../container";
+import { asClass } from "awilix";
 import ExamDAO from "../dao/examDAO";
 import Exam from "../entity/exam";
 import { asyncDB } from "./dbConfig";
@@ -182,3 +184,7 @@ export default class ExamRepository {
         return this.#convertToExams(rows);
     }
 }
+
+container.register({
+    examRepository: asClass(ExamRepository)
+})

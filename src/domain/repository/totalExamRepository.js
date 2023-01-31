@@ -1,3 +1,5 @@
+import {asClass} from 'awilix'
+import container from '../../container';
 import ExcelErrorMsg from "../../validator/excelErrorMsg";
 import TotalExam from "../entity/totalExam";
 import { asyncDB } from "./dbConfig";
@@ -109,3 +111,7 @@ export default class TotalExamRepository {
         return totalExam;
     }    
 }
+
+container.register({
+    totalExamRepository: asClass(TotalExamRepository)
+});

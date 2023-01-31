@@ -1,7 +1,9 @@
+import {asClass} from 'awilix'
+import container from '../../container';
 import TotalExamRepository from "../repository/totalExamRepository";
 
 export default class TotalExamService {
-    #totalExamRepository = new TotalExamRepository();
+    #totalExamRepository = container.resolve('totalExamRepository');
 
     async getTotalExam(round, courseId) {
         const totalExam = await this.#totalExamRepository.findByRoundAndCourseId(round, courseId);
@@ -51,3 +53,8 @@ export default class TotalExamService {
         return examInfo.commonRound;
     }
 }
+
+
+container.register({
+    totalExamService: asClass(TotalExamService)
+});

@@ -5,12 +5,13 @@ import wrap from 'express-async-wrap'
 import StudentService from "../domain/service/studentService.js";
 import ExamService from "../domain/service/examService.js";
 import TotalExamService from "../domain/service/totalExamService.js";
+import container from "../container.js";
 
 const router = express.Router();
 
-const studentService = new StudentService();
-const examService = new ExamService();
-const totalExamService = new TotalExamService();
+const studentService = container.resolve('studentService');
+const examService = container.resolve('examService');
+const totalExamService = container.resolve('totalExamService');
 
 export default (app) => {
     app.use('/class', router);

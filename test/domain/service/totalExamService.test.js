@@ -1,4 +1,4 @@
-import { async } from "regenerator-runtime";
+import container from "../../../src/container";
 import TotalExam from "../../../src/domain/entity/totalExam";
 import CourseRepository from "../../../src/domain/repository/courseRepository";
 import TotalExamRepository from "../../../src/domain/repository/totalExamRepository";
@@ -8,11 +8,11 @@ import TotalExamService from "../../../src/domain/service/totalExamService";
 const TEST_ROUND = 1;
 const TEST_COMMON_ROUND = 100;
 
-const totalExamService = new TotalExamService();
-const totalExamRepository = new TotalExamRepository();
+const totalExamService = container.resolve('totalExamService');
+const totalExamRepository = container.resolve('totalExamRepository');
 
-const courseService = new CourseService();
-const courseRepository = new CourseRepository();
+const courseService = container.resolve('courseService');
+const courseRepository = container.resolve('courseRepository');
 
 let courseId;
 let testTotalExam;

@@ -1,4 +1,5 @@
 import { async } from "regenerator-runtime";
+import container from "../../../src/container";
 import Exam from "../../../src/domain/entity/exam";
 import Student from "../../../src/domain/entity/student";
 import TotalExam from "../../../src/domain/entity/totalExam";
@@ -13,13 +14,13 @@ import ExcelService from "../../../src/excel/excelService";
 const TEST_ROUND = 1;
 const TEST_COMMON_ROUND = 100;
 
-const examService = new ExamService();
-const examRepository = new ExamRepository();
+const examService = container.resolve('examService');
+const examRepository = container.resolve('examRepository');
 
-const courseService = new CourseService();
-const courseRepository = new CourseRepository();
-const studentRepository = new StudentRepository();
-const totalExamRepository = new TotalExamRepository();
+const courseService = container.resolve('courseService');
+const courseRepository = container.resolve('courseRepository');
+const studentRepository = container.resolve('studentRepository');
+const totalExamRepository = container.resolve('totalExamRepository');
 
 let courseId;
 const studentIds = [];

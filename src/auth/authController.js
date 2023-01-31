@@ -1,11 +1,11 @@
 import express from "express";
 import AuthService from "./authService";
 import passport from "./passportConfig";
-import Container from "typedi";
+import container from "../container";
 
 console.log("auth");
 
-const authService = new AuthService();
+const authService = container.resolve('authService');
 
 const router = express.Router();
 

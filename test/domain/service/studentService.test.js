@@ -1,11 +1,12 @@
+import container from "../../../src/container";
 import StudentService from "../../../src/domain/service/studentService";
 import CourseRepository from "../../../src/domain/repository/courseRepository";
 import StudentRepository from "../../../src/domain/repository/studentRepository";
 import Student from "../../../src/domain/entity/student";
 
-const studentService = new StudentService();
-const studentRepository = new StudentRepository();
-const courseRepository = new CourseRepository();
+const studentService = container.resolve('studentService');
+const studentRepository = container.resolve('studentRepository');
+const courseRepository = container.resolve('courseRepository');
 
 const courseName = 'serviceServiceTest';
 let courseId;
@@ -72,4 +73,3 @@ function createStudent(name, phoneNum) {
 
     return new Student(name, phoneNum, courseId);
 }
-
