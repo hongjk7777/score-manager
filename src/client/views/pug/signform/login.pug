@@ -8,20 +8,22 @@ block nav
 block login-content 
     body.text-center 
         main.form-signin.w-100.m-auto
-            form(action="/login/password", method="post") 
-                h1.h3.mb-3.fw-normal 로그인
+            h1.h3.mb-3.fw-normal 로그인
+            #login-form
                 .form-floating
                     input#username.form-control(name="username" type="text" placeholder="ID" autocomplete="username" required)
-                    label(for='username') ID
+                    label ID
                 .form-floating
-                    input#current-password.form-control(name="password" type='password' placeholder='Password' autocomplete="current-password" required)
-                    label(for='current-password') Password
+                    input#password.form-control(name="password" type='password' placeholder='Password' autocomplete="current-password" required)
+                    label Password
                 div * 아이디는 전화번호입니다 
                 br
                 //- .checkbox.mb-3
                 //-     label
                 //-         input(type='checkbox' value='remember-me')
                 //-         |  Remember me
-                button.w-100.btn.btn-lg.btn-primary(type='submit') 로그인
+                button#login-btn.w-100.btn.btn-lg.btn-primary 로그인
 
-block footer
+block footer 
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script(src="/public/views/js/login.js") 

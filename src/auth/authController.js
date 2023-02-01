@@ -53,18 +53,22 @@ export default (app) => {
                 }
             },
             'application/json': function() {
-                res.json({ ok: true, location: '/' });
+                if(authService.isAdmin(req.user)) {
+                    res.json({ ok: true, admin: true });
+                } else{
+                    res.json({ ok: true, admin: false });
+                }
             }
         });
     }, function(err, req, res, next) {
-    console.log(err);
+        console.log(err);
         if (err.status !== 401) { return next(err); }
         res.format({
             'text/html': function() {
-                res.redirect('/login');
+                res.send({ ok: false, location: '/login' });
             },
             'application/json': function() {
-                res.json({ ok: false, location: '/login' });
+                res.send({ ok: false, location: '/login' });
             }
         });
     });
