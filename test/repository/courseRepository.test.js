@@ -7,7 +7,6 @@ let courseId;
 
 beforeAll(async () => {
     courseId = await courseRepository.save(courseName);
-
 })
 
 afterAll(async () => {
@@ -31,6 +30,22 @@ describe('통합 테스트', () => {
     })
 })
 
+describe('findByName 테스트', () => {
+    test('정상 테스트', async() => {
+        const findClass = await courseRepository.findByName(courseName);
+
+        expect(findClass.id).toBe(courseId);
+    })
+})
+
+describe('findById 테스트', () => {
+    test('정상 테스트', async() => {
+        const findClass = await courseRepository.findById(courseId);
+
+        expect(findClass.name).toBe(courseName);
+    })
+})
+
 describe('findAllClass 테스트', () => {
     test('정상 테스트', async () => {
         let classes = await courseRepository.findAllClass();
@@ -44,17 +59,5 @@ describe('findAllClass 테스트', () => {
         await courseRepository.deleteById(courseId);
         classes = await courseRepository.findAllClass();
         expect(beforeCount).toBe(classes.length);
-    })
-})
-
-describe('findById 테스트', () => {
-    test('정상 테스트', async() => {
-        const courseName = 'findIdTestClass';
-        const courseId = await courseRepository.save(courseName);
-        const findClass = await courseRepository.findById(courseId);
-
-        expect(findClass.name).toBe(courseName);
-
-        await courseRepository.deleteById(courseId)
     })
 })
