@@ -115,7 +115,7 @@ export default class ExcelService {
         const commonRound = this.#getCommonRound(roundExam);
         const scoreRuleWorksheet = this.#worksheetService.findWorksheetByName(`테스트(${round})`, excel);
         const scoreRule = this.#worksheetService.getScoreRule(scoreRuleWorksheet);
-        const problemScores = this.#parseProblemScore(scoreRule);
+        const problemScores = this.#getProblemScores(scoreRule);
         const examInfo = this.#calculateExamInfo(roundExam);
         
         const totalExam = new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
@@ -132,9 +132,92 @@ export default class ExcelService {
         return 0;
     }
 
-    #parseProblemScore(scoreRule) {
+    #getProblemScores(scoreRule) {
+        const parsedScoreRules = this.#parseProblemScoreRules(scoreRule);
+        let problemScores = new Array();
+
+        parsedScoreRules.forEach(problemScoreRule => {
+            const problemScore = this.#extractProblemScore(problemScoreRule);
+            problemScores.push(problemScore);
+        });
+
+        problemScores = this.#validateProblemScores(problemScores)
+        
+        return problemScores;
+    }
+
+    #parseProblemScoreRules(scoreRule) {
+        let problemNum = 0;
+        let parsedScoreRules = new Array();
+
+        scoreRule = scoreRule.split('\n');
+
+        scoreRule.forEach(element => {
+            element = element.trim();
+
+            if(element.startsWith(`${problemNum + 1}.`)) {
+                problemNum++;
+                return;
+            }
+
+            if(problemNum > 0) {
+                if(parsedScoreRules[problemNum - 1]) {
+                    parsedScoreRules[problemNum - 1] += element + '\n';
+                } else {
+                    parsedScoreRules[problemNum - 1] = element + '\n';
+                }
+            }
+        });
+        
+        return parsedScoreRules;
+    }
+
+    #extractProblemScore(problemScoreRule) {
+        let smallProblemNum = 0;
+        let problemScore = 0;
+
+        problemScoreRule = problemScoreRule.split('\n');
+
+        problemScoreRule.forEach(element => {
+            element = element.trim();
+
+            if(this.#isProblemScore(element, smallProblemNum)) {
+                const score = this.#extractSmallProblemScore(element);
+                problemScore += score;
+                smallProblemNum++;
+
+                return;
+            }
+        });
+
+        return problemScore;
+    }
+
+    #validateProblemScores(problemScores) {
+        if(problemScores[0] && problemScores[1] && problemScores[2]) {
+            return problemScores;
+        }
 
         return [0, 0, 0];
+    }
+
+    #isProblemScore(element, smallProblemNum) {
+        return element.startsWith(`(${smallProblemNum + 1})`) && element.includes('점');
+    }
+
+    #extractSmallProblemScore(scoreInfos) {
+        const scoreInfo = scoreInfos.split(' ');
+
+        for (const element of scoreInfo) {
+            if(element.includes('점')) {
+                const regex = /[^0-9]/g;
+                const result = element.replace(regex, "");
+
+                return parseInt(result);
+            }
+        }
+
+        return 0;
     }
 
     #calculateExamInfo(roundExam) {
