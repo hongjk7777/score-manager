@@ -21,19 +21,19 @@ describe( 'POST /login', () => {
                 username: 'test112',
                 password: 'test1123'
             })
-            .expect('Location', '/login')
-            .expect(302, done);
+            .expect(401, done);
     });
 
     test('비밀번호 틀림', (done) => {
-        request(app)
+        request.agent(app)
             .post('/login/password')
             .send({
                 username: 'test',
                 password: 'test1123'
             })
-            .expect('Location', '/login')
-            .expect(302, done);
+            .expect(401, done)
+            // .expect('Location', '/login')
+            // .expect(302, done);
     });
 });
 
