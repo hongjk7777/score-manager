@@ -7,40 +7,86 @@ import ExcelErrorMsg from "../../src/validator/excelErrorMsg";
 const courseRepository = container.resolve('courseRepository');
 const studentRepository = container.resolve('studentRepository');
 
+let testStudent;
 let testCourseId;
 const testClassName = 'testClassName';
 
+beforeAll(async () => {
+    //테스트 class 생성
+    testCourseId = await courseRepository.save(testClassName);
+})
+
+afterAll(async () => {
+    //테스트 class 삭제
+    expect(await courseRepository.deleteById(testCourseId)).toBe(true);
+
+    await expect(courseRepository.findById(testCourseId))
+        .rejects.toThrow(ReferenceError(ExcelErrorMsg.NO_EXISTENT_CLASS));
+})
+
+beforeEach(async () => {
+    //테스트 student 생성
+    testStudent = createTempStudent(testCourseId);
+
+    testStudent.id = await studentRepository.save(testStudent)
+})
+
+afterEach(async () => {
+    //테스트 student 삭제
+    await studentRepository.deleteByCourseId(testCourseId);
+
+    const findStudent = await studentRepository.findByCourseId(testCourseId);
+    expect(findStudent.length).toBe(0);
+})
+
 describe('repo 통합 테스트', () => {
-
-    beforeAll(async () => {
-        //테스트 class 생성
-        testCourseId = await courseRepository.save(testClassName);
-    })
-
     test('정상 테스트', async () => {
-        const student = createTempStudent(testCourseId);
-
-        await studentRepository.save(student)
-
-        let findStudents = await studentRepository.findByCourseId(testCourseId);
-        expect(findStudents.length).toBe(1);
-
-        await studentRepository.deleteByCourseId(testCourseId);
-
-        findStudents = await studentRepository.findByCourseId(testCourseId);
-        expect(findStudents.length).toBe(0);
+        const findStudent = await studentRepository.findById(testStudent.id);
+        expect(findStudent).toEqual(testStudent);
 
         // examRepository.deleteByClassId();
     })
+})
 
-    afterAll(async () => {
-        //테스트 class 삭제
-        expect(await courseRepository.deleteById(testCourseId)).toBe(true);
+describe('findById 테스트', () => {
+    test('정상 테스트', async () => {
+        const findStudent = await studentRepository.findById(testStudent.id);
 
-        await expect(courseRepository.findById(testCourseId))
-            .rejects.toThrow(ReferenceError(ExcelErrorMsg.NO_EXISTENT_CLASS));
+        expect(findStudent).toEqual(testStudent);
     })
-}) 
+})
+
+describe('findByCourseId 테스트', () => {
+    test('정상 테스트', async () => {
+        const students = await studentRepository.findByCourseId(testCourseId);
+
+        expect(students).toEqual([testStudent]);
+    })
+})
+
+describe('findOneByPhoneNum 테스트', () => {
+    test('정상 테스트', async () => {
+        const findStudent = await studentRepository.findOneByPhoneNum(testStudent.phoneNum);
+
+        expect(findStudent).toEqual(testStudent);
+    })
+})
+
+describe('findOneByPhoneNumAndCourseId 테스트', () => {
+    test('정상 테스트', async () => {
+        const findStudent = await studentRepository.findOneByPhoneNumAndCourseId(testStudent.phoneNum, testCourseId);
+
+        expect(findStudent).toEqual(testStudent);
+    })
+})
+
+describe('findOneByNameAndCourseId 테스트', () => {
+    test('정상 테스트', async () => {
+        const findStudent = await studentRepository.findOneByNameAndCourseId(testStudent.name, testCourseId);
+
+        expect(findStudent).toEqual(testStudent);
+    })
+})
 
 function createTempStudent(testCourseId) {
     return new Student('testStudent', 'testPhoneNum', testCourseId);
