@@ -15,7 +15,14 @@ block content
         
         <br>
         .gap-2.text-center
-            a.btn.btn-primary.btn-lg.p-3(href='/class') 성적보러가기
+            if (user)
+                if(user.username === 'admin' || user.username === 'test')
+                    a.btn.btn-primary.btn-lg.p-3(href='/classList') 성적보러가기
+                else
+                    a.btn.btn-primary.btn-lg.p-3(href='/class') 성적보러가기
+            else 
+                a.btn.btn-primary.btn-lg.p-3(href='/class') 성적보러가기
+
         //- .row.home-row-content.justify-content-md-center
         //-     .col-6
         //-         img(alt='Stylized image of a doitedu with for studying, exams, and scores.' src='public/views/img/homeImg1.jpg' width="100%" height="100%")
