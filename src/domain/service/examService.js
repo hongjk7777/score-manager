@@ -28,7 +28,7 @@ export default class ExamService {
         let lastScore = -1;
 
         datas.forEach((data, index) => {
-            if(data.score_sum === lastScore) {
+            if(data.scoreSum === lastScore) {
                 sameCount++;
             }  else {
                 sameCount = 0;
@@ -36,7 +36,7 @@ export default class ExamService {
 
             data.ranking = index + 1 - sameCount;
 
-            lastScore = data.score_sum;
+            lastScore = data.scoreSum;
         });
     }
 
