@@ -8,12 +8,12 @@ export default class TotalExamRepository {
     async save(totalExam) {
         const query = `INSERT INTO total_exams(round, common_round, score_rule, class_id
             , total_tester, average, standard_deviation, max_score, first_problem_score, 
-                second_problem_score, third_problem_score) VALUES(${totalExam.round}, 
-                ${totalExam.commonRound}, '${totalExam.scoreRule}', ${totalExam.classId}, 
-                ${totalExam.totalTester}, ${totalExam.average}, ${totalExam.standardDeviation}, ${totalExam.maxScore},
-                ${totalExam.problemScores[0]}, ${totalExam.problemScores[1]}, ${totalExam.problemScores[2]})`
+                second_problem_score, third_problem_score) VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                
 
-        const [result] = await asyncDB.execute(query);
+        const [result] = await asyncDB.execute(query, [totalExam.round, totalExam.commonRound, totalExam.scoreRule,
+            totalExam.classId, totalExam.totalTester, totalExam.average, totalExam.standardDeviation, totalExam.maxScore,
+            totalExam.problemScores[0], totalExam.problemScores[1], totalExam.problemScores[2]]);
 
         return result.warningStatus === 0;
     }
