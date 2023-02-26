@@ -19,23 +19,23 @@ export default class CourseService {
         return await this.#courseRepository.save(className);
     }
 
-    async getCourseName(classId) {
-        const course = await this.#courseRepository.findById(classId);
+    async getCourseName(courseId) {
+        const course = await this.#courseRepository.findById(courseId);
 
         return course.name;
     }
 
-    async deleteClass(classId) {
-        await this.deleteClassPrevDB(classId);
-        await this.#courseRepository.deleteById(classId);
+    async deleteClass(courseId) {
+        await this.deleteClassPrevDB(courseId);
+        await this.#courseRepository.deleteById(courseId);
     }
 
-    async deleteClassPrevDB(classId) {
+    async deleteClassPrevDB(courseId) {
         let success = false;
 
-        success = await this.#examRepository.deleteByClassId(classId);
-        success = await this.#studentRepository.deleteByCourseId(classId);
-        success = await this.#totalExamRepository.deleteByClassId(classId);
+        success = await this.#examRepository.deleteByClassId(courseId);
+        success = await this.#studentRepository.deleteByCourseId(courseId);
+        success = await this.#totalExamRepository.deleteByClassId(courseId);
 
         return success;
     }

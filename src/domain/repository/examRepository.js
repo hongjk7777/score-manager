@@ -34,8 +34,8 @@ export default class ExamRepository {
         return result.warningStatus === 0;
     }
 
-    async findByClassId(classId) {
-        const query = `SELECT * FROM exams WHERE class_id = ${classId}`;
+    async findByClassId(courseId) {
+        const query = `SELECT * FROM exams WHERE class_id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -72,8 +72,8 @@ export default class ExamRepository {
         return this.#convertToExams(rows);
     }
 
-    async findExamRoundCount(classId) {
-        const query = `SELECT MAX(round) as count FROM exams WHERE class_id = ${classId};`;
+    async findExamRoundCount(courseId) {
+        const query = `SELECT MAX(round) as count FROM exams WHERE class_id = ${courseId};`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -132,8 +132,8 @@ export default class ExamRepository {
         return exams;
     }
 
-    async deleteByClassId(classId) {
-        const query = `DELETE FROM exams WHERE class_id = ${classId}`;
+    async deleteByClassId(courseId) {
+        const query = `DELETE FROM exams WHERE class_id = ${courseId}`;
         
         const [result] = await asyncDB.execute(query);
 

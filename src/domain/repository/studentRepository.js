@@ -102,8 +102,8 @@ export default class StudentRepository {
         return new Student(student.name, student.phone_num, student.class_id, student.id);
     }
 
-    async deleteByCourseId(classId) {
-        const query = `DELETE FROM students WHERE class_id = ${classId}`;
+    async deleteByCourseId(courseId) {
+        const query = `DELETE FROM students WHERE class_id = ${courseId}`;
         
         const [result] = await asyncDB.execute(query);
 

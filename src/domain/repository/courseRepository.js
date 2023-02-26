@@ -25,8 +25,8 @@ export default class CourseRepository {
         return new Course(rows[0].id, rows[0].name);
     }
 
-    async findById(classId) {
-        const query = `SELECT * FROM classes WHERE id = ${classId}`;
+    async findById(courseId) {
+        const query = `SELECT * FROM classes WHERE id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -49,8 +49,8 @@ export default class CourseRepository {
         return rows;
     }
 
-    async deleteById(classId) {
-        const query = `DELETE FROM classes WHERE id = ${classId}`;
+    async deleteById(courseId) {
+        const query = `DELETE FROM classes WHERE id = ${courseId}`;
 
         const [results] = await asyncDB.execute(query);
 

@@ -11,8 +11,8 @@ export default class TotalExamService {
         return totalExam;
     }
 
-    async getProblemScores(round, classId) {
-        const totalExam = await this.getTotalExam(round, classId);
+    async getProblemScores(round, courseId) {
+        const totalExam = await this.getTotalExam(round, courseId);
 
         return totalExam.problemScores;
     }
@@ -35,8 +35,8 @@ export default class TotalExamService {
         return scoreRuleData;
     }
 
-    async getScoreRules(round, classId) {
-        const scoreRule = await this.#totalExamRepository.findScoreRule(round, classId);
+    async getScoreRules(round, courseId) {
+        const scoreRule = await this.#totalExamRepository.findScoreRule(round, courseId);
 
         return scoreRule.split(/\r\n|\r|\n/);
     }

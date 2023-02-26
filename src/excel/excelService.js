@@ -100,25 +100,25 @@ export default class ExcelService {
         return excel;
     }
 
-    async #saveRoundExams(excel, roundExams, classId) {
+    async #saveRoundExams(excel, roundExams, courseId) {
         const roundPromises = new Array();
 
         roundExams.forEach((roundExam, round) => {
-            roundPromises.push(this.#saveRoundExamInfo(excel, roundExam, round + 1, classId));
+            roundPromises.push(this.#saveRoundExamInfo(excel, roundExam, round + 1, courseId));
             roundPromises.push(this.#saveRoundExamData(roundExam)); 
         });
 
         await Promise.all(roundPromises);
     }
 
-    async #saveRoundExamInfo(excel, roundExam, round, classId) {
+    async #saveRoundExamInfo(excel, roundExam, round, courseId) {
         const commonRound = this.#getCommonRound(roundExam);
         const scoreRuleWorksheet = this.#worksheetService.findWorksheetByName(`테스트(${round})`, excel);
         const scoreRule = this.#worksheetService.getScoreRule(scoreRuleWorksheet);
         const problemScores = this.#getProblemScores(scoreRule);
         const examInfo = this.#calculateExamInfo(roundExam);
         
-        const totalExam = new TotalExam(round, commonRound, scoreRule, classId, examInfo.totalTester,
+        const totalExam = new TotalExam(round, commonRound, scoreRule, courseId, examInfo.totalTester,
                     examInfo.average, examInfo.standardDev, examInfo.maxScore, problemScores)
 
         await this.#totalExamRepository.save(totalExam);

@@ -40,7 +40,7 @@ export default class WorksheetService {
         return students;
     }
 
-    #getStudents(worksheet, classId) {
+    #getStudents(worksheet, courseId) {
         const students = new Array();
         const indexRow = this.#getIndexRow(worksheet);
         const nameCol = this.#getNameCol(indexRow);
@@ -52,7 +52,7 @@ export default class WorksheetService {
             const name = this.#getName(row, nameCol);
             const phoneNum = this.#getPhoneNum(row, phoneNumCol);
 
-            students.push(new Student(name, phoneNum, classId));
+            students.push(new Student(name, phoneNum, courseId));
         })
 
         return students;
@@ -198,7 +198,7 @@ export default class WorksheetService {
         return Math.max(oldCommonRound, newCommonRound);
     }
     
-    async #getExamScores(worksheet, col, classId) {
+    async #getExamScores(worksheet, col, courseId) {
         //한 행씩 아래로 내려가면서 이름 있는지 확인하고 -> 하나의 객체 만들어서 저장
         //끝나고 나서 합계 구하기
         const firstScoreCol = worksheet.getColumn(col);
@@ -211,7 +211,7 @@ export default class WorksheetService {
                 const scoreCells = this.#getScoreCells(worksheet, rowNum, col);
                 const scores = this.#cellService.getScores(scoreCells);
 
-                const student = await this.#findStudent(worksheet, rowNum, classId);
+                const student = await this.#findStudent(worksheet, rowNum, courseId);
                 const studentId = student.id;
 
                 examScores.push(new ExamScore(scores, studentId));

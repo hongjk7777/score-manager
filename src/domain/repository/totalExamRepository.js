@@ -18,8 +18,8 @@ export default class TotalExamRepository {
         return result.warningStatus === 0;
     }
 
-    async findByClassId(classId) {
-        const query = `SELECT * FROM total_exams WHERE class_id = ${classId}`;
+    async findByClassId(courseId) {
+        const query = `SELECT * FROM total_exams WHERE class_id = ${courseId}`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -68,8 +68,8 @@ export default class TotalExamRepository {
         return scoreRule.replaceAll('$', '');
     }
 
-    async findScoreRule(round, classId) {
-        const query = `SELECT score_rule FROM total_exams WHERE round = ${round} AND class_id = ${classId};`;
+    async findScoreRule(round, courseId) {
+        const query = `SELECT score_rule FROM total_exams WHERE round = ${round} AND class_id = ${courseId};`;
 
         const [rows] = await asyncDB.execute(query);
 
@@ -82,8 +82,8 @@ export default class TotalExamRepository {
         return scoreRule.replaceAll('$', '');
     }
  
-    async deleteByClassId(classId) {
-        const query = `DELETE FROM total_exams WHERE class_id = ${classId}`;
+    async deleteByClassId(courseId) {
+        const query = `DELETE FROM total_exams WHERE class_id = ${courseId}`;
 
         const [result] = await asyncDB.execute(query);
 
