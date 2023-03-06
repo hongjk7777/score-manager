@@ -65,7 +65,7 @@ export default class ExamService {
     #changeToScoreData(scoreSumData) {
         let scoreData = {};
 
-        scoreData['점수'] = scoreSumData['score_sum'];
+        scoreData['점수'] = scoreSumData['scoreSum'];
         scoreData['등수'] = scoreSumData['ranking'];
         scoreData['백분위'] = scoreSumData['distribution'];
         

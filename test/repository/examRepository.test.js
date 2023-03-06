@@ -81,7 +81,7 @@ describe('findAllScoreSum 테스트', () => {
     test('정상 테스트', async () => {
         const results = await examRepository.findAllScoreSum(testExam.commonRound);
 
-        expect(results[0].score_sum).toBe(testExam.scoreSum);
+        expect(results[0].scoreSum).toBe(testExam.scoreSum);
     })
 })
 

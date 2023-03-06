@@ -85,7 +85,7 @@ export default class ExamRepository {
     }
     
     async findAllScoreSum(commonRound) {
-        const query = `SELECT score_sum FROM exams WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;
+        const query = `SELECT score_sum as scoreSum FROM exams WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;
         
         const [rows] = await asyncDB.execute(query);
 
