@@ -96,16 +96,18 @@ export default class ExamRepository {
         return rows;
     }
 
-    async findCommonExamRanking(commonRound) {
+  async findCommonExamRanking(commonRound) {
+    const query = `SELECT first_score, second_score, third_score, score_sum, seoul_dept, 
         const query = `SELECT first_score, second_score, third_score, score_sum, seoul_dept, 
+    const query = `SELECT first_score, second_score, third_score, score_sum, seoul_dept, 
                         yonsei_dept, students.name AS student_name, phone_num, classes.name AS class_name
-                        FROM exams INNER JOIN students ON exams.student_id = students.id INNER JOIN classes 
+                        FROM (SELECT * FROM exams WHERE common_round = ${commonRound}) AS exams INNER JOIN students ON exams.student_id = students.id INNER JOIN classes 
                         ON students.class_id = classes.id WHERE common_round = ${commonRound} ORDER BY score_sum DESC`;
 
-        const [rows] = await asyncDB.execute(query);
+    const [rows] = await asyncDB.execute(query);
 
-        return this.#convertToExamDAOs(rows);
-    }
+    return this.#convertToExamDAOs(rows);
+  }
 
     async findByCommonRound(commonRound) {
         const query = `SELECT * FROM exams WHERE common_round = ${commonRound}`;
